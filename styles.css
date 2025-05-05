@@ -1,0 +1,180 @@
+:root {
+    --bg-color: #ffffff;
+    --text-color: #333333;
+    --primary-color: #2a9d8f;
+    --secondary-color: #d9786a;
+    --accent-color: #e8b923;
+    --nav-bg: #a8b5a2;
+}
+
+body.dark-mode {
+    --bg-color: #1a1a1a;
+    --text-color: #f5e6cc;
+    --nav-bg: #2c2c2c;
+}
+
+body {
+    margin: 0;
+    font-family: 'Open Sans', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    background: linear-gradient(rgba(168, 181, 162, 0.1), rgba(168, 181, 162, 0.1));
+}
+
+header {
+    background-color: var(--nav-bg);
+    padding: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.logo {
+    font-family: 'Lora', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+}
+
+nav a {
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+nav a:hover {
+    color: var(--primary-color);
+}
+
+#theme-toggle {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.hero {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: linear-gradient(rgba(249, 174, 97, 0.2), rgba(249, 174, 97, 0.2));
+}
+
+.hero h1 {
+    font-family: 'Lora', serif;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.cta-button {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.cta-button:hover {
+    background-color: var(--secondary-color);
+}
+
+.tools-preview {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+.tool-card {
+    background-color: var(--bg-color);
+    border: 1px solid var(--nav-bg);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.tool-section {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+.tool-input {
+    display: flex;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.tool-input input {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid var(--nav-bg);
+    border-radius: 5px;
+    flex: 1;
+}
+
+.tool-input button {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.tool-input button:hover {
+    background-color: var(--secondary-color);
+}
+
+#rhyme-results {
+    margin-top: 1rem;
+    font-size: 1.1rem;
+}
+
+footer {
+    text-align: center;
+    padding: 2rem;
+    background-color: var(--nav-bg);
+    margin-top: 2rem;
+}
+
+.ad-placeholder {
+    margin-top: 1rem;
+    font-style: italic;
+    color: var(--text-color);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #1a1a1a;
+        --text-color: #f5e6cc;
+        --nav-bg: #2c2c2c;
+    }
+}
+
+@media (max-width: 768px) {
+    nav ul {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .hero h1 {
+        font-size: 2rem;
+    }
+}
