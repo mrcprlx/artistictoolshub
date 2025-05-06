@@ -1,8 +1,8 @@
 :root {
-    --bg-color: #fef8f2;
-    /* Softer off-white for light mode */
+    --bg-color: #fffaf5;
+    /* Creamy base for cozy feel */
     --text-color: #1a1a1a;
-    /* Darker text for better contrast */
+    /* Dark text for contrast */
     --primary-color: #2a9d8f;
     /* Teal for buttons */
     --secondary-color: #d9786a;
@@ -10,16 +10,9 @@
     --accent-color: #e8b923;
     /* Mustard for highlights */
     --nav-bg: #a8b5a2;
-    /* Sage green for nav */
-}
-
-body.dark-mode {
-    --bg-color: #1a1a1a;
-    /* Deep charcoal for dark mode */
-    --text-color: #f5e6cc;
-    /* Soft cream for text */
-    --nav-bg: #2c2c2c;
-    /* Darker nav */
+    /* Sage green for nav/footer */
+    --hero-bg: #f9e9df;
+    /* Light terracotta for hero */
 }
 
 body {
@@ -28,9 +21,8 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     line-height: 1.6;
-    background: linear-gradient(rgba(168, 181, 162, 0.2), rgba(249, 174, 97, 0.2));
-    /* Stronger natural gradient */
-    transition: background-color 0.3s, color 0.3s;
+    background: linear-gradient(rgba(168, 181, 162, 0.3), rgba(249, 174, 97, 0.3));
+    /* Natural gradient */
 }
 
 header {
@@ -74,23 +66,23 @@ nav a:hover {
     color: var(--primary-color);
 }
 
-#theme-toggle {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-}
-
 .hero {
     text-align: center;
     padding: 4rem 2rem;
-    background: linear-gradient(rgba(249, 174, 97, 0.3), rgba(168, 181, 162, 0.3));
+    background-color: var(--hero-bg);
+    background: linear-gradient(rgba(249, 174, 97, 0.4), rgba(168, 181, 162, 0.4));
 }
 
 .hero h1 {
     font-family: 'Lora', serif;
     font-size: 2.5rem;
     margin-bottom: 1rem;
+    color: #2c2c2c;
+    /* Darker for readability */
+}
+
+.hero p {
+    color: #2c2c2c;
 }
 
 .cta-button {
@@ -112,6 +104,14 @@ nav a:hover {
     padding: 0 2rem;
 }
 
+.tools-preview h2 {
+    font-family: 'Lora', serif;
+    font-size: 2rem;
+    color: #2c2c2c;
+    /* Darker for readability */
+    text-align: center;
+}
+
 .tool-card {
     background-color: var(--bg-color);
     border: 1px solid var(--nav-bg);
@@ -119,6 +119,23 @@ nav a:hover {
     padding: 1.5rem;
     margin: 1rem 0;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.tool-card h3 {
+    color: #2c2c2c;
+}
+
+.tool-card p {
+    color: #2c2c2c;
+}
+
+.tool-card a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.tool-card a:hover {
+    color: var(--secondary-color);
 }
 
 .tool-section {
@@ -133,7 +150,8 @@ nav a:hover {
     margin: 1.5rem 0;
 }
 
-.tool-input input {
+.tool-input input,
+.tool-input select {
     padding: 0.5rem;
     font-size: 1rem;
     border: 1px solid var(--nav-bg);
@@ -156,9 +174,12 @@ nav a:hover {
     background-color: var(--secondary-color);
 }
 
-#rhyme-results {
+#rhyme-results,
+#syllable-results,
+#form-results {
     margin-top: 1rem;
     font-size: 1.1rem;
+    color: #2c2c2c;
 }
 
 footer {
@@ -171,15 +192,7 @@ footer {
 .ad-placeholder {
     margin-top: 1rem;
     font-style: italic;
-    color: var(--text-color);
-}
-
-@media (prefers-color-scheme: dark) {
-    :root:not(.light-mode) {
-        --bg-color: #1a1a1a !important;
-        --text-color: #f5e6cc !important;
-        --nav-bg: #2c2c2c !important;
-    }
+    color: #2c2c2c;
 }
 
 @media (max-width: 768px) {
