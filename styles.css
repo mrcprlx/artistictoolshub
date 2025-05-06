@@ -102,7 +102,8 @@ nav a:hover {
 .tools-preview,
 .about-content,
 .contact-form,
-.terms-content {
+.terms-content,
+.privacy-content {
     max-width: 1200px;
     margin: 2rem auto;
     padding: 0 2rem;
@@ -112,7 +113,8 @@ nav a:hover {
 .tools-preview h2,
 .about-content h2,
 .contact-form h2,
-.terms-content h2 {
+.terms-content h2,
+.privacy-content h2 {
     font-family: 'Lora', serif;
     font-size: 2rem;
     color: #2c2c2c;
@@ -122,17 +124,20 @@ nav a:hover {
 
 .intro p,
 .about-content p,
-.terms-content p {
+.terms-content p,
+.privacy-content p {
     color: #2c2c2c;
 }
 
-.terms-content ul {
+.terms-content ul,
+.privacy-content ul {
     color: #2c2c2c;
     margin: 1rem 0;
     padding-left: 2rem;
 }
 
-.terms-content li {
+.terms-content li,
+.privacy-content li {
     margin-bottom: 0.5rem;
 }
 
