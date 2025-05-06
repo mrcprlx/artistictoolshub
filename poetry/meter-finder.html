@@ -4,9 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Syllable Counter - Count syllables in words or phrases at Artistic Tools Hub.">
-    <meta name="keywords" content="syllable counter, poetry tool, syllable count">
-    <title>Syllable Counter - Artistic Tools Hub</title>
+    <meta name="description"
+        content="Word Meter Finder - Find words with specific stress patterns for poetry at Artistic Tools Hub.">
+    <meta name="keywords" content="meter finder, poetry tool, stress patterns">
+    <title>Word Meter Finder - Artistic Tools Hub</title>
     <link rel="stylesheet" href="../styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600&display=swap"
         rel="stylesheet">
@@ -33,13 +34,18 @@
     </header>
     <main>
         <section class="tool-section">
-            <h1>Syllable Counter</h1>
-            <p>Enter a word or phrase to count its syllables.</p>
+            <h1>Word Meter Finder</h1>
+            <p>Enter a stress pattern (e.g., iambic: unstressed-stressed) to find matching words.</p>
             <div class="tool-input">
-                <input type="text" id="syllable-input" placeholder="Enter a word or phrase (e.g., poetry)">
-                <button onclick="countSyllables()">Count Syllables</button>
+                <select id="meter-select">
+                    <option value="01">Iambic (unstressed-stressed)</option>
+                    <option value="10">Trochaic (stressed-unstressed)</option>
+                    <option value="001">Anapestic (unstressed-unstressed-stressed)</option>
+                    <option value="100">Dactylic (stressed-unstressed-unstressed)</option>
+                </select>
+                <button onclick="findMeterWords()">Find Words</button>
             </div>
-            <div id="syllable-results"></div>
+            <div id="meter-results"></div>
         </section>
     </main>
     <footer>
@@ -51,7 +57,7 @@
         </script>
     </footer>
     <script src="../scripts.js"></script>
-    <script src="syllable-counter.js"></script>
+    <script src="meter-finder.js"></script>
 </body>
 
 </html>

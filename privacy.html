@@ -1,54 +1,20 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Privacy Policy - How Artistic Tools Hub handles your data and uses third-party services.">
+    <meta name="description"
+        content="Privacy Policy - How Artistic Tools Hub handles your data and uses third-party services.">
     <meta name="keywords" content="privacy policy, artistic tools, data protection">
     <title>Privacy Policy - Artistic Tools Hub</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7078691985192067" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600&display=swap"
+        rel="stylesheet">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7078691985192067"
+        crossorigin="anonymous"></script>
 </head>
+
 <body>
     <header>
         <nav>
@@ -56,6 +22,9 @@
             <ul>
                 <li><a href="index.html">Home</a></li>
                 <li><a href="poetry/index.html">Poetry Tools</a></li>
+                <li><a href="music/index.html">Music Tools</a></li>
+                <li><a href="visual-arts/index.html">Visual Arts</a></li>
+                <li><a href="literature/index.html">Literature</a></li>
                 <li><a href="about.html">About</a></li>
                 <li><a href="contact.html">Contact</a></li>
                 <li><a href="terms.html">Terms</a></li>
@@ -70,12 +39,17 @@
         </section>
         <section class="privacy-content">
             <h2>1. Introduction</h2>
-            <p>Artistic Tools Hub (“we”, “us”, or “the Site”) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our website, artistictoolshub.com.</p>
+            <p>Artistic Tools Hub (“we”, “us”, or “the Site”) is committed to protecting your privacy. This Privacy
+                Policy explains how we collect, use, and safeguard your information when you use our website,
+                artistictoolshub.com.</p>
             <h2>2. Information We Collect</h2>
             <p>We collect the following information:</p>
             <ul>
-                <li><strong>Contact Form Data</strong>: When you submit our contact form, we collect your name, email address, and message via Formspree, a third-party service.</li>
-                <li><strong>Usage Data</strong>: Our third-party ad provider, Google AdSense, may collect anonymized data about your interactions with ads, such as clicks or impressions, using cookies or similar technologies.</li>
+                <li><strong>Contact Form Data</strong>: When you submit our contact form, we collect your name, email
+                    address, and message via Formspree, a third-party service.</li>
+                <li><strong>Usage Data</strong>: Our third-party ad provider, Google AdSense, may collect anonymized
+                    data about your interactions with ads, such as clicks or impressions, using cookies or similar
+                    technologies.</li>
             </ul>
             <h2>3. How We Use Your Information</h2>
             <p>We use your information to:</p>
@@ -87,8 +61,12 @@
             <h2>4. Third-Party Services</h2>
             <p>We use:</p>
             <ul>
-                <li><strong>Google AdSense</strong>: To serve ads. AdSense may use cookies to personalize ads based on your interests. Learn more at <a href="https://policies.google.com/technologies/ads">Google’s Ad Policies</a>.</li>
-                <li><strong>Formspree</strong>: To process contact form submissions. Formspree’s privacy practices are available at <a href="https://formspree.io/legal/privacy-policy">Formspree’s Privacy Policy</a>.</li>
+                <li><strong>Google AdSense</strong>: To serve ads. AdSense may use cookies to personalize ads based on
+                    your interests. Learn more at <a href="https://policies.google.com/technologies/ads">Google’s Ad
+                        Policies</a>.</li>
+                <li><strong>Formspree</strong>: To process contact form submissions. Formspree’s privacy practices are
+                    available at <a href="https://formspree.io/legal/privacy-policy">Formspree’s Privacy Policy</a>.
+                </li>
             </ul>
             <p>We are not responsible for the privacy practices of these third parties.</p>
             <h2>5. Cookies and Tracking</h2>
@@ -98,34 +76,34 @@
                 <li>Adjusting your browser settings to block cookies (note: this may affect site functionality).</li>
             </ul>
             <h2>6. Data Security</h2>
-            <p>We take reasonable measures to protect your data, but no online service is 100% secure. Contact form data is stored securely by Formspree, and we do not store it ourselves.</p>
+            <p>We take reasonable measures to protect your data, but no online service is 100% secure. Contact form data
+                is stored securely by Formspree, and we do not store it ourselves.</p>
             <h2>7. Your Rights</h2>
             <p>Depending on your location (e.g., EU, California), you may have rights to:</p>
             <ul>
                 <li>Access or delete your personal data.</li>
                 <li>Opt out of data processing for ads.</li>
             </ul>
-            <p>To exercise these rights, contact us via our <a href="contact.html">Contact page</a>. For AdSense data, use Google’s tools linked above.</p>
+            <p>To exercise these rights, contact us via our <a href="contact.html">Contact page</a>. For AdSense data,
+                use Google’s tools linked above.</p>
             <h2>8. Children’s Privacy</h2>
             <p>The Site is not intended for children under 13. We do not knowingly collect data from children.</p>
             <h2>9. Changes to This Policy</h2>
-            <p>We may update this Privacy Policy. Changes will be posted here, and your continued use of the Site constitutes acceptance.</p>
+            <p>We may update this Privacy Policy. Changes will be posted here, and your continued use of the Site
+                constitutes acceptance.</p>
             <h2>10. Contact Us</h2>
             <p>For privacy-related questions, use our <a href="contact.html">Contact page</a>.</p>
         </section>
     </main>
     <footer>
         <p>© 2025 Artistic Tools Hub. All rights reserved.</p>
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-7078691985192067"
-             data-ad-slot="1234567890"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7078691985192067"
+            data-ad-slot="1234567890" data-ad-format="auto" data-full-width-responsive="true"></ins>
         <script>
             (adsbygoogle = window.adsbygoogle || []).push({});
         </script>
     </footer>
     <script src="scripts.js"></script>
 </body>
+
 </html>
