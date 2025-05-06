@@ -1,0 +1,111 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Terms of Service - Rules for using Artistic Tools Hub’s website and tools.">
+    <meta name="keywords" content="terms of service, artistic tools, poetry tools">
+    <title>Terms of Service - Artistic Tools Hub</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7078691985192067" crossorigin="anonymous"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">Artistic Tools Hub</div>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="poetry/index.html">Poetry Tools</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="terms.html">Terms</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="hero">
+            <h1>Terms of Service</h1>
+            <p>Rules and guidelines for using Artistic Tools Hub’s website and tools.</p>
+        </section>
+        <section class="terms-content">
+            <h2>1. Acceptance of Terms</h2>
+            <p>By accessing or using Artistic Tools Hub (“the Site”), you agree to be bound by these Terms of Service (“Terms”). If you do not agree, please do not use the Site.</p>
+            <h2>2. Use of the Site</h2>
+            <p>You may use the Site for personal, non-commercial purposes. You agree not to:</p>
+            <ul>
+                <li>Use the Site for illegal activities.</li>
+                <li>Attempt to harm, disrupt, or gain unauthorized access to the Site.</li>
+                <li>Engage in actions that generate invalid ad clicks or impressions, such as clicking ads on your own site.</li>
+                <li>Submit content that violates intellectual property rights or is harmful.</li>
+            </ul>
+            <h2>3. Third-Party Services</h2>
+            <p>The Site uses third-party services, including Google AdSense for ads and Formspree for contact forms. These services are subject to their own terms and privacy policies. We are not responsible for their content or practices.</p>
+            <h2>4. Intellectual Property</h2>
+            <p>All content on the Site, including text, tools, and designs, is owned by Artistic Tools Hub or its licensors. You may not reproduce or distribute content without permission.</p>
+            <h2>5. Limitation of Liability</h2>
+            <p>The Site is provided “as is” without warranties. Artistic Tools Hub is not liable for any damages arising from your use of the Site, including data loss or service interruptions.</p>
+            <h2>6. Termination</h2>
+            <p>We may suspend or terminate your access to the Site at any time for violating these Terms or for any other reason.</p>
+            <h2>7. Changes to Terms</h2>
+            <p>We may update these Terms at any time. Changes will be posted on this page, and your continued use of the Site constitutes acceptance.</p>
+            <h2>8. Governing Law</h2>
+            <p>These Terms are governed by the laws of the United States. Any disputes will be resolved in U.S. courts.</p>
+            <h2>9. Contact Us</h2>
+            <p>For questions about these Terms, please use our <a href="contact.html">Contact page</a>.</p>
+        </section>
+    </main>
+    <footer>
+        <p>© 2025 Artistic Tools Hub. All rights reserved.</p>
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-7078691985192067"
+             data-ad-slot="1234567890"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </footer>
+    <script src="scripts.js"></script>
+</body>
+</html>

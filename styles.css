@@ -99,14 +99,20 @@ nav a:hover {
 }
 
 .intro,
-.tools-preview {
+.tools-preview,
+.about-content,
+.contact-form,
+.terms-content {
     max-width: 1200px;
     margin: 2rem auto;
     padding: 0 2rem;
 }
 
 .intro h2,
-.tools-preview h2 {
+.tools-preview h2,
+.about-content h2,
+.contact-form h2,
+.terms-content h2 {
     font-family: 'Lora', serif;
     font-size: 2rem;
     color: #2c2c2c;
@@ -114,8 +120,20 @@ nav a:hover {
     text-align: center;
 }
 
-.intro p {
+.intro p,
+.about-content p,
+.terms-content p {
     color: #2c2c2c;
+}
+
+.terms-content ul {
+    color: #2c2c2c;
+    margin: 1rem 0;
+    padding-left: 2rem;
+}
+
+.terms-content li {
+    margin-bottom: 0.5rem;
 }
 
 .tool-card {
@@ -164,7 +182,7 @@ nav a:hover {
     border-radius: 5px;
     flex: 1;
     background-color: var(--bg-color);
-    color: var(--text-color);
+    color: #2c2c2c;
 }
 
 .tool-input button {
@@ -186,6 +204,48 @@ nav a:hover {
     margin-top: 1rem;
     font-size: 1.1rem;
     color: #2c2c2c;
+}
+
+.contact-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.contact-form label {
+    font-weight: 600;
+    color: #2c2c2c;
+}
+
+.contact-form input,
+.contact-form textarea {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid var(--nav-bg);
+    border-radius: 5px;
+    background-color: var(--bg-color);
+    color: #2c2c2c;
+}
+
+.contact-form textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.contact-form button {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.contact-form button:hover {
+    background-color: var(--secondary-color);
 }
 
 footer {
