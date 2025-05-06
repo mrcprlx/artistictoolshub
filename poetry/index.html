@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="Poetic Form Generator - Generate templates for haikus, sonnets, and more at Artistic Tools Hub.">
-    <meta name="keywords" content="poetic form generator, poetry tool, haiku, sonnet">
-    <title>Poetic Form Generator - Artistic Tools Hub</title>
+        content="Artistic Tools Hub - Poetry tools for writers, including rhyme finder, syllable counter, and more.">
+    <meta name="keywords" content="poetry tools, rhyme finder, syllable counter, poetic forms">
+    <title>Poetry Tools - Artistic Tools Hub</title>
     <link rel="stylesheet" href="../styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600&display=swap"
         rel="stylesheet">
@@ -28,18 +28,29 @@
         </nav>
     </header>
     <main>
-        <section class="tool-section">
-            <h1>Poetic Form Generator</h1>
-            <p>Select a poetic form to generate a template.</p>
-            <div class="tool-input">
-                <select id="form-select">
-                    <option value="haiku">Haiku</option>
-                    <option value="sonnet">Sonnet (Shakespearean)</option>
-                    <option value="villanelle">Villanelle</option>
-                </select>
-                <button onclick="generateForm()">Generate Template</button>
+        <section class="hero">
+            <h1>Craft Poetry with Ease</h1>
+            <p>Explore our free tools for poets, from rhyme finders to syllable counters, designed to spark your
+                creativity.</p>
+            <a href="rhyme-finder.html" class="cta-button">Try Our Tools</a>
+        </section>
+        <section class="tools-preview">
+            <h2>Our Poetry Tools</h2>
+            <div class="tool-card">
+                <h3>Rhyme Finder</h3>
+                <p>Find perfect rhymes for any word to elevate your poems.</p>
+                <a href="rhyme-finder.html">Try Now</a>
             </div>
-            <div id="form-results"></div>
+            <div class="tool-card">
+                <h3>Syllable Counter</h3>
+                <p>Count syllables in words or phrases for precise poetic forms.</p>
+                <a href="syllable-counter.html">Try Now</a>
+            </div>
+            <div class="tool-card">
+                <h3>Poetic Form Generator</h3>
+                <p>Generate templates for haikus, sonnets, and more.</p>
+                <a href="form-generator.html">Try Now</a>
+            </div>
         </section>
     </main>
     <footer>
@@ -51,7 +62,6 @@
         </script>
     </footer>
     <script src="../scripts.js"></script>
-    <script src="form-generator.js"></script>
 </body>
 
 </html>

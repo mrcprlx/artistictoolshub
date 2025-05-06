@@ -98,18 +98,24 @@ nav a:hover {
     background-color: var(--secondary-color);
 }
 
+.intro,
 .tools-preview {
     max-width: 1200px;
     margin: 2rem auto;
     padding: 0 2rem;
 }
 
+.intro h2,
 .tools-preview h2 {
     font-family: 'Lora', serif;
     font-size: 2rem;
     color: #2c2c2c;
     /* Darker for readability */
     text-align: center;
+}
+
+.intro p {
+    color: #2c2c2c;
 }
 
 .tool-card {
@@ -189,10 +195,11 @@ footer {
     margin-top: 2rem;
 }
 
-.ad-placeholder {
+.adsbygoogle {
     margin-top: 1rem;
-    font-style: italic;
-    color: #2c2c2c;
+    border: 1px solid var(--nav-bg);
+    border-radius: 5px;
+    padding: 0.5rem;
 }
 
 @media (max-width: 768px) {
