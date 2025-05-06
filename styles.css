@@ -1,16 +1,25 @@
 :root {
-    --bg-color: #ffffff;
-    --text-color: #333333;
+    --bg-color: #fef8f2;
+    /* Softer off-white for light mode */
+    --text-color: #1a1a1a;
+    /* Darker text for better contrast */
     --primary-color: #2a9d8f;
+    /* Teal for buttons */
     --secondary-color: #d9786a;
+    /* Terracotta for hover */
     --accent-color: #e8b923;
+    /* Mustard for highlights */
     --nav-bg: #a8b5a2;
+    /* Sage green for nav */
 }
 
 body.dark-mode {
     --bg-color: #1a1a1a;
+    /* Deep charcoal for dark mode */
     --text-color: #f5e6cc;
+    /* Soft cream for text */
     --nav-bg: #2c2c2c;
+    /* Darker nav */
 }
 
 body {
@@ -19,7 +28,9 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     line-height: 1.6;
-    background: linear-gradient(rgba(168, 181, 162, 0.1), rgba(168, 181, 162, 0.1));
+    background: linear-gradient(rgba(168, 181, 162, 0.2), rgba(249, 174, 97, 0.2));
+    /* Stronger natural gradient */
+    transition: background-color 0.3s, color 0.3s;
 }
 
 header {
@@ -73,7 +84,7 @@ nav a:hover {
 .hero {
     text-align: center;
     padding: 4rem 2rem;
-    background: linear-gradient(rgba(249, 174, 97, 0.2), rgba(249, 174, 97, 0.2));
+    background: linear-gradient(rgba(249, 174, 97, 0.3), rgba(168, 181, 162, 0.3));
 }
 
 .hero h1 {
@@ -128,6 +139,8 @@ nav a:hover {
     border: 1px solid var(--nav-bg);
     border-radius: 5px;
     flex: 1;
+    background-color: var(--bg-color);
+    color: var(--text-color);
 }
 
 .tool-input button {
@@ -162,10 +175,10 @@ footer {
 }
 
 @media (prefers-color-scheme: dark) {
-    :root {
-        --bg-color: #1a1a1a;
-        --text-color: #f5e6cc;
-        --nav-bg: #2c2c2c;
+    :root:not(.light-mode) {
+        --bg-color: #1a1a1a !important;
+        --text-color: #f5e6cc !important;
+        --nav-bg: #2c2c2c !important;
     }
 }
 
@@ -174,6 +187,7 @@ footer {
         flex-direction: column;
         gap: 0.5rem;
     }
+
     .hero h1 {
         font-size: 2rem;
     }
