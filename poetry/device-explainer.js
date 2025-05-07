@@ -1,28 +1,125 @@
-async function explainDevice() {
-    const input = document.getElementById('device-input').value.toLowerCase();
+function explainDevice() {
+    const input = document.getElementById('device-input').value.toLowerCase().trim();
     const resultsDiv = document.getElementById('device-results');
-    resultsDiv.innerHTML = 'Searching...';
+    resultsDiv.innerHTML = '';
 
-    const devices = {
-        metaphor: {
-            definition: "A figure of speech comparing two unlike things without using like or as.",
-            example: "Her eyes were stars shining in the night."
-        },
-        alliteration: {
-            definition: "Repetition of initial consonant sounds in nearby words.",
-            example: "Peter Piper picked a peck of pickled peppers."
-        },
-        simile: {
-            definition: "A comparison using like or as.",
-            example: "Her smile was like sunshine on a cloudy day."
-        }
-        // Add more terms as needed
-    };
+    const devices = [
+        { term: "metaphor", definition: "A figure of speech that directly compares two unlike things without using 'like' or 'as'.", example: "Her eyes are stars shining in the night sky." },
+        { term: "simile", definition: "A comparison between two unlike things using 'like' or 'as'.", example: "His smile was as bright as the sun." },
+        { term: "alliteration", definition: "The repetition of initial consonant sounds in closely positioned words.", example: "Peter Piper picked a peck of pickled peppers." },
+        { term: "personification", definition: "Giving human traits to non-human entities.", example: "The wind whispered through the trees." },
+        { term: "assonance", definition: "The repetition of vowel sounds in nearby words.", example: "The rain in Spain stays mainly in the plain." },
+        { term: "consonance", definition: "The repetition of consonant sounds, typically at the end of words, within a line.", example: "Blank and think, their sounds echo in sync." },
+        { term: "onomatopoeia", definition: "A word that imitates the natural sound of a thing.", example: "The bees buzzed in the garden." },
+        { term: "hyperbole", definition: "An exaggerated statement not meant to be taken literally.", example: "I’m so hungry I could eat a horse." },
+        { term: "enjambment", definition: "The continuation of a sentence without a pause beyond the end of a line, couplet, or stanza.", example: "I think I shall never see / A poem lovely as a tree (Joyce Kilmer)." },
+        { term: "anaphora", definition: "The repetition of a word or phrase at the beginning of successive clauses or lines.", example: "I have a dream... I have a dream... (Martin Luther King Jr.)." },
+        { term: "imagery", definition: "Vivid descriptive language that appeals to the senses.", example: "The golden sun melted into the horizon, painting the sky in shades of crimson." },
+        { term: "oxymoron", definition: "A figure of speech in which contradictory terms are combined.", example: "Deafening silence filled the room." },
+        { term: "allusion", definition: "A reference to another work of literature, person, or event.", example: "He was a real Romeo with the ladies." },
+        { term: "symbolism", definition: "Using symbols to represent ideas or qualities.", example: "A dove often symbolizes peace." },
+        { term: "irony", definition: "A contrast between expectation and reality.", example: "A fire station burns down." },
+        { term: "metonymy", definition: "Substituting a word with another closely associated term.", example: "The crown issued a decree (referring to the king)." },
+        { term: "synecdoche", definition: "A part is used to represent the whole, or the whole for a part.", example: "All hands on deck (hands representing the sailors)." },
+        { term: "rhyme", definition: "The correspondence of sounds between words, typically at the end of lines.", example: "Cat and hat share a perfect rhyme." },
+        { term: "end rhyme", definition: "Rhyme occurring at the end of lines.", example: "The rose blooms red / Upon the bed." },
+        { term: "internal rhyme", definition: "Rhyme occurring within a single line of poetry.", example: "Once upon a midnight dreary, while I pondered, weak and weary (Edgar Allan Poe)." },
+        { term: "slant rhyme", definition: "A near rhyme where sounds are similar but not exact.", example: "Worm and storm are a slant rhyme." },
+        { term: "caesura", definition: "A pause or break within a line of poetry, often marked by punctuation.", example: "To be, or not to be—that is the question (Shakespeare)." },
+        { term: "anadiplosis", definition: "Repetition of the last word of one clause at the beginning of the next.", example: "Fear leads to anger; anger leads to hate (Yoda)." },
+        { term: "epistrophe", definition: "Repetition of a word or phrase at the end of successive clauses or lines.", example: "When I was a child, I spoke as a child, I understood as a child." },
+        { term: "chiasmus", definition: "A rhetorical structure where the second half of an expression reverses the first.", example: "Ask not what your country can do for you, but what you can do for your country (JFK)." },
+        { term: "antithesis", definition: "Juxtaposition of contrasting ideas in balanced phrases.", example: "It was the best of times, it was the worst of times (Dickens)." },
+        { term: "apostrophe", definition: "Addressing an absent or imaginary person or thing as if it were present.", example: "O Death, where is thy sting?" },
+        { term: "euphemism", definition: "A mild or indirect word substituted for a harsh or blunt one.", example: "He passed away instead of he died." },
+        { term: "litotes", definition: "Understatement by using double negatives to emphasize a positive.", example: "She’s not unkind (meaning she’s kind)." },
+        { term: "paradox", definition: "A statement that seems contradictory but reveals a truth.", example: "I must be cruel to be kind (Shakespeare)." },
+        { term: "pun", definition: "A play on words with multiple meanings or similar sounds.", example: "I’m reading a book on anti-gravity; it’s hard to put down." },
+        { term: "zeugma", definition: "A single word used in relation to two or more parts of a sentence with different meanings.", example: "She broke his car and his heart." },
+        { term: "allegory", definition: "A narrative with a hidden meaning, often moral or political.", example: "Animal Farm by George Orwell represents the Russian Revolution." },
+        { term: "euphony", definition: "Pleasing, harmonious sounds in a line of poetry.", example: "The lulling murmur of the stream." },
+        { term: "cacophony", definition: "Harsh, discordant sounds in a line of poetry.", example: "The crackling, snapping twigs broke the silence." },
+        { term: "meter", definition: "The rhythmic structure of a poem, based on stressed and unstressed syllables.", example: "Iambic pentameter: Shall I compare thee to a summer’s day?" },
+        { term: "iamb", definition: "A metrical foot with an unstressed syllable followed by a stressed syllable.", example: "The word 'begin' (be-GIN) is an iamb." },
+        { term: "trochee", definition: "A metrical foot with a stressed syllable followed by an unstressed syllable.", example: "The word 'happy' (HAP-py) is a trochee." },
+        { term: "anapest", definition: "A metrical foot with two unstressed syllables followed by a stressed syllable.", example: "The word 'interfere' (in-ter-FERE) is an anapest." },
+        { term: "dactyl", definition: "A metrical foot with a stressed syllable followed by two unstressed syllables.", example: "The word 'beautiful' (BEAU-ti-ful) is a dactyl." },
+        { term: "spondee", definition: "A metrical foot with two stressed syllables.", example: "The phrase 'heartbreak' (HEART-BREAK) is a spondee." },
+        { term: "pyrrhic", definition: "A metrical foot with two unstressed syllables.", example: "The phrase 'of the' (of the) is a pyrrhic." },
+        { term: "juxtaposition", definition: "Placing two elements side by side for contrast or comparison.", example: "The rich man’s feast beside the beggar’s crumbs." },
+        { term: "repetition", definition: "Repeating words or phrases for emphasis or rhythm.", example: "The woods are lovely, dark, and deep, / But I have promises to keep, / And miles to go before I sleep (Frost)." },
+        { term: "parallelism", definition: "Using similar grammatical structures to emphasize related ideas.", example: "I came, I saw, I conquered." },
+        { term: "climax", definition: "Arranging ideas in order of increasing importance for dramatic effect.", example: "I lost my pen, my book, my mind!" },
+        { term: "bathos", definition: "A sudden shift from the lofty to the trivial for humorous or anticlimactic effect.", example: "He died for love, honor, and a good Wi-Fi signal." },
+        { term: "synesthesia", definition: "Describing one sensory experience in terms of another.", example: "The scent of rain was a soft green whisper." },
+        { term: "pathetic fallacy", definition: "Attributing human emotions to nature, often to reflect the mood.", example: "The sky wept as the hero fell." },
+        { term: "ekphrasis", definition: "A vivid description of a visual work of art within a poem.", example: "Keats’ 'Ode on a Grecian Urn' describes scenes on an ancient urn." },
+        { term: "epiphany", definition: "A sudden realization or insight experienced by a character or speaker.", example: "In Frost’s 'The Road Not Taken,' the speaker realizes the impact of life’s choices." },
+        { term: "tone", definition: "The poet’s attitude toward the subject, conveyed through word choice and style.", example: "A sarcastic tone in Donne’s 'The Flea' mocks romantic persuasion." },
+        { term: "mood", definition: "The emotional atmosphere created by the poem for the reader.", example: "A melancholic mood in Poe’s 'The Raven' with its somber imagery." },
+        { term: "volta", definition: "The turn or shift in thought or argument in a poem, often in a sonnet.", example: "In Shakespeare’s Sonnet 18, the volta at line 9 shifts to the beloved’s eternal beauty." },
+        { term: "apocopation", definition: "The omission of the final sound or syllable of a word for poetic effect.", example: "Singin’ instead of singing in a folk poem." },
+        { term: "elision", definition: "The omission of a sound or syllable when speaking, often for meter.", example: "O’er instead of over in 'The Star-Spangled Banner'." },
+        { term: "syncope", definition: "The omission of a sound or syllable from the middle of a word.", example: "Ne’er instead of never in traditional poetry." },
+        { term: "aphaeresis", definition: "The omission of a sound or syllable from the beginning of a word.", example: "'Tis instead of it is in Shakespearean poetry." },
+        { term: "hypallage", definition: "A rhetorical device where adjectives are transferred to a different noun than expected.", example: "Her fearful spirit would bring laughter (the spirit isn’t fearful, she is)." },
+        { term: "periphrasis", definition: "Using more words than necessary to describe something, often for poetic effect.", example: "The liquid of life instead of water." },
+        { term: "anacoluthon", definition: "A sentence that changes structure mid-way, often for dramatic effect.", example: "I will have such revenges—what they are I know not (Shakespeare)." },
+        { term: "asyndeton", definition: "The omission of conjunctions between clauses for rhythm or emphasis.", example: "I came, I saw, I conquered (Julius Caesar)." },
+        { term: "polysyndeton", definition: "The deliberate use of multiple conjunctions for emphasis or rhythm.", example: "We have ships and men and arms and planes." },
+        { term: "epizeuxis", definition: "The immediate repetition of a word for emphasis.", example: "Never, never, never give up (Winston Churchill)." },
+        { term: "diacope", definition: "Repetition of a word with one or more words in between for emphasis.", example: "A horse, a horse, my kingdom for a horse! (Shakespeare)." },
+        { term: "antimeria", definition: "Using one part of speech as another, often a noun as a verb.", example: "I’ll google the answer (using 'Google' as a verb)." },
+        { term: "hendiadys", definition: "Expressing a single idea using two nouns joined by 'and' instead of an adjective and noun.", example: "Nice and warm instead of nicely warm." },
+        { term: "pleonasm", definition: "Using more words than necessary, often redundantly, for emphasis.", example: "I saw it with my own eyes." },
+        { term: "anastrophe", definition: "Inversion of the usual word order for emphasis or meter.", example: "Powerful you have become (Yoda)." },
+        { term: "ellipsis", definition: "The omission of words that are understood in context, often for rhythm.", example: "The more you learn... the better." },
+        { term: "parataxis", definition: "Placing clauses side by side without subordinating conjunctions.", example: "I woke, I dressed, I left." },
+        { term: "hypotaxis", definition: "Using subordination to show the relationship between clauses.", example: "Because I was tired, I slept early." },
+        { term: "amplification", definition: "Expanding on an idea by adding details for emphasis.", example: "Love, that fiery passion, that burning desire, consumes us all." },
+        { term: "catachresis", definition: "A strained or mixed metaphor, often for dramatic effect.", example: "I will speak daggers to her (Shakespeare)." },
+        { term: "conceit", definition: "An extended metaphor comparing two unlike things in a surprising way.", example: "In Donne’s 'The Flea,' a flea bite compares to a marriage bed." },
+        { term: "aubade", definition: "A poem about dawn or morning, often involving lovers parting.", example: "Donne’s 'The Sun Rising' is an aubade." },
+        { term: "elegy", definition: "A mournful poem, often lamenting the dead.", example: "Whitman’s 'O Captain! My Captain!' mourns Lincoln." },
+        { term: "pastoral", definition: "A poem idealizing rural life or shepherds.", example: "Marlowe’s 'The Passionate Shepherd to His Love'." },
+        { term: "palinode", definition: "A poem that retracts a previous statement or poem.", example: "Chaucer’s retraction at the end of 'The Canterbury Tales'." },
+        { term: "epithalamion", definition: "A poem written to celebrate a marriage.", example: "Spenser’s 'Epithalamion' celebrates his own wedding." },
+        { term: "prolepsis", definition: "Anticipating and addressing an objection before it’s raised.", example: "You might say I’m wrong, but hear me out." },
+        { term: "isocolon", definition: "A series of phrases or clauses with similar structure and length.", example: "Veni, vidi, vici (I came, I saw, I conquered)." },
+        { term: "tricolon", definition: "A series of three parallel elements for rhetorical effect.", example: "Life, liberty, and the pursuit of happiness." },
+        { term: "kenning", definition: "A compound expression used in place of a single noun, often in Old English poetry.", example: "Whale-road for the sea in 'Beowulf'." },
+        { term: "litany", definition: "A prayer-like poem with a series of invocations or repetitions.", example: "A litany for survival by Audre Lorde." },
+        { term: "amplificatio", definition: "Expanding a topic through repetition or elaboration for rhetorical effect.", example: "Her beauty, her grace, her charm—none could resist." },
+        { term: "aporia", definition: "Expressing doubt or uncertainty as a rhetorical device.", example: "To be or not to be—that is the question (Shakespeare)." },
+        { term: "circumlocution", definition: "Using many words to express something that could be said more directly.", example: "The person who extinguishes fires instead of firefighter." },
+        { term: "encomium", definition: "A poem or speech of high praise.", example: "A poem praising a victorious athlete in Pindar’s odes." },
+        { term: "invective", definition: "A poem or speech of harsh criticism or abuse.", example: "Swift’s 'A Modest Proposal' uses invective to critique society." },
+        { term: "meiosis", definition: "Understatement for ironic or rhetorical effect.", example: "It’s just a scratch (for a deep wound)." },
+        { term: "occultatio", definition: "Mentioning something by saying you won’t mention it.", example: "I won’t speak of his failures, his many defeats." },
+        { term: "paronomasia", definition: "A pun or play on words with similar sounds.", example: "Time flies when you’re having fun." },
+        { term: "syllepsis", definition: "A type of zeugma where a word is used differently in relation to multiple parts of a sentence.", example: "She lost her keys and her temper." },
+        { term: "topographia", definition: "A detailed description of a place, often idealized.", example: "Milton’s description of Eden in 'Paradise Lost'." },
+        { term: "amphibrach", definition: "A metrical foot with an unstressed, stressed, unstressed syllable pattern.", example: "The word 'together' (to-GETH-er) is an amphibrach." },
+        { term: "catalexis", definition: "The omission of an expected syllable at the end of a line for metrical effect.", example: "A truncated iambic line: 'To be or not to be' ends abruptly." },
+        { term: "acephalous", definition: "A line missing the first syllable expected in its meter.", example: "An iambic line starting with a stressed syllable: 'BE not afraid'." },
+        { term: "hypercatalexis", definition: "An extra syllable at the end of a line beyond the expected meter.", example: "An iambic line with an extra unstressed syllable: 'Shall I compare thee to a summer’s day-uh'." },
+        { term: "anacrusis", definition: "One or more extra syllables at the beginning of a line before the regular meter begins.", example: "In 'The Night Before Christmas,' 'Twas' is an anacrusis." },
+        { term: "antistrophe", definition: "The second section of an ode in classical Greek poetry, often paired with a strophe.", example: "Used in Pindar’s odes to balance the strophe’s movement." },
+        { term: "epode", definition: "The third section of a classical ode, following the strophe and antistrophe.", example: "The concluding part of Pindar’s odes, often more reflective." },
+        { term: "hemistich", definition: "Half of a poetic line, often divided by a caesura.", example: "In 'Beowulf,' lines are often split: 'Hrothgar’s heirloom // hall defended'." },
+        { term: "terza rima", definition: "A three-line stanza form with an interlocking rhyme scheme (ABA BCB CDC).", example: "Dante’s 'Divine Comedy' uses terza rima." },
+        { term: "refrain", definition: "A repeated line or group of lines at intervals in a poem.", example: "In Poe’s 'The Raven,' 'Nevermore' is a refrain." },
+        { term: "incremental repetition", definition: "Repeating a phrase with slight variations to advance the narrative.", example: "In ballads like 'Lord Randall,' questions repeat with new details." }
+    ];
 
-    if (devices[input]) {
-        const { definition, example } = devices[input];
-        resultsDiv.innerHTML = `<p><strong>${input.charAt(0).toUpperCase() + input.slice(1)}</strong>: ${definition}</p><p>Example: ${example}</p>`;
+    const device = devices.find(d => d.term === input);
+    if (device) {
+        resultsDiv.innerHTML = `
+            <h3>${device.term.charAt(0).toUpperCase() + device.term.slice(1)}</h3>
+            <p><strong>Definition:</strong> ${device.definition}</p>
+            <p><strong>Example:</strong> ${device.example}</p>
+        `;
     } else {
-        resultsDiv.innerHTML = '<p>Term not found. Try another term.</p>';
+        resultsDiv.innerHTML = `<p>Sorry, the term "${input}" was not found. Try another poetic device!</p>`;
     }
 }
