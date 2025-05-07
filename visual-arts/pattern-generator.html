@@ -19,6 +19,11 @@
             flex-wrap: wrap;
             gap: 10px;
         }
+
+        .ad-section {
+            margin: 20px 0;
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -45,6 +50,8 @@
         <section class="tool-section">
             <h1>Simple Pattern Generator</h1>
             <p>Create custom repeating patterns for use as backgrounds in your artwork.</p>
+            <p>Choose from 16 patterns like Honeycomb or Spirals, adjust size and spacing, and create unique backgrounds
+                for your artwork.</p>
             <div class="tool-input">
                 <select id="pattern-type" onchange="generatePattern()">
                     <option value="stripes">Stripes</option>
@@ -72,6 +79,13 @@
                     placeholder="Size (5-50)">
                 <input type="number" id="pattern-spacing" value="10" min="0" max="50" onchange="generatePattern()"
                     placeholder="Spacing (0-50)">
+            </div>
+            <div class="ad-section">
+                <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7078691985192067"
+                    data-ad-slot="1234567890" data-ad-format="auto" data-full-width-responsive="true"></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
             </div>
             <canvas id="pattern-canvas"></canvas>
         </section>
