@@ -13,15 +13,20 @@ async function findRhymes() {
         const rhymeGroups = await response.json();
 
         let matchingGroup = null;
+        // Check if the word exists in any group
         for (const group of rhymeGroups) {
             if (group.words.includes(inputWord)) {
                 matchingGroup = group;
                 break;
             }
-            const ending = inputWord.slice(-3); // Check last 3 letters for potential rhyme
-            if (group.ending === `-${ending}`) {
-                matchingGroup = group;
-                break;
+        }
+
+        // If not found, try matching by ending (last 2, 3, or 4 letters)
+        if (!matchingGroup) {
+            for (let len = 2; len <= 4; len++) {
+                const ending = inputWord.slice(-len);
+                matchingGroup = rhymeGroups.find(group => group.ending === `-${ending}`);
+                if (matchingGroup) break;
             }
         }
 
@@ -36,7 +41,7 @@ async function findRhymes() {
                 resultsDiv.innerHTML = '<p>No rhymes found for this word.</p>';
             }
         } else {
-            resultsDiv.innerHTML = '<p>No rhymes found. Try another word!</p>';
+            resultsDiv.innerHTML = `<p>No rhymes found for "${inputWord}". Try a different word, or it might not be in our rhyme database yet!</p>`;
         }
     } catch (error) {
         resultsDiv.innerHTML = '<p>Error fetching rhymes. Please try again.</p>';
