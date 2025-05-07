@@ -1,0 +1,17 @@
+[
+    {"key": "C", "mood": "Bright", "scale": "C Major", "notes": "C D E F G A B", "description": "A classic major scale, cheerful and uplifting."},
+    {"key": "C", "mood": "Melancholic", "scale": "A Minor (Aeolian)", "notes": "A B C D E F G", "description": "The natural minor scale, sad and reflective."},
+    {"key": "C", "mood": "Mysterious", "scale": "D Dorian", "notes": "D E F G A B C", "description": "A minor scale with a raised 6th, haunting and jazzy."},
+    {"key": "C", "mood": "Epic", "scale": "G Mixolydian", "notes": "G A B C D E F", "description": "A major scale with a flat 7th, bold and adventurous."},
+    {"key": "C", "mood": "Tense", "scale": "F# Locrian", "notes": "F# G A B C D E", "description": "A diminished scale, dark and unstable."},
+    {"key": "G", "mood": "Bright", "scale": "G Major", "notes": "G A B C D E F#", "description": "A warm major scale, happy and vibrant."},
+    {"key": "G", "mood": "Melancholic", "scale": "E Minor (Aeolian)", "notes": "E F# G A B C D", "description": "A natural minor, emotional and somber."},
+    {"key": "G", "mood": "Mysterious", "scale": "A Dorian", "notes": "A B C D E F# G", "description": "A minor scale with a raised 6th, intriguing and soulful."},
+    {"key": "G", "mood": "Epic", "scale": "D Mixolydian", "notes": "D E F# G A B C", "description": "A major scale with a flat 7th, heroic and driving."},
+    {"key": "G", "mood": "Tense", "scale": "C# Locrian", "notes": "C# D E F G A B", "description": "A diminished scale, eerie and unsettling."},
+    {"key": "D", "mood": "Bright", "scale": "D Major", "notes": "D E F# G A B C#", "description": "A lively major scale, sunny and optimistic."},
+    {"key": "D", "mood": "Melancholic", "scale": "B Minor (Aeolian)", "notes": "B C# D E F# G A", "description": "A natural minor, deep and sorrowful."},
+    {"key": "D", "mood": "Mysterious", "scale": "E Dorian", "notes": "E F# G A B C# D", "description": "A minor scale with a raised 6th, mystical and expressive."},
+    {"key": "D", "mood": "Epic", "scale": "A Mixolydian", "notes": "A B C# D E F# G", "description": "A major scale with a flat 7th, grand and spirited."},
+    {"key": "D", "mood": "Tense", "scale": "G# Locrian", "notes": "G# A B C D E F#", "description": "A diminished scale, tense and dramatic."}
+]

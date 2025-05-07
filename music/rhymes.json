@@ -1,0 +1,12 @@
+[
+    {"ending": "-ay", "words": ["day", "play", "say", "way", "stay", "pray", "gray", "lay", "may", "ray"]},
+    {"ending": "-ight", "words": ["light", "night", "fight", "right", "sight", "bright", "might", "tight", "flight", "height"]},
+    {"ending": "-ee", "words": ["see", "free", "tree", "bee", "flee", "key", "me", "sea", "tea", "wee"]},
+    {"ending": "-ore", "words": ["more", "core", "door", "floor", "score", "store", "before", "explore", "ignore", "roar"]},
+    {"ending": "-ain", "words": ["rain", "pain", "main", "chain", "train", "brain", "gain", "plain", "stain", "vain"]},
+    {"ending": "-ow", "words": ["now", "how", "cow", "bow", "vow", "wow", "allow", "plow", "brow", "sow"]},
+    {"ending": "-ice", "words": ["ice", "nice", "price", "dice", "slice", "vice", "advice", "device", "spice", "twice"]},
+    {"ending": "-end", "words": ["end", "friend", "send", "bend", "lend", "mend", "spend", "trend", "blend", "defend"]},
+    {"ending": "-ake", "words": ["make", "take", "cake", "fake", "lake", "shake", "wake", "brake", "flake", "stake"]},
+    {"ending": "-all", "words": ["call", "fall", "hall", "mall", "small", "tall", "wall", "ball", "stall", "crawl"]}
+]
