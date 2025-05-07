@@ -5,14 +5,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="Artistic Tools Hub - Free tools for artists, including poetry, music, and painting resources.">
-    <meta name="keywords" content="artistic tools, poetry tools, music tools, painting tools">
+        content="Artistic Tools Hub - Free tools for artists, including poetry, music, visual arts, and literature resources.">
+    <meta name="keywords" content="artistic tools, poetry tools, music tools, visual arts tools, literature tools">
     <title>Artistic Tools Hub - Creative Tools for Artists</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600&display=swap"
         rel="stylesheet">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7078691985192067"
         crossorigin="anonymous"></script>
+    <style>
+        .hero-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .cta-button {
+            background-color: #D77A61;
+            /* Terracotta */
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .cta-button:hover {
+            background-color: #A9BA9D;
+            /* Sage green */
+        }
+
+        @media (max-width: 600px) {
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .cta-button {
+                width: 100%;
+                max-width: 200px;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -37,15 +76,20 @@
     <main>
         <section class="hero">
             <h1>Welcome to Artistic Tools Hub</h1>
-            <p>Your one-stop platform for free creative tools. Explore our poetry tools today and stay tuned for music
-                and painting resources!</p>
-            <a href="poetry/index.html" class="cta-button">Discover Poetry Tools</a>
+            <p>Your one-stop platform for free creative tools. Explore resources for poetry, music, visual arts, and
+                literature to inspire your artistic journey!</p>
+            <div class="hero-buttons">
+                <a href="poetry/index.html" class="cta-button">Discover Poetry Tools</a>
+                <a href="music/index.html" class="cta-button">Discover Music Tools</a>
+                <a href="visual-arts/index.html" class="cta-button">Discover Visual Arts Tools</a>
+                <a href="literature/index.html" class="cta-button">Discover Literature Tools</a>
+            </div>
         </section>
         <section class="intro">
             <h2>Empowering Creativity</h2>
             <p>Artistic Tools Hub is dedicated to providing free, easy-to-use tools for artists of all kinds. Whether
-                you're crafting poems, composing music, or painting masterpieces, our platform will grow to support your
-                creative journey.</p>
+                you're crafting poems, composing music, painting masterpieces, or writing stories, our platform supports
+                your creative journey.</p>
         </section>
     </main>
     <footer>
