@@ -211,6 +211,7 @@ nav a:hover {
     padding: 0.5rem 1rem;
     border-radius: 5px;
     cursor: pointer;
+    flex: 0 0 auto;
 }
 
 .tool-input button:hover {
@@ -308,5 +309,19 @@ footer {
 
     .hero h1 {
         font-size: 2rem;
+    }
+
+    .tool-input {
+        flex-wrap: wrap;
+    }
+
+    .tool-input select {
+        flex: 1 1 100%;
+    }
+
+    .tool-input button {
+        flex: 1 1 100%;
+        max-width: 200px;
+        margin: 0 auto;
     }
 }
