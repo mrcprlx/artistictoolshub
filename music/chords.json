@@ -1,0 +1,12 @@
+[
+    {"progression": "I-IV-V-I", "example": "C-F-G-C", "description": "A classic pop progression, upbeat and familiar."},
+    {"progression": "ii-V-I", "example": "Dm-G-C", "description": "A jazzy progression, often used in standards."},
+    {"progression": "I-V-vi-IV", "example": "C-G-Am-F", "description": "A popular progression for emotional ballads."},
+    {"progression": "vi-IV-I-V", "example": "Am-F-C-G", "description": "A versatile progression for modern pop songs."},
+    {"progression": "I-iii-IV-V", "example": "C-Em-F-G", "description": "A bright progression with a hopeful feel."},
+    {"progression": "ii-IV-I-V", "example": "Dm-F-C-G", "description": "A smooth progression, great for intros."},
+    {"progression": "I-vi-IV-V", "example": "C-Am-F-G", "description": "A 50s doo-wop feel, nostalgic and sweet."},
+    {"progression": "I-IV-vi-V", "example": "C-F-Am-G", "description": "A dynamic progression for storytelling songs."},
+    {"progression": "iii-vi-ii-V", "example": "Em-Am-Dm-G", "description": "A melancholic progression, often used in jazz."},
+    {"progression": "I-V-iii-IV", "example": "C-G-Em-F", "description": "A reflective progression, good for acoustic tracks."}
+]

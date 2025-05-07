@@ -1,0 +1,7 @@
+[
+    {"mood": "Warm", "colors": ["#FF6F61", "#FF9F80", "#FFC107", "#FFD54F", "#FFECB3"], "description": "A palette of fiery reds and golden yellows, evoking warmth and energy."},
+    {"mood": "Cool", "colors": ["#4A90E2", "#50C8E8", "#A3DFFA", "#D6EFFF", "#EAF7FF"], "description": "A palette of soft blues, reminiscent of a calm ocean or winter sky."},
+    {"mood": "Vibrant", "colors": ["#FF4081", "#F50057", "#C51162", "#AA00FF", "#D81B60"], "description": "A bold palette of pinks and purples, full of life and energy."},
+    {"mood": "Earthy", "colors": ["#8D6E63", "#A1887F", "#BCAAA4", "#D7CCC8", "#EFEBE9"], "description": "A palette of muted browns and beiges, inspired by nature."},
+    {"mood": "Pastel", "colors": ["#F8BBD0", "#FFCDD2", "#E1BEE7", "#D1C4E9", "#C5CAE9"], "description": "A soft palette of pinks and purples, delicate and calming."}
+]
