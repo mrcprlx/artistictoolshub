@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Contrast Checker - Ensure color accessibility for your designs at Artistic Tools Hub.">
+    <meta name="keywords" content="contrast checker, accessibility tool, visual arts">
+    <title>Contrast Checker - Artistic Tools Hub</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600&display=swap"
+        rel="stylesheet">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7078691985192067"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="logo">Artistic Tools Hub</div>
+            <input type="checkbox" id="nav-toggle" class="nav-toggle">
+            <label for="nav-toggle" class="nav-toggle-label">☰</label>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../poetry/index.html">Poetry Tools</a></li>
+                <li><a href="../music/index.html">Music Tools</a></li>
+                <li><a href="index.html">Visual Arts</a></li>
+                <li><a href="../literature/index.html">Literature</a></li>
+                <li><a href="../about.html">About</a></li>
+                <li><a href="../contact.html">Contact</a></li>
+                <li><a href="../terms.html">Terms</a></li>
+                <li><a href="../privacy.html">Privacy</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="tool-section">
+            <h1>Contrast Checker</h1>
+            <p>Check the contrast ratio between two colors to ensure accessibility in your designs (WCAG AA and AAA).
+            </p>
+            <div class="tool-input">
+                <input type="color" id="color1" value="#A9BA9D">
+                <input type="color" id="color2" value="#D77A61">
+                <button onclick="checkContrast()">Check Contrast</button>
+            </div>
+            <div id="contrast-results"></div>
+        </section>
+    </main>
+    <footer>
+        <p>© 2025 Artistic Tools Hub. All rights reserved.</p>
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7078691985192067"
+            data-ad-slot="1234567890" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </footer>
+    <script src="../scripts.js"></script>
+    <script src="contrast-checker.js"></script>
+</body>
+
+</html>

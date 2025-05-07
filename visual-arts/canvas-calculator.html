@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Canvas Size Calculator - Calculate pixel dimensions for your artwork at Artistic Tools Hub.">
+    <meta name="keywords" content="canvas size calculator, pixel dimensions, visual arts">
+    <title>Canvas Size Calculator - Artistic Tools Hub</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600&display=swap"
+        rel="stylesheet">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7078691985192067"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="logo">Artistic Tools Hub</div>
+            <input type="checkbox" id="nav-toggle" class="nav-toggle">
+            <label for="nav-toggle" class="nav-toggle-label">☰</label>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../poetry/index.html">Poetry Tools</a></li>
+                <li><a href="../music/index.html">Music Tools</a></li>
+                <li><a href="index.html">Visual Arts</a></li>
+                <li><a href="../literature/index.html">Literature</a></li>
+                <li><a href="../about.html">About</a></li>
+                <li><a href="../contact.html">Contact</a></li>
+                <li><a href="../terms.html">Terms</a></li>
+                <li><a href="../privacy.html">Privacy</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="tool-section">
+            <h1>Canvas Size Calculator</h1>
+            <p>Calculate pixel dimensions for various canvas sizes at different DPIs.</p>
+            <div class="tool-input">
+                <select id="size-select">
+                    <option value="A4">A4</option>
+                    <option value="A3">A3</option>
+                    <option value="A2">A2</option>
+                    <option value="A1">A1</option>
+                    <option value="Instagram Post (Square)">Instagram Post (Square)</option>
+                    <option value="Instagram Story">Instagram Story</option>
+                    <option value="Instagram Post (Portrait)">Instagram Post (Portrait)</option>
+                    <option value="Instagram Post (Landscape)">Instagram Post (Landscape)</option>
+                    <option value="Twitter Post">Twitter Post</option>
+                    <option value="Twitter Header">Twitter Header</option>
+                    <option value="Facebook Post">Facebook Post</option>
+                    <option value="Facebook Cover">Facebook Cover</option>
+                    <option value="YouTube Thumbnail">YouTube Thumbnail</option>
+                    <option value="Standard Poster">Standard Poster</option>
+                    <option value="Small Poster">Small Poster</option>
+                    <option value="Business Card">Business Card</option>
+                    <option value="Letter">Letter</option>
+                    <option value="Digital Art (4K)">Digital Art (4K)</option>
+                    <option value="Digital Art (HD)">Digital Art (HD)</option>
+                    <option value="Comic Page">Comic Page</option>
+                </select>
+                <select id="dpi-input" onchange="calculateCanvasSize()">
+                    <option value="72">72 DPI (Screen)</option>
+                    <option value="150">150 DPI (Low Print)</option>
+                    <option value="300" selected>300 DPI (Standard Print)</option>
+                    <option value="600">600 DPI (High Quality Print)</option>
+                </select>
+                <button onclick="calculateCanvasSize()">Calculate</button>
+            </div>
+            <div id="canvas-results"></div>
+        </section>
+    </main>
+    <footer>
+        <p>© 2025 Artistic Tools Hub. All rights reserved.</p>
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7078691985192067"
+            data-ad-slot="1234567890" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </footer>
+    <script src="../scripts.js"></script>
+    <script src="canvas-calculator.js"></script>
+</body>
+
+</html>

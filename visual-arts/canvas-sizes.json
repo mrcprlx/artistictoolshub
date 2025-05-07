@@ -1,0 +1,22 @@
+[
+    {"size": "A4", "widthInches": 8.27, "heightInches": 11.69},
+    {"size": "A3", "widthInches": 11.69, "heightInches": 16.54},
+    {"size": "A2", "widthInches": 16.54, "heightInches": 23.39},
+    {"size": "A1", "widthInches": 23.39, "heightInches": 33.11},
+    {"size": "Instagram Post (Square)", "widthInches": 4, "heightInches": 4},
+    {"size": "Instagram Story", "widthInches": 4.5, "heightInches": 8},
+    {"size": "Instagram Post (Portrait)", "widthInches": 4, "heightInches": 5},
+    {"size": "Instagram Post (Landscape)", "widthInches": 5, "heightInches": 4},
+    {"size": "Twitter Post", "widthInches": 5, "heightInches": 3},
+    {"size": "Twitter Header", "widthInches": 15, "heightInches": 5},
+    {"size": "Facebook Post", "widthInches": 4.8, "heightInches": 4.8},
+    {"size": "Facebook Cover", "widthInches": 8.52, "heightInches": 3.15},
+    {"size": "YouTube Thumbnail", "widthInches": 12.8, "heightInches": 7.2},
+    {"size": "Standard Poster", "widthInches": 24, "heightInches": 36},
+    {"size": "Small Poster", "widthInches": 11, "heightInches": 17},
+    {"size": "Business Card", "widthInches": 3.5, "heightInches": 2},
+    {"size": "Letter", "widthInches": 8.5, "heightInches": 11},
+    {"size": "Digital Art (4K)", "widthInches": 13.33, "heightInches": 7.5},
+    {"size": "Digital Art (HD)", "widthInches": 6.4, "heightInches": 3.6},
+    {"size": "Comic Page", "widthInches": 6.875, "heightInches": 10.4375}
+]
