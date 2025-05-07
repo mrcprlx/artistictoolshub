@@ -1,54 +1,20 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Color Palette Generator - Generate color schemes for your art at Artistic Tools Hub.">
+    <meta name="description"
+        content="Color Palette Generator - Generate color schemes for your art at Artistic Tools Hub.">
     <meta name="keywords" content="color palette generator, visual arts tool, art inspiration">
     <title>Color Palette Generator - Artistic Tools Hub</title>
     <link rel="stylesheet" href="../styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7078691985192067" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600&display=swap"
+        rel="stylesheet">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7078691985192067"
+        crossorigin="anonymous"></script>
 </head>
+
 <body>
     <header>
         <nav>
@@ -79,6 +45,32 @@
                     <option value="Vibrant">Vibrant</option>
                     <option value="Earthy">Earthy</option>
                     <option value="Pastel">Pastel</option>
+                    <option value="Monochromatic Blue">Monochromatic Blue</option>
+                    <option value="Neon">Neon</option>
+                    <option value="Vintage">Vintage</option>
+                    <option value="Oceanic">Oceanic</option>
+                    <option value="Forest">Forest</option>
+                    <option value="Desert">Desert</option>
+                    <option value="Cosmic">Cosmic</option>
+                    <option value="Sunset">Sunset</option>
+                    <option value="Autumn">Autumn</option>
+                    <option value="Winter">Winter</option>
+                    <option value="Spring">Spring</option>
+                    <option value="Summer">Summer</option>
+                    <option value="Monochromatic Green">Monochromatic Green</option>
+                    <option value="Retro 80s">Retro 80s</option>
+                    <option value="Golden Hour">Golden Hour</option>
+                    <option value="Midnight">Midnight</option>
+                    <option value="Tropical">Tropical</option>
+                    <option value="Lavender Fields">Lavender Fields</option>
+                    <option value="Monochromatic Red">Monochromatic Red</option>
+                    <option value="Minimalist">Minimalist</option>
+                    <option value="Impressionist">Impressionist</option>
+                    <option value="Candy">Candy</option>
+                    <option value="Arctic">Arctic</option>
+                    <option value="Volcanic">Volcanic</option>
+                    <option value="Meadow">Meadow</option>
+                    <option value="Galactic">Galactic</option>
                 </select>
                 <button onclick="generatePalette()">Generate Palette</button>
             </div>
@@ -87,12 +79,8 @@
     </main>
     <footer>
         <p>© 2025 Artistic Tools Hub. All rights reserved.</p>
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-7078691985192067"
-             data-ad-slot="1234567890"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7078691985192067"
+            data-ad-slot="1234567890" data-ad-format="auto" data-full-width-responsive="true"></ins>
         <script>
             (adsbygoogle = window.adsbygoogle || []).push({});
         </script>
@@ -100,4 +88,5 @@
     <script src="../scripts.js"></script>
     <script src="palette-generator.js"></script>
 </body>
+
 </html>
