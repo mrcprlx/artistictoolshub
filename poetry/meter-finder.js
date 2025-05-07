@@ -5,9 +5,7 @@ async function findMeterWords() {
     resultsDiv.innerHTML = 'Searching...';
 
     try {
-        // Placeholder: Load CMU dictionary (not included here due to size)
-        // Simulated fetch from cmudict.txt or precomputed JSON
-        const response = await fetch('https://api.example.com/cmudict'); // Replace with actual source
+        const response = await fetch('cmudict.json');
         const words = await response.json();
         const matches = words.filter(word => word.stress === pattern).map(word => word.text);
 

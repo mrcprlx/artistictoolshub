@@ -47,6 +47,18 @@ nav {
     color: var(--text-color);
 }
 
+/* Hamburger menu styles */
+.nav-toggle {
+    display: none;
+}
+
+.nav-toggle-label {
+    display: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-color);
+}
+
 nav ul {
     list-style: none;
     display: flex;
@@ -273,9 +285,25 @@ footer {
 }
 
 @media (max-width: 768px) {
+    .nav-toggle-label {
+        display: block;
+    }
+
     nav ul {
+        display: none;
         flex-direction: column;
         gap: 0.5rem;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background-color: var(--nav-bg);
+        padding: 1rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-toggle:checked~ul {
+        display: flex;
     }
 
     .hero h1 {
