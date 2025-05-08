@@ -1,0 +1,26 @@
+[
+    {
+        "structure": "Three-Act Structure",
+        "stages": [
+            {"stage": "Act 1: Setup", "description": "Introduce the characters, setting, and main conflict."},
+            {"stage": "Act 2: Confrontation", "description": "The protagonist faces obstacles and the conflict escalates."},
+            {"stage": "Act 3: Resolution", "description": "The conflict is resolved, and the story concludes."}
+        ]
+    },
+    {
+        "structure": "Hero's Journey",
+        "stages": [
+            {"stage": "Call to Adventure", "description": "The hero is presented with a challenge or quest."},
+            {"stage": "Trials and Challenges", "description": "The hero faces tests and gains allies."},
+            {"stage": "Return with the Elixir", "description": "The hero returns home transformed with a reward."}
+        ]
+    },
+    {
+        "structure": "Freytag's Pyramid",
+        "stages": [
+            {"stage": "Exposition", "description": "The story begins with background information."},
+            {"stage": "Climax", "description": "The turning point of the story with maximum tension."},
+            {"stage": "Denouement", "description": "The story resolves and loose ends are tied up."}
+        ]
+    }
+]

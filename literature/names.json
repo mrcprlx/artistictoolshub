@@ -1,0 +1,28 @@
+{
+    "cultures": [
+        {
+            "culture": "English",
+            "firstNames": {
+                "male": ["James", "William", "Henry", "Edward", "Charles"],
+                "female": ["Elizabeth", "Margaret", "Charlotte", "Anne", "Victoria"]
+            },
+            "lastNames": ["Smith", "Brown", "Wilson", "Davis", "Clark"]
+        },
+        {
+            "culture": "Japanese",
+            "firstNames": {
+                "male": ["Hiroshi", "Takashi", "Kenji", "Satoshi", "Yuki"],
+                "female": ["Sakura", "Aiko", "Yumi", "Haruka", "Mika"]
+            },
+            "lastNames": ["Sato", "Suzuki", "Takahashi", "Tanaka", "Watanabe"]
+        },
+        {
+            "culture": "Medieval",
+            "firstNames": {
+                "male": ["Baldric", "Godric", "Leofric", "Oswin", "Wulfric"],
+                "female": ["Eadith", "Aethelflaed", "Beatrix", "Cwenburg", "Eldgyth"]
+            },
+            "lastNames": ["of York", "the Smith", "Longbow", "Ironhand", "Stone"]
+        }
+    ]
+}
