@@ -22,5 +22,46 @@
             {"stage": "Climax", "description": "The turning point of the story with maximum tension."},
             {"stage": "Denouement", "description": "The story resolves and loose ends are tied up."}
         ]
+    },
+    {
+        "structure": "Kishōtenketsu (East Asian)",
+        "stages": [
+            {"stage": "Ki: Introduction", "description": "Introduce the characters and setting."},
+            {"stage": "Shō: Development", "description": "Develop the situation with a focus on details."},
+            {"stage": "Ten: Twist", "description": "Introduce an unexpected twist or shift."},
+            {"stage": "Ketsu: Conclusion", "description": "Resolve the story, often reflecting on the twist."}
+        ]
+    },
+    {
+        "structure": "Save the Cat Beat Sheet",
+        "stages": [
+            {"stage": "Opening Image", "description": "Set the tone and introduce the protagonist."},
+            {"stage": "Catalyst", "description": "An event that disrupts the protagonist’s world."},
+            {"stage": "Finale", "description": "The protagonist overcomes challenges and transforms."}
+        ]
+    },
+    {
+        "structure": "In Medias Res",
+        "stages": [
+            {"stage": "Start in the Middle", "description": "Begin the story in the midst of action."},
+            {"stage": "Backstory Reveal", "description": "Gradually reveal the events leading up to the action."},
+            {"stage": "Resolution", "description": "Conclude with the consequences of the initial action."}
+        ]
+    },
+    {
+        "structure": "Seven-Point Story Structure",
+        "stages": [
+            {"stage": "Hook", "description": "Grab the reader’s attention with an intriguing start."},
+            {"stage": "Midpoint", "description": "A major revelation shifts the protagonist’s journey."},
+            {"stage": "Resolution", "description": "Tie up the story with a satisfying conclusion."}
+        ]
+    },
+    {
+        "structure": "Nonlinear Narrative",
+        "stages": [
+            {"stage": "Fragmented Start", "description": "Begin with disjointed events out of chronological order."},
+            {"stage": "Connecting Threads", "description": "Gradually reveal connections between events."},
+            {"stage": "Converging Resolution", "description": "Bring the threads together for a cohesive ending."}
+        ]
     }
 ]
