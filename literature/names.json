@@ -3,26 +3,82 @@
         {
             "culture": "English",
             "firstNames": {
-                "male": ["James", "William", "Henry", "Edward", "Charles"],
-                "female": ["Elizabeth", "Margaret", "Charlotte", "Anne", "Victoria"]
+                "male": ["James", "William", "Henry", "Edward", "Charles", "Thomas", "George", "Robert", "John", "Michael"],
+                "female": ["Elizabeth", "Margaret", "Charlotte", "Anne", "Victoria", "Emily", "Jane", "Mary", "Sarah", "Grace"]
             },
-            "lastNames": ["Smith", "Brown", "Wilson", "Davis", "Clark"]
+            "lastNames": ["Smith", "Brown", "Wilson", "Davis", "Clark", "Harris", "Lewis", "Walker", "Hall", "Allen"]
         },
         {
             "culture": "Japanese",
             "firstNames": {
-                "male": ["Hiroshi", "Takashi", "Kenji", "Satoshi", "Yuki"],
-                "female": ["Sakura", "Aiko", "Yumi", "Haruka", "Mika"]
+                "male": ["Hiroshi", "Takashi", "Kenji", "Satoshi", "Yuki", "Masato", "Riku", "Haruto", "Kaito", "Daichi"],
+                "female": ["Sakura", "Aiko", "Yumi", "Haruka", "Mika", "Rin", "Hana", "Miyu", "Sana", "Aoi"]
             },
-            "lastNames": ["Sato", "Suzuki", "Takahashi", "Tanaka", "Watanabe"]
+            "lastNames": ["Sato", "Suzuki", "Takahashi", "Tanaka", "Watanabe", "Ito", "Yamamoto", "Nakamura", "Kobayashi", "Kato"]
         },
         {
             "culture": "Medieval",
             "firstNames": {
-                "male": ["Baldric", "Godric", "Leofric", "Oswin", "Wulfric"],
-                "female": ["Eadith", "Aethelflaed", "Beatrix", "Cwenburg", "Eldgyth"]
+                "male": ["Baldric", "Godric", "Leofric", "Oswin", "Wulfric", "Aldric", "Eadric", "Hrothgar", "Sigurd", "Thorin"],
+                "female": ["Eadith", "Aethelflaed", "Beatrix", "Cwenburg", "Eldgyth", "Gunnora", "Matilda", "Rowena", "Sigrid", "Thyra"]
             },
-            "lastNames": ["of York", "the Smith", "Longbow", "Ironhand", "Stone"]
+            "lastNames": ["of York", "the Smith", "Longbow", "Ironhand", "Stone", "Blackthorn", "Ravenwood", "Whitestone", "Stormcloak", "Oakenshield"]
+        },
+        {
+            "culture": "Arabic",
+            "firstNames": {
+                "male": ["Ahmed", "Omar", "Yusuf", "Khalid", "Ibrahim", "Ali", "Hassan", "Malik", "Tariq", "Faisal"],
+                "female": ["Fatima", "Aisha", "Zahra", "Laila", "Nour", "Amira", "Sara", "Yasmin", "Hana", "Mariam"]
+            },
+            "lastNames": ["Al-Farsi", "Haddad", "Nasser", "Khoury", "Sabbagh", "Rahim", "Malik", "Hamid", "Aziz", "Saeed"]
+        },
+        {
+            "culture": "Norse",
+            "firstNames": {
+                "male": ["Bjorn", "Erik", "Leif", "Ragnar", "Thor", "Ivar", "Sigurd", "Gunnar", "Harald", "Knud"],
+                "female": ["Freya", "Sigrid", "Ingrid", "Thyra", "Gudrun", "Astrid", "Liv", "Ragnhild", "Solveig", "Eira"]
+            },
+            "lastNames": ["Ironside", "Bloodaxe", "Stormborn", "Frostbeard", "Skullsplitter", "Wolfcloak", "Raveneye", "Thunderstrike", "Iceborn", "Shieldbreaker"]
+        },
+        {
+            "culture": "Victorian",
+            "firstNames": {
+                "male": ["Albert", "Arthur", "Cecil", "Edmund", "Frederick", "Percival", "Reginald", "Sidney", "Walter", "Vincent"],
+                "female": ["Adelaide", "Clara", "Eleanor", "Florence", "Lillian", "Maud", "Priscilla", "Rosalind", "Sybil", "Violet"]
+            },
+            "lastNames": ["Ashford", "Blythe", "Cranston", "Davenport", "Ellwood", "Fairchild", "Grayson", "Harrington", "Kingsley", "Thornfield"]
+        },
+        {
+            "culture": "Indian",
+            "firstNames": {
+                "male": ["Arjun", "Rohan", "Vikram", "Aryan", "Dev", "Kiran", "Rahul", "Sanjay", "Nikhil", "Anil"],
+                "female": ["Priya", "Anjali", "Meera", "Shreya", "Divya", "Kavya", "Neha", "Riya", "Saanvi", "Aarushi"]
+            },
+            "lastNames": ["Sharma", "Patel", "Verma", "Singh", "Gupta", "Mehta", "Kapoor", "Rao", "Joshi", "Malhotra"]
+        },
+        {
+            "culture": "Futuristic",
+            "firstNames": {
+                "male": ["Zorak", "Kael", "Draven", "Nero", "Talis", "Vex", "Cyrus", "Jaxon", "Ryn", "Elias"],
+                "female": ["Nova", "Lyra", "Selene", "Astra", "Elara", "Zara", "Kynara", "Vera", "Sylis", "Luna"]
+            },
+            "lastNames": ["Starforge", "Neonstrike", "Voidwalker", "Skyborn", "Techspire", "Galax", "Circuit", "Nexus", "Etherion", "Stellaris"]
+        },
+        {
+            "culture": "Russian",
+            "firstNames": {
+                "male": ["Ivan", "Dmitri", "Alexei", "Nikolai", "Sergei", "Vladimir", "Mikhail", "Pavel", "Yuri", "Andrei"],
+                "female": ["Anastasia", "Svetlana", "Olga", "Irina", "Yelena", "Natalia", "Katerina", "Marina", "Sofia", "Tatiana"]
+            },
+            "lastNames": ["Ivanov", "Petrov", "Sokolov", "Morozov", "Volkov", "Popov", "Smirnov", "Kozlov", "Fedorov", "Romanov"]
+        },
+        {
+            "culture": "African",
+            "firstNames": {
+                "male": ["Kwame", "Ayo", "Chike", "Obi", "Tunde", "Juma", "Sefu", "Kofi", "Ade", "Musa"],
+                "female": ["Amina", "Zuri", "Nia", "Imani", "Fatou", "Adanna", "Sanaa", "Kemi", "Nala", "Deka"]
+            },
+            "lastNames": ["Diallo", "Mensah", "Okafor", "Kamau", "Ndiaye", "Adebayo", "Sow", "Bello", "Jalloh", "Traore"]
         }
     ]
 }
