@@ -761,6 +761,19 @@ let dictionaryLoaded = false;
 
 // Load cmudict.json with retries
 async function loadDictionary() {
+    // Check localStorage first
+    const cached = localStorage.getItem('cmudict');
+    if (cached) {
+        try {
+            dictionary = JSON.parse(cached);
+            dictionaryLoaded = true;
+            console.log(`Loaded cmudict.json from localStorage with ${dictionary.length} entries`);
+            return;
+        } catch (e) {
+            console.error('Failed to parse cached cmudict:', e);
+        }
+    }
+
     const maxRetries = 3;
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
@@ -772,24 +785,16 @@ async function loadDictionary() {
             dictionary = data;
             dictionaryLoaded = true;
             console.log(`Loaded cmudict.json with ${dictionary.length} entries (attempt ${attempt})`);
-            // Cache in localStorage
             localStorage.setItem('cmudict', JSON.stringify(data));
             return;
         } catch (error) {
             console.error(`Attempt ${attempt} failed:`, error);
             if (attempt === maxRetries) {
-                console.error('All attempts failed; checking localStorage');
-                const cached = localStorage.getItem('cmudict');
-                if (cached) {
-                    dictionary = JSON.parse(cached);
-                    dictionaryLoaded = true;
-                    console.log(`Loaded cmudict.json from localStorage with ${dictionary.length} entries`);
-                } else {
-                    dictionaryLoaded = false;
-                    console.error('No cached dictionary available; using regex fallback');
-                }
+                dictionaryLoaded = false;
+                console.error('All fetch attempts failed; using regex fallback');
+                document.getElementById('analyzer-results').innerHTML = '<p class="error">Error: Could not load syllable dictionary (possible CORS or file path issue). Using fallback syllable counting.</p>';
             }
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1s before retry
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
     }
 }
@@ -824,7 +829,7 @@ async function analyzePoem() {
             if (dictionaryLoaded) break;
         }
         if (!dictionaryLoaded) {
-            resultsDiv.innerHTML = '<p class="error">Error: Syllable dictionary not loaded. Using fallback syllable counting.</p>';
+            resultsDiv.innerHTML = '<p class="error">Error: Syllable dictionary not loaded (possible CORS or file path issue). Using fallback syllable counting.</p>';
             console.warn('Dictionary not loaded; using regex fallback');
         }
     }
@@ -1132,13 +1137,13 @@ function countSyllables(line) {
         if (!dictionaryLoaded || dictionary.length === 0) {
             console.log(`Word: ${word}, Dictionary not loaded, using regex`);
             let count = 0;
-            word = word.replace(/ia|io|ua|uo|ie|oi|ou|ai|ei|au/g, 'i-a');
+            const cleanWord = word.replace(/ia|io|ua|uo|ie|oi|ou|ai|ei|au/g, 'i-a');
             const vowels = /[aeiouy]+/g;
-            const matches = word.match(vowels);
+            const matches = cleanWord.match(vowels);
             if (matches) {
                 count = matches.length;
-                if (word.endsWith('e') && !word.endsWith('le') && !word.endsWith('re')) count--;
-                if (word.includes('tion') || word.includes('sion')) count--;
+                if (cleanWord.endsWith('e') && !cleanWord.endsWith('le') && !cleanWord.endsWith('re')) count--;
+                if (cleanWord.includes('tion') || cleanWord.includes('sion')) count--;
                 count = Math.max(1, count);
             } else {
                 count = 1;
@@ -1157,15 +1162,15 @@ function countSyllables(line) {
         } else {
             // Improved regex fallback
             let count = 0;
-            word = word.replace(/ia|io|ua|uo|ie|oi|ou|ai|ei|au/g, 'i-a');
+            const cleanWord = word.replace(/ia|io|ua|uo|ie|oi|ou|ai|ei|au/g, 'i-a');
             const vowels = /[aeiouy]+/g;
-            const matches = word.match(vowels);
+            const matches = cleanWord.match(vowels);
             if (matches) {
                 count = matches.length;
-                if (word.endsWith('e') && !word.endsWith('le') && !word.endsWith('re')) count--;
-                if (word.includes('tion') || word.includes('sion')) count--;
-                // Adjust for common two-syllable patterns
-                if (word.match(/^[aeiouy][^aeiouy]*[aeiouy]$/) || word.length > 5) count = Math.max(2, count);
+                if (cleanWord.endsWith('e') && !cleanWord.endsWith('le') && !cleanWord.endsWith('re')) count--;
+                if (cleanWord.includes('tion') || cleanWord.includes('sion')) count--;
+                // Prevent overcounting for long words
+                if (word.length > 6 && count > 2) count = 2; // e.g., whispering
                 count = Math.max(1, count);
             } else {
                 count = 1;
