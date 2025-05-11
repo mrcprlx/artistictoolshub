@@ -26,7 +26,7 @@ function explainDevice() {
         { term: "internal rhyme", definition: "Rhyme occurring within a single line of poetry.", example: "Once upon a midnight dreary, while I pondered, weak and weary (Edgar Allan Poe)." },
         { term: "slant rhyme", definition: "A near rhyme where sounds are similar but not exact.", example: "Worm and storm are a slant rhyme." },
         { term: "caesura", definition: "A pause or break within a line of poetry, often marked by punctuation.", example: "To be, or not to be—that is the question (Shakespeare)." },
-        { term: "anadiplosis", definition: "Repetition of the last word of one clause at the beginning of the next.", example: "Fear leads to anger; anger leads to hate (Yoda)." },
+        { term: "anadiplosis", definition: "Repetition of the last word of one clause at the beginning of the next.", example: "Love leads to joy; joy leads to peace." },
         { term: "epistrophe", definition: "Repetition of a word or phrase at the end of successive clauses or lines.", example: "When I was a child, I spoke as a child, I understood as a child." },
         { term: "chiasmus", definition: "A rhetorical structure where the second half of an expression reverses the first.", example: "Ask not what your country can do for you, but what you can do for your country (JFK)." },
         { term: "antithesis", definition: "Juxtaposition of contrasting ideas in balanced phrases.", example: "It was the best of times, it was the worst of times (Dickens)." },
