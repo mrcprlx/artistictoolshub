@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Share and explore creative works at Artistic Tools Hub.">
+    <title>Creations - Artistic Tools Hub</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600&display=swap"
+        rel="stylesheet">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7078691985192067"
+        crossorigin="anonymous"></script>
+    <!-- reCAPTCHA -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="logo">Artistic Tools Hub</div>
+            <input type="checkbox" id="nav-toggle" class="nav-toggle">
+            <label for="nav-toggle" class="nav-toggle-label">☰</label>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="poetry/index.html">Poetry Tools</a></li>
+                <li><a href="music/index.html">Music Tools</a></li>
+                <li><a href="visual-arts/index.html">Visual Arts</a></li>
+                <li><a href="literature/index.html">Literature</a></li>
+                <li><a href="creations.html">Creations</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="terms.html">Terms</a></li>
+                <li><a href="privacy.html">Privacy</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="hero">
+            <h1>Share Your Creations</h1>
+            <p>Showcase your art with our community!</p>
+            <a href="#" class="cta-button" id="submit-creation">Submit Your Creation</a>
+        </section>
+        <section class="submission-form" id="submission-form" style="display: none;">
+            <div class="form-container">
+                <h2>Submit Your Creation</h2>
+                <p>Guidelines: Max 500 words, 2MB PNG/JPG images, no explicit content. Social links may be reviewed for
+                    appropriateness.</p>
+                <form id="creation-form" action="/submit" method="POST" enctype="multipart/form-data">
+                    <label for="creation-text">Your Creation (max 500 words)</label>
+                    <textarea id="creation-text" name="text" maxlength="500" required></textarea>
+                    <label for="creation-image">Add Image (optional, 2MB max, PNG/JPG)</label>
+                    <input type="file" id="creation-image" name="image" accept="image/png,image/jpeg">
+                    <label for="creation-author">Name or Social Link (optional)</label>
+                    <input type="text" id="creation-author" name="author"
+                        placeholder="Enter name or social links, optional">
+                    <div class="g-recaptcha" data-sitekey="YOUR_RECAPTCHA_SITE_KEY"></div>
+                    <button type="submit" class="cta-button">Submit for Review</button>
+                </form>
+                <p id="form-message" style="display: none;">Submission Pending Review</p>
+            </div>
+        </section>
+        <section class="creations-list">
+            <div class="pagination-controls">
+                <label for="items-per-page">Show: </label>
+                <select id="items-per-page">
+                    <option value="10">10 per page</option>
+                    <option value="25">25 per page</option>
+                    <option value="50">50 per page</option>
+                </select>
+                <span>(higher counts may affect performance)</span>
+            </div>
+            <div class="creations-grid" id="creations-grid">
+                <!-- Dynamic cards added via JS -->
+            </div>
+            <div class="pagination-buttons">
+                <button class="cta-button" id="prev-page" disabled>Previous</button>
+                <button class="cta-button" id="next-page">Next</button>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>© 2025 Artistic Tools Hub. All rights reserved.</p>
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7078691985192067"
+            data-ad-slot="1234567890" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </footer>
+    <script src="creations.js"></script>
+</body>
+
+</html>

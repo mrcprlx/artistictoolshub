@@ -325,3 +325,179 @@ footer {
         margin: 0 auto;
     }
 }
+
+.submission-form {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+.form-container {
+    background-color: var(--bg-color);
+    border: 1px solid var(--nav-bg);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.submission-form h2 {
+    font-family: 'Lora', serif;
+    font-size: 2rem;
+    color: #2c2c2c;
+    text-align: center;
+}
+
+.submission-form p {
+    color: #2c2c2c;
+    margin-bottom: 1rem;
+}
+
+.submission-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.submission-form label {
+    font-weight: 600;
+    color: #2c2c2c;
+}
+
+.submission-form textarea,
+.submission-form input[type="text"],
+.submission-form input[type="file"] {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid var(--nav-bg);
+    border-radius: 5px;
+    background-color: var(--bg-color);
+    color: #2c2c2c;
+}
+
+.submission-form textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+
+.submission-form button {
+    align-self: flex-start;
+}
+
+.creations-list {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    justify-content: center;
+}
+
+.pagination-controls select {
+    padding: 0.5rem;
+    border: 1px solid var(--nav-bg);
+    border-radius: 5px;
+    background-color: var(--bg-color);
+    color: #2c2c2c;
+}
+
+.creations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.creation-card {
+    background-color: var(--bg-color);
+    border: 1px solid var(--nav-bg);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.creation-card h3 {
+    font-family: 'Lora', serif;
+    font-size: 1.5rem;
+    color: #2c2c2c;
+    margin: 0 0 0.5rem;
+}
+
+.creation-card p {
+    color: #2c2c2c;
+    margin: 0 0 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.creation-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+}
+
+.creation-card a.author-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.creation-card a.author-link:hover {
+    color: var(--secondary-color);
+}
+
+.share-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.share-buttons a,
+.share-buttons button {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+}
+
+.share-buttons a:hover,
+.share-buttons button:hover {
+    background-color: var(--secondary-color);
+}
+
+.pagination-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+    .submission-form {
+        padding: 0 1rem;
+    }
+
+    .creations-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pagination-controls {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .pagination-controls select {
+        width: 100%;
+        max-width: 200px;
+    }
+}
