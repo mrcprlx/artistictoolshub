@@ -11,7 +11,7 @@ exports.handler = async (event) => {
     const recaptchaVerify = await fetch('https://www.google.com/recaptcha/api/siteverify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `secret=6LcsqUArAAAAAO_6yjshCF0v5LWEDKCFxTBcxiCv&response=${recaptchaResponse}`,
+        body: `secret=6LcutUArAAAAAJN2SybU0lCjLmmr9Drzew6wmjbC&response=${recaptchaResponse}`,
     });
     const recaptchaData = await recaptchaVerify.json();
     if (!recaptchaData.success) {
