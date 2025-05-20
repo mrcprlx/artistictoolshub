@@ -74,10 +74,18 @@ document.getElementById('creation-form').addEventListener('submit', async (e) =>
             body: JSON.stringify({ text, image: imageUrl, author, 'g-recaptcha-response': recaptchaResponse }),
         });
         if (!response.ok) {
-            const errorData = await response.json();
+            let errorData;
+            try {
+                errorData = await response.json();
+            } catch (jsonError) {
+                const text = await response.text();
+                console.error('Non-JSON response:', text);
+                throw new Error('Server returned non-JSON response: ' + text.slice(0, 100));
+            }
             console.error('Netlify Function error:', errorData);
             throw new Error(errorData.message || 'Submission failed');
         }
+        const data = await response.json();
         document.getElementById('form-message').style.display = 'block';
         document.getElementById('creation-form').reset();
         setTimeout(() => {
