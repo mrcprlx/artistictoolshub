@@ -1,15 +1,15 @@
 {
-       "name": "artistictoolshub",
-       "version": "1.0.0",
-       "description": "Artistic Tools Hub - Free creative tools for artists",
-       "main": "index.js",
-       "scripts": {
-         "test": "echo \"Error: no test specified\" && exit 1"
-       },
-       "dependencies": {
-         "node-fetch": "^2.6.12"
-       },
-       "devDependencies": {},
-       "author": "Artistic Tools Hub",
-       "license": "ISC"
-     }
+  "name": "artistictoolshub",
+  "version": "1.0.0",
+  "description": "Artistic Tools Hub",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
