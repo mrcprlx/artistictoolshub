@@ -54,12 +54,14 @@ document.getElementById('creation-form').addEventListener('submit', async (e) =>
             });
             const imageData = await imageResponse.json();
             if (!imageData.secure_url) {
-                alert('Image upload failed.');
+                console.error('Cloudinary error:', imageData);
+                alert('Image upload failed: ' + (imageData.error?.message || 'Unknown error'));
                 return;
             }
             imageUrl = imageData.secure_url;
         } catch (error) {
-            alert('Image upload failed. Please try again.');
+            console.error('Cloudinary upload error:', error);
+            alert('Image upload failed: ' + error.message);
             return;
         }
     }
@@ -71,7 +73,11 @@ document.getElementById('creation-form').addEventListener('submit', async (e) =>
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text, image: imageUrl, author, 'g-recaptcha-response': recaptchaResponse }),
         });
-        if (!response.ok) throw new Error('Submission failed');
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Netlify Function error:', errorData);
+            throw new Error(errorData.message || 'Submission failed');
+        }
         document.getElementById('form-message').style.display = 'block';
         document.getElementById('creation-form').reset();
         setTimeout(() => {
@@ -81,7 +87,9 @@ document.getElementById('creation-form').addEventListener('submit', async (e) =>
         // Refresh creations
         fetchCreations();
     } catch (error) {
-        alert('Submission failed. Please try again.');
+        console.error('Submission error:', error);
+        alert('Submission failed: ' + error.message);
+        return;
     }
 });
 
