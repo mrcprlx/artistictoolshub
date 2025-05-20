@@ -87,12 +87,14 @@ async function submitForm(recaptchaResponse) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestBody),
         });
+        // Clone response to allow multiple reads
+        const responseClone = response.clone();
         let responseBody;
         try {
             responseBody = await response.json();
         } catch (jsonError) {
             console.error('Failed to parse JSON:', jsonError);
-            const rawText = await response.text();
+            const rawText = await responseClone.text();
             console.error('Raw response:', rawText.slice(0, 200));
             throw new Error(`Server error: ${response.status} ${response.statusText} - Non-JSON response`);
         }

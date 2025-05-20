@@ -1,2 +1,2 @@
-/.netlify/functions/* /.netlify/functions/:splat 200
+/.netlify/functions/* /.netlify/functions/:splat 200! Method=POST,GET,OPTIONS
 /* /index.html 200! Method=GET
