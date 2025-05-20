@@ -1,3 +1,4 @@
+// Force redeploy: Updated 2025-05-20
 const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
