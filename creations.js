@@ -123,10 +123,13 @@ function renderCreations() {
       <p>${creation.text}</p>
       ${creation.image ? `<img src="${creation.image}" alt="Creation image">` : ''}
       ${creation.author ? `<a href="${creation.author.startsWith('http') ? creation.author : '#'}" class="author-link">${creation.author}</a>` : ''}
-      <div class="share-buttons">
-        <a href="https://x.com/intent/tweet?text=Check%20out%20this%20creation%20on%20ArtisticToolsHub!&url=${encodeURIComponent(`https://artistictoolshub.com/creations?id=${creation.id}`)}" target="_blank">Share on X</a>
-        <a href="mailto:?subject=Check%20out%20this%20creation!&body=See%20this%20on%20ArtisticToolsHub:%20https://artistictoolshub.com/creations?id=${creation.id}" target="_blank">Email</a>
-        <button onclick="copyLink(${creation.id})">Copy Link</button>
+      <div class="share-container">
+        <button class="share-button">Share</button>
+        <div class="share-submenu">
+          <a href="https://x.com/intent/tweet?text=Check%20out%20this%20creation%20on%20ArtisticToolsHub!&url=${encodeURIComponent(`https://artistictoolshub.com/creations?id=${creation.id}`)}" target="_blank">Share on X</a>
+          <a href="mailto:?subject=Check%20out%20this%20creation!&body=See%20this%20on%20ArtisticToolsHub:%20https://artistictoolshub.com/creations?id=${creation.id}" target="_blank">Email</a>
+          <button onclick="copyLink(${creation.id})">Copy Link</button>
+        </div>
       </div>
     `;
         creationsGrid.appendChild(card);

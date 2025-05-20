@@ -45,7 +45,8 @@
             <div class="form-container">
                 <h2>Submit Your Creation</h2>
                 <p>Guidelines: Max 500 words, 2MB PNG/JPG images, no explicit content. Social links may be reviewed for
-                    appropriateness.</p>
+                    appropriateness. Latest 50 creations displayed; older ones archived but accessible via direct links
+                    for 2 years.</p>
                 <form id="creation-form" action="/submit" method="POST" enctype="multipart/form-data">
                     <label for="creation-text">Your Creation (max 500 words)</label>
                     <textarea id="creation-text" name="text" maxlength="500" required></textarea>
@@ -54,7 +55,7 @@
                     <label for="creation-author">Name or Social Link (optional)</label>
                     <input type="text" id="creation-author" name="author"
                         placeholder="Enter name or social links, optional">
-                    <div class="g-recaptcha" data-sitekey="YOUR_RECAPTCHA_SITE_KEY"></div>
+                    <div class="g-recaptcha" data-sitekey="6LcsqUArAAAAAHH1G1tFK6ufPjBvzdZcVnGFRejI"></div>
                     <button type="submit" class="cta-button">Submit for Review</button>
                 </form>
                 <p id="form-message" style="display: none;">Submission Pending Review</p>
