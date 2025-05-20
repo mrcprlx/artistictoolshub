@@ -6,11 +6,13 @@ exports.handler = async (event) => {
             method: event.httpMethod,
             path: event.path,
             body: event.body,
-            headers: event.headers
+            headers: event.headers,
+            queryStringParameters: event.queryStringParameters
         });
 
         // Handle CORS pre-flight OPTIONS request
         if (event.httpMethod === 'OPTIONS') {
+            console.log('Handling OPTIONS request');
             return {
                 statusCode: 200,
                 headers: {
@@ -26,6 +28,7 @@ exports.handler = async (event) => {
             console.error('Method not allowed:', event.httpMethod);
             return {
                 statusCode: 405,
+                headers: { 'Access-Control-Allow-Origin': '*' },
                 body: JSON.stringify({ message: 'Method Not Allowed' }),
             };
         }
@@ -37,6 +40,7 @@ exports.handler = async (event) => {
             console.error('JSON parse error:', error);
             return {
                 statusCode: 400,
+                headers: { 'Access-Control-Allow-Origin': '*' },
                 body: JSON.stringify({ message: 'Invalid request body' }),
             };
         }
@@ -47,6 +51,7 @@ exports.handler = async (event) => {
             console.error('Missing fields:', { text, recaptchaResponse });
             return {
                 statusCode: 400,
+                headers: { 'Access-Control-Allow-Origin': '*' },
                 body: JSON.stringify({ message: 'Missing required fields' }),
             };
         }
@@ -57,6 +62,7 @@ exports.handler = async (event) => {
             console.error('reCAPTCHA Secret Key not configured');
             return {
                 statusCode: 500,
+                headers: { 'Access-Control-Allow-Origin': '*' },
                 body: JSON.stringify({ message: 'Server configuration error' }),
             };
         }
@@ -71,6 +77,7 @@ exports.handler = async (event) => {
             console.error('reCAPTCHA verification failed:', recaptchaData);
             return {
                 statusCode: 400,
+                headers: { 'Access-Control-Allow-Origin': '*' },
                 body: JSON.stringify({ message: 'reCAPTCHA verification failed' }),
             };
         }
@@ -91,15 +98,14 @@ ${text}
 
         return {
             statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-            },
+            headers: { 'Access-Control-Allow-Origin': '*' },
             body: JSON.stringify({ message: 'Submission received' }),
         };
     } catch (error) {
         console.error('Function error:', error);
         return {
             statusCode: 500,
+            headers: { 'Access-Control-Allow-Origin': '*' },
             body: JSON.stringify({ message: 'Server error: ' + error.message }),
         };
     }
