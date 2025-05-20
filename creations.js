@@ -73,19 +73,17 @@ document.getElementById('creation-form').addEventListener('submit', async (e) =>
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text, image: imageUrl, author, 'g-recaptcha-response': recaptchaResponse }),
         });
-        if (!response.ok) {
-            let errorData;
-            try {
-                errorData = await response.json();
-            } catch (jsonError) {
-                const text = await response.text();
-                console.error('Non-JSON response:', text);
-                throw new Error('Server returned non-JSON response: ' + text.slice(0, 100));
-            }
-            console.error('Netlify Function error:', errorData);
-            throw new Error(errorData.message || 'Submission failed');
+        let responseBody;
+        try {
+            responseBody = await response.json();
+        } catch (jsonError) {
+            console.error('Failed to parse JSON:', jsonError);
+            throw new Error(`Server error: ${response.status} ${response.statusText}`);
         }
-        const data = await response.json();
+        if (!response.ok) {
+            console.error('Netlify Function error:', responseBody);
+            throw new Error(responseBody.message || `Submission failed: ${response.status}`);
+        }
         document.getElementById('form-message').style.display = 'block';
         document.getElementById('creation-form').reset();
         setTimeout(() => {
