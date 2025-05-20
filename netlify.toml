@@ -4,13 +4,6 @@
   functions = "netlify/functions"
 
 [[redirects]]
-  from = "/.netlify/functions/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-  force = true
-  conditions = { Method = ["POST", "GET", "OPTIONS"] }
-
-[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
