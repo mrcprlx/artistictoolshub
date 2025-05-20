@@ -15,18 +15,21 @@ document.getElementById('submit-creation').addEventListener('click', (e) => {
     formSection.scrollIntoView({ behavior: 'smooth' });
 });
 
-// Form submission
-document.getElementById('creation-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
+// Form submission with reCAPTCHA v2 Invisible
+function onSubmit(token) {
+    submitForm(token);
+}
+
+async function submitForm(recaptchaResponse) {
     const text = document.getElementById('creation-text').value;
     const image = document.getElementById('creation-image').files[0];
     const author = document.getElementById('creation-author').value;
-    const recaptchaResponse = document.querySelector('.g-recaptcha-response').value;
 
     // Validate text (500 words)
     const wordCount = text.trim().split(/\s+/).length;
     if (wordCount > 500) {
         alert('Text exceeds 500 words.');
+        grecaptcha.reset();
         return;
     }
 
@@ -36,10 +39,12 @@ document.getElementById('creation-form').addEventListener('submit', async (e) =>
         const maxSize = 2 * 1024 * 1024; // 2MB
         if (image.size > maxSize) {
             alert('Image exceeds 2MB.');
+            grecaptcha.reset();
             return;
         }
         if (!['image/png', 'image/jpeg'].includes(image.type)) {
             alert('Only PNG or JPG images allowed.');
+            grecaptcha.reset();
             return;
         }
 
@@ -56,12 +61,14 @@ document.getElementById('creation-form').addEventListener('submit', async (e) =>
             if (!imageData.secure_url) {
                 console.error('Cloudinary error:', imageData);
                 alert('Image upload failed: ' + (imageData.error?.message || 'Unknown error'));
+                grecaptcha.reset();
                 return;
             }
             imageUrl = imageData.secure_url;
         } catch (error) {
             console.error('Cloudinary upload error:', error);
             alert('Image upload failed: ' + error.message);
+            grecaptcha.reset();
             return;
         }
     }
@@ -95,8 +102,15 @@ document.getElementById('creation-form').addEventListener('submit', async (e) =>
     } catch (error) {
         console.error('Submission error:', error);
         alert('Submission failed: ' + error.message);
+        grecaptcha.reset();
         return;
     }
+}
+
+// Prevent default form submission
+document.getElementById('creation-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    grecaptcha.execute();
 });
 
 // Fetch creations from Netlify CMS

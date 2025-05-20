@@ -55,8 +55,9 @@
                     <label for="creation-author">Name or Social Link (optional)</label>
                     <input type="text" id="creation-author" name="author"
                         placeholder="Enter name or social links, optional">
-                    <div class="g-recaptcha" data-sitekey="6LcutUArAAAAACGLWQEY0JpxX758DhjP6dx3Shld"></div>
-                    <button type="submit" class="cta-button">Submit for Review</button>
+                    <button type="submit" class="cta-button g-recaptcha"
+                        data-sitekey="6LcutUArAAAAACGLWQEY0JpxX758DhjP6dx3Shld" data-callback="onSubmit">Submit for
+                        Review</button>
                 </form>
                 <p id="form-message" style="display: none;">Submission Pending Review</p>
             </div>

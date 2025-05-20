@@ -2,6 +2,7 @@ const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
     try {
+        console.log('Received request:', { method: event.httpMethod, body: event.body });
         if (event.httpMethod !== 'POST') {
             return {
                 statusCode: 405,
