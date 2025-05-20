@@ -2,17 +2,17 @@ const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
     try {
-        console.log('Function invoked:', {
+        console.log('Function invoked: submit-creation', {
             method: event.httpMethod,
             path: event.path,
-            body: event.body,
+            body: event.body ? event.body.slice(0, 200) : 'No body',
             headers: event.headers,
             queryStringParameters: event.queryStringParameters
         });
 
         // Handle CORS pre-flight OPTIONS request
         if (event.httpMethod === 'OPTIONS') {
-            console.log('Handling OPTIONS request');
+            console.log('Handling OPTIONS request for submit-creation');
             return {
                 statusCode: 200,
                 headers: {
@@ -25,7 +25,7 @@ exports.handler = async (event) => {
         }
 
         if (event.httpMethod !== 'POST') {
-            console.error('Method not allowed:', event.httpMethod);
+            console.error('Method not allowed in submit-creation:', event.httpMethod);
             return {
                 statusCode: 405,
                 headers: { 'Access-Control-Allow-Origin': '*' },
@@ -37,7 +37,7 @@ exports.handler = async (event) => {
         try {
             body = JSON.parse(event.body);
         } catch (error) {
-            console.error('JSON parse error:', error);
+            console.error('JSON parse error in submit-creation:', error);
             return {
                 statusCode: 400,
                 headers: { 'Access-Control-Allow-Origin': '*' },
@@ -48,7 +48,7 @@ exports.handler = async (event) => {
         const { text, image, author, 'g-recaptcha-response': recaptchaResponse } = body;
 
         if (!text || !recaptchaResponse) {
-            console.error('Missing fields:', { text, recaptchaResponse });
+            console.error('Missing fields in submit-creation:', { text, recaptchaResponse });
             return {
                 statusCode: 400,
                 headers: { 'Access-Control-Allow-Origin': '*' },
@@ -59,7 +59,7 @@ exports.handler = async (event) => {
         // Validate reCAPTCHA
         const secretKey = process.env.RECAPTCHA_SECRET_KEY;
         if (!secretKey) {
-            console.error('reCAPTCHA Secret Key not configured');
+            console.error('reCAPTCHA Secret Key not configured in submit-creation');
             return {
                 statusCode: 500,
                 headers: { 'Access-Control-Allow-Origin': '*' },
@@ -74,7 +74,7 @@ exports.handler = async (event) => {
 
         const recaptchaData = await recaptchaVerify.json();
         if (!recaptchaData.success) {
-            console.error('reCAPTCHA verification failed:', recaptchaData);
+            console.error('reCAPTCHA verification failed in submit-creation:', recaptchaData);
             return {
                 statusCode: 400,
                 headers: { 'Access-Control-Allow-Origin': '*' },
@@ -102,7 +102,7 @@ ${text}
             body: JSON.stringify({ message: 'Submission received' }),
         };
     } catch (error) {
-        console.error('Function error:', error);
+        console.error('Function error in submit-creation:', error);
         return {
             statusCode: 500,
             headers: { 'Access-Control-Allow-Origin': '*' },
