@@ -16,9 +16,9 @@ document.getElementById('submit-creation').addEventListener('click', (e) => {
 });
 
 // Form submission with reCAPTCHA v2 Invisible
-function onSubmit(token) {
+window.onSubmit = function (token) {
     submitForm(token);
-}
+};
 
 async function submitForm(recaptchaResponse) {
     const text = document.getElementById('creation-text').value;
@@ -110,6 +110,7 @@ async function submitForm(recaptchaResponse) {
 // Prevent default form submission
 document.getElementById('creation-form').addEventListener('submit', (e) => {
     e.preventDefault();
+    console.log('Form submitted, executing reCAPTCHA');
     grecaptcha.execute();
 });
 

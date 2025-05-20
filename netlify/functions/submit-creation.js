@@ -2,7 +2,21 @@ const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
     try {
-        console.log('Received request:', { method: event.httpMethod, body: event.body });
+        console.log('Received request:', { method: event.httpMethod, body: event.body, headers: event.headers });
+
+        // Handle CORS pre-flight OPTIONS request
+        if (event.httpMethod === 'OPTIONS') {
+            return {
+                statusCode: 200,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type',
+                },
+                body: '',
+            };
+        }
+
         if (event.httpMethod !== 'POST') {
             return {
                 statusCode: 405,
@@ -70,6 +84,9 @@ ${text}
 
         return {
             statusCode: 200,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+            },
             body: JSON.stringify({ message: 'Submission received' }),
         };
     } catch (error) {
