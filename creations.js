@@ -92,7 +92,9 @@ async function submitForm(recaptchaResponse) {
             responseBody = await response.json();
         } catch (jsonError) {
             console.error('Failed to parse JSON:', jsonError);
-            throw new Error(`Server error: ${response.status} ${response.statusText}`);
+            const rawText = await response.text();
+            console.error('Raw response:', rawText.slice(0, 200));
+            throw new Error(`Server error: ${response.status} ${response.statusText} - Non-JSON response`);
         }
         if (!response.ok) {
             console.error('Netlify Function error:', responseBody);
