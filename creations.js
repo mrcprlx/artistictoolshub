@@ -17,6 +17,7 @@ document.getElementById('submit-creation').addEventListener('click', (e) => {
 
 // Form submission with reCAPTCHA v2 Invisible
 window.onSubmit = function (token) {
+    console.log('reCAPTCHA token received:', token);
     submitForm(token);
 };
 
@@ -75,10 +76,16 @@ async function submitForm(recaptchaResponse) {
 
     // Submit to Netlify CMS
     try {
+        const requestBody = { text, image: imageUrl, author, 'g-recaptcha-response': recaptchaResponse };
+        console.log('Sending request to Netlify Function:', {
+            url: '/.netlify/functions/submit-creation',
+            method: 'POST',
+            body: requestBody
+        });
         const response = await fetch('/.netlify/functions/submit-creation', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text, image: imageUrl, author, 'g-recaptcha-response': recaptchaResponse }),
+            body: JSON.stringify(requestBody),
         });
         let responseBody;
         try {

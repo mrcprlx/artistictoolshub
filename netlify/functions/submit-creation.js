@@ -2,7 +2,12 @@ const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
     try {
-        console.log('Received request:', { method: event.httpMethod, body: event.body, headers: event.headers });
+        console.log('Function invoked:', {
+            method: event.httpMethod,
+            path: event.path,
+            body: event.body,
+            headers: event.headers
+        });
 
         // Handle CORS pre-flight OPTIONS request
         if (event.httpMethod === 'OPTIONS') {
@@ -18,6 +23,7 @@ exports.handler = async (event) => {
         }
 
         if (event.httpMethod !== 'POST') {
+            console.error('Method not allowed:', event.httpMethod);
             return {
                 statusCode: 405,
                 body: JSON.stringify({ message: 'Method Not Allowed' }),
@@ -38,6 +44,7 @@ exports.handler = async (event) => {
         const { text, image, author, 'g-recaptcha-response': recaptchaResponse } = body;
 
         if (!text || !recaptchaResponse) {
+            console.error('Missing fields:', { text, recaptchaResponse });
             return {
                 statusCode: 400,
                 body: JSON.stringify({ message: 'Missing required fields' }),
