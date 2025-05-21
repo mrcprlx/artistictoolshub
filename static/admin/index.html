@@ -14,10 +14,7 @@
         // Inline CMS config
         CMS.init({
             config: {
-                backend: {
-                    name: 'git-gateway',
-                    branch: 'main'
-                },
+                backend: { name: 'git-gateway', branch: 'main' },
                 media_folder: 'static/uploads',
                 public_folder: '/uploads',
                 collections: [
@@ -37,23 +34,30 @@
             }
         });
 
+        // Initialize Netlify Identity
+        netlifyIdentity.init();
+        console.log('Netlify Identity initialized');
+
         // Handle invite token
         const urlParams = new URLSearchParams(window.location.hash.substring(1));
         const inviteToken = urlParams.get('invite_token');
+        console.log('Invite token:', inviteToken);
         if (inviteToken) {
-            netlifyIdentity.open('signup'); // Open sign-up UI
+            console.log('Attempting to accept invite');
             netlifyIdentity.gotrue.acceptInviteExternalUrl(inviteToken, '/reviewadmin')
                 .then(() => {
-                    console.log('Invite accepted, opening login');
-                    netlifyIdentity.open('login');
+                    console.log('Invite accepted, opening sign-up');
+                    netlifyIdentity.open('signup');
                 })
                 .catch(err => console.error('Invite error:', err));
         } else {
-            netlifyIdentity.open('login'); // Default to login
+            console.log('No invite token, opening login');
+            netlifyIdentity.open('login');
         }
 
         // Redirect to /reviewadmin after login
         window.netlifyIdentity.on('login', () => {
+            console.log('User logged in, redirecting to /reviewadmin');
             window.location.href = '/reviewadmin';
         });
     </script>
