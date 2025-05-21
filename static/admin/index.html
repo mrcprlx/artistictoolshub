@@ -11,6 +11,20 @@
 <body>
     <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
     <script>
+        // Handle invite token from URL
+        const urlParams = new URLSearchParams(window.location.hash.substring(1));
+        const inviteToken = urlParams.get('invite_token');
+        if (inviteToken) {
+            netlifyIdentity.gotrue.acceptInviteExternalUrl(inviteToken, '/reviewadmin')
+                .then(() => {
+                    netlifyIdentity.open('login');
+                })
+                .catch(err => console.error('Invite error:', err));
+        } else {
+            // Open login if no token
+            netlifyIdentity.open('login');
+        }
+
         // Redirect to /reviewadmin after login
         window.netlifyIdentity.on('login', () => {
             window.location.href = '/reviewadmin';
