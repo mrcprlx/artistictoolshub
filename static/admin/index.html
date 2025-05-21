@@ -11,6 +11,32 @@
 <body>
     <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
     <script>
+        // Explicitly load config.yml
+        CMS.init({
+            config: {
+                backend: {
+                    name: 'git-gateway',
+                    branch: 'main'
+                },
+                media_folder: 'static/uploads',
+                public_folder: '/uploads',
+                collections: [
+                    {
+                        name: 'creations',
+                        label: 'Creations',
+                        folder: 'content/creations',
+                        create: true,
+                        slug: '{{slug}}',
+                        fields: [
+                            { label: 'Text', name: 'text', widget: 'text', required: true },
+                            { label: 'Image', name: 'image', widget: 'image', required: false },
+                            { label: 'Author', name: 'author', widget: 'string', required: false }
+                        ]
+                    }
+                ]
+            }
+        });
+
         // Handle invite token from URL
         const urlParams = new URLSearchParams(window.location.hash.substring(1));
         const inviteToken = urlParams.get('invite_token');
