@@ -1,7 +1,7 @@
-# Force redeploy: Updated 2025-05-20 20:04
+# Updated 2025-05-20 22:45
 [build]
   command = "npm install"
-  publish = "public"
+  publish = "."
   functions = "netlify/functions"
 
 [[redirects]]
