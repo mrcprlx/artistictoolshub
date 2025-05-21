@@ -1,8 +1,19 @@
-# Updated 2025-05-20 23:45
 [build]
   command = "npm install"
   publish = "."
   functions = "netlify/functions"
+
+[[redirects]]
+  from = "/admin/*"
+  to = "/static/admin/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/reviewadmin/*"
+  to = "/static/reviewadmin/index.html"
+  status = 200
+  force = true
 
 [[redirects]]
   from = "/*"
