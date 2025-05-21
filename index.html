@@ -13,6 +13,12 @@
         rel="stylesheet">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7078691985192067"
         crossorigin="anonymous"></script>
+    <script>
+        // Redirect invite links to /admin
+        if (window.location.hash.includes('invite_token')) {
+            window.location.href = '/admin' + window.location.hash;
+        }
+    </script>
     <style>
         .hero-buttons {
             display: flex;
