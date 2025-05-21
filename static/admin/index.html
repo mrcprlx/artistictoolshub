@@ -38,9 +38,11 @@
         netlifyIdentity.init();
         console.log('Netlify Identity initialized');
 
-        // Parse invite token from hash
-        const urlParams = new URLSearchParams(window.location.hash.substring(1));
-        const inviteToken = urlParams.get('invite_token');
+        // Parse invite token from full URL
+        const fullUrl = window.location.href;
+        console.log('Admin Full URL:', fullUrl);
+        const tokenMatch = fullUrl.match(/invite_token=([^&]*)/);
+        const inviteToken = tokenMatch ? tokenMatch[1] : null;
         console.log('Invite token:', inviteToken);
 
         if (inviteToken) {
