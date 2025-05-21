@@ -38,12 +38,14 @@
         netlifyIdentity.init();
         console.log('Netlify Identity initialized');
 
-        // Handle invite token
-        const urlParams = new URLSearchParams(window.location.hash.substring(1));
-        const inviteToken = urlParams.get('invite_token');
+        // Parse invite token from full URL
+        const hash = window.location.hash || '';
+        const inviteTokenMatch = hash.match(/invite_token=([^&]*)/);
+        const inviteToken = inviteTokenMatch ? inviteTokenMatch[1] : null;
         console.log('Invite token:', inviteToken);
+
         if (inviteToken) {
-            console.log('Attempting to accept invite');
+            console.log('Attempting to accept invite with token:', inviteToken);
             netlifyIdentity.gotrue.acceptInviteExternalUrl(inviteToken, '/reviewadmin')
                 .then(() => {
                     console.log('Invite accepted, opening sign-up');
