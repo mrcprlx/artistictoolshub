@@ -15,11 +15,15 @@
         crossorigin="anonymous">
         </script>
     <script>
-        // Parse and redirect invite token
+        // Log and redirect invite token
+        const fullUrl = window.location.href;
         const hash = window.location.hash || '';
+        console.log('Full URL:', fullUrl);
+        console.log('Hash:', hash);
         const tokenMatch = hash.match(/invite_token=([^&]*)/);
         if (tokenMatch) {
             const inviteToken = tokenMatch[1];
+            console.log('Invite token found:', inviteToken);
             window.location.href = '/admin#invite_token=' + inviteToken;
         }
     </script>
