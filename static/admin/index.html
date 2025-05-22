@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Artistic Tools Hub - Admin</title>
-    <!-- Load Auth0 SDK -->
-    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js"></script>
+    <!-- Use npm CDN for Auth0 SDK -->
+    <script src="https://unpkg.com/@auth0/auth0-spa-js@2.1.3/dist/auth0-spa-js.prod.js"></script>
 </head>
 
 <body>
@@ -20,39 +20,43 @@
     </div>
     <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
     <script>
-        // Initialize Auth0
         let auth0Client;
         async function initAuth0() {
-            auth0Client = await createAuth0Client({
-                domain: 'dev-d07c5upcmrg0jedl.us.auth0.com',
-                clientId: 'mbJ5rUjoVg7ztjnzO7MsHKlv66KYlkF1',
-                authorizationParams: {
-                    redirect_uri: window.location.origin + '/admin'
+            try {
+                if (!window.createAuth0Client) {
+                    throw new Error('Auth0 SDK not loaded');
                 }
-            });
+                auth0Client = await window.createAuth0Client({
+                    domain: 'dev-d07c5upcmrg0jedl.us.auth0.com',
+                    clientId: 'mbJ5rUjoVg7ztjnzO7MsHKlv66KYlkF1',
+                    authorizationParams: {
+                        redirect_uri: window.location.origin + '/admin'
+                    }
+                });
+                console.log('Auth0 initialized');
 
-            // Check if user is logged in
-            const isAuthenticated = await auth0Client.isAuthenticated();
-            if (isAuthenticated) {
-                document.getElementById('logout-btn').style.display = 'block';
-                document.getElementById('cms-content').style.display = 'block';
-                loadCMS();
-            } else {
-                document.getElementById('login-btn').style.display = 'block';
-            }
+                const isAuthenticated = await auth0Client.isAuthenticated();
+                if (isAuthenticated) {
+                    document.getElementById('logout-btn').style.display = 'block';
+                    document.getElementById('cms-content').style.display = 'block';
+                    loadCMS();
+                } else {
+                    document.getElementById('login-btn').style.display = 'block';
+                }
 
-            // Handle redirect callback (after login)
-            if (window.location.search.includes('code=')) {
-                await auth0Client.handleRedirectCallback();
-                window.history.replaceState({}, document.title, '/admin');
-                document.getElementById('login-btn').style.display = 'none';
-                document.getElementById('logout-btn').style.display = 'block';
-                document.getElementById('cms-content').style.display = 'block';
-                loadCMS();
+                if (window.location.search.includes('code=')) {
+                    await auth0Client.handleRedirectCallback();
+                    window.history.replaceState({}, document.title, '/admin');
+                    document.getElementById('login-btn').style.display = 'none';
+                    document.getElementById('logout-btn').style.display = 'block';
+                    document.getElementById('cms-content').style.display = 'block';
+                    loadCMS();
+                }
+            } catch (err) {
+                console.error('Auth0 init error:', err);
             }
         }
 
-        // Load CMS
         function loadCMS() {
             CMS.init({
                 config: {
@@ -73,19 +77,25 @@
                     }]
                 }
             });
+            console.log('CMS initialized');
         }
 
-        // Login
         document.getElementById('login-btn').addEventListener('click', async () => {
-            await auth0Client.loginWithRedirect();
+            try {
+                await auth0Client.loginWithRedirect();
+            } catch (err) {
+                console.error('Login error:', err);
+            }
         });
 
-        // Logout
         document.getElementById('logout-btn').addEventListener('click', async () => {
-            await auth0Client.logout({ logoutParams: { returnTo: window.location.origin } });
+            try {
+                await auth0Client.logout({ logoutParams: { returnTo: window.location.origin } });
+            } catch (err) {
+                console.error('Logout error:', err);
+            }
         });
 
-        // Start Auth0
         initAuth0();
     </script>
 </body>
