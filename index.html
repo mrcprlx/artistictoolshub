@@ -25,7 +25,7 @@
             const inviteToken = tokenMatch[1];
             console.log('Invite token found:', inviteToken);
             setTimeout(() => {
-                window.location.href = '/admin#invite_token=' + inviteToken;
+                window.location.href = '/admin?invite_token=' + inviteToken;
             }, 5000); // 5-second delay
         }
     </script>
