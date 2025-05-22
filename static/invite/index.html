@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invite Sign-up</title>
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+</head>
+
+<body>
+    <script>
+        // Initialize Netlify Identity
+        netlifyIdentity.init();
+        console.log('Netlify Identity initialized');
+
+        // Parse invite token from hash
+        const hash = window.location.hash || '';
+        const tokenMatch = hash.match(/invite_token=([^&]*)/);
+        const inviteToken = tokenMatch ? tokenMatch[1] : null;
+        console.log('Invite token:', inviteToken);
+
+        if (inviteToken) {
+            console.log('Opening sign-up with invite token:', inviteToken);
+            netlifyIdentity.open('signup');
+        } else {
+            console.log('No invite token, redirecting to /admin');
+            window.location.href = '/admin';
+        }
+
+        // Redirect to /reviewadmin after sign-up or login
+        netlifyIdentity.on('login', () => {
+            console.log('User signed up/logged in, redirecting to /reviewadmin');
+            window.location.href = '/reviewadmin';
+        });
+    </script>
+</body>
+
+</html>

@@ -4,9 +4,9 @@
   functions = "netlify/functions"
 
 [[redirects]]
-  from = "/#invite_token=*"
-  to = "/admin"
-  status = 302
+  from = "/invite"
+  to = "/static/invite/index.html"
+  status = 200
   force = true
 
 [[redirects]]
