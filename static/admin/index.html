@@ -46,14 +46,20 @@
         if (inviteToken) {
             console.log('Opening sign-up with invite token:', inviteToken);
             netlifyIdentity.open('signup');
-            // Netlify Identity widget handles invite token via URL
-            window.netlifyIdentity.on('init', () => {
-                netlifyIdentity.gotrue.currentUser()?.acceptInvite(inviteToken)
-                    .then(() => {
-                        console.log('Invite accepted, user signed up');
-                        netlifyIdentity.open('login');
-                    })
-                    .catch(err => console.error('Invite error:', err));
+            netlifyIdentity.on('init', () => {
+                console.log('Identity widget initialized, checking user');
+                const user = netlifyIdentity.gotrue.currentUser();
+                if (user) {
+                    console.log('User found, attempting to accept invite');
+                    user.acceptInvite(inviteToken)
+                        .then(() => {
+                            console.log('Invite accepted, opening login');
+                            netlifyIdentity.open('login');
+                        })
+                        .catch(err => console.error('Invite error:', err));
+                } else {
+                    console.log('No user, sign-up should handle token');
+                }
             });
         } else {
             console.log('No invite token, opening login');
@@ -61,7 +67,7 @@
         }
 
         // Redirect to /reviewadmin after login
-        window.netlifyIdentity.on('login', () => {
+        netlifyIdentity.on('login', () => {
             console.log('User logged in, redirecting to /reviewadmin');
             window.location.href = '/reviewadmin';
         });
