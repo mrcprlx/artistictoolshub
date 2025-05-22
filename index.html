@@ -15,9 +15,16 @@
         crossorigin="anonymous">
         </script>
     <script>
-        // Redirect invite links to /invite with hash
-        if (window.location.hash.includes('invite_token')) {
-            window.location.href = '/invite' + window.location.hash;
+        // Log and redirect invite token with delay for debugging
+        const fullUrl = window.location.href;
+        const hash = window.location.hash || '';
+        console.log('Index Full URL:', fullUrl);
+        console.log('Index Hash:', hash);
+        if (hash.includes('invite_token')) {
+            console.log('Invite token found, redirecting to /invite with hash:', hash);
+            setTimeout(() => {
+                window.location.href = '/invite' + hash;
+            }, 5000); // 5-second delay
         }
     </script>
     <style>
