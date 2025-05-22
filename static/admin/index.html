@@ -10,22 +10,26 @@
 
 <body>
     <script>
-        // Initialize Netlify Identity first
+        // Initialize Netlify Identity
         netlifyIdentity.init();
         console.log('Netlify Identity initialized');
 
-        // Check for invite token in hash
+        // Log URL and hash
+        console.log('Full URL:', window.location.href);
+        console.log('Hash:', window.location.hash);
+
+        // Check for invite token
         if (window.location.hash.includes('invite_token')) {
-            console.log('Invite token found:', window.location.hash);
-            netlifyIdentity.open('signup'); // Widget should handle token from hash
+            console.log('Invite token detected:', window.location.hash);
+            netlifyIdentity.open('signup');
         } else {
-            console.log('No invite token, showing login');
+            console.log('No invite token, opening login');
             netlifyIdentity.open('login');
         }
 
-        // Load CMS only after login/signup
+        // Load CMS and redirect after login
         netlifyIdentity.on('login', () => {
-            console.log('User logged in, loading CMS and redirecting to /reviewadmin');
+            console.log('User logged in, loading CMS');
             const script = document.createElement('script');
             script.src = 'https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js';
             script.onload = () => {
@@ -48,6 +52,7 @@
                         }]
                     }
                 });
+                console.log('Redirecting to /reviewadmin');
                 window.location.href = '/reviewadmin';
             };
             document.body.appendChild(script);
