@@ -15,18 +15,8 @@
         crossorigin="anonymous">
         </script>
     <script>
-        // Log and redirect invite token with delay
-        const fullUrl = window.location.href;
-        const hash = window.location.hash || '';
-        console.log('Full URL:', fullUrl);
-        console.log('Hash:', hash);
-        const tokenMatch = hash.match(/invite_token=([^&]*)/);
-        if (tokenMatch) {
-            const inviteToken = tokenMatch[1];
-            console.log('Invite token found:', inviteToken);
-            setTimeout(() => {
-                window.location.href = '/admin?invite_token=' + inviteToken;
-            }, 5000); // 5-second delay
+        if (window.location.hash.includes('invite_token')) {
+            window.location.href = '/admin' + window.location.hash;
         }
     </script>
     <style>

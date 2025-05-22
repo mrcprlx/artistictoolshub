@@ -9,58 +9,48 @@
 </head>
 
 <body>
-    <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
     <script>
-        // Inline CMS config
-        CMS.init({
-            config: {
-                backend: { name: 'git-gateway', branch: 'main' },
-                media_folder: 'static/uploads',
-                public_folder: '/uploads',
-                collections: [
-                    {
-                        name: 'creations',
-                        label: 'Creations',
-                        folder: 'content/creations',
-                        create: true,
-                        slug: '{{slug}}',
-                        fields: [
-                            { label: 'Text', name: 'text', widget: 'text', required: true },
-                            { label: 'Image', name: 'image', widget: 'image', required: false },
-                            { label: 'Author', name: 'author', widget: 'string', required: false }
-                        ]
-                    }
-                ]
-            }
-        });
-
-        // Initialize Netlify Identity
+        // Initialize Netlify Identity first
         netlifyIdentity.init();
         console.log('Netlify Identity initialized');
 
-        // Parse invite token from query parameter
-        const urlParams = new URLSearchParams(window.location.search);
-        const inviteToken = urlParams.get('invite_token');
-        console.log('Invite token:', inviteToken);
-
-        if (inviteToken) {
-            console.log('Opening sign-up with invite token:', inviteToken);
-            // Open sign-up UI and let widget handle token
-            netlifyIdentity.open('signup');
-            netlifyIdentity.on('init', () => {
-                console.log('Identity widget initialized');
-                // Log widget state
-                console.log('Current user:', netlifyIdentity.gotrue.currentUser());
-            });
+        // Check for invite token in hash
+        if (window.location.hash.includes('invite_token')) {
+            console.log('Invite token found:', window.location.hash);
+            netlifyIdentity.open('signup'); // Widget should handle token from hash
         } else {
-            console.log('No invite token, opening login');
+            console.log('No invite token, showing login');
             netlifyIdentity.open('login');
         }
 
-        // Redirect to /reviewadmin after login
+        // Load CMS only after login/signup
         netlifyIdentity.on('login', () => {
-            console.log('User logged in, redirecting to /reviewadmin');
-            window.location.href = '/reviewadmin';
+            console.log('User logged in, loading CMS and redirecting to /reviewadmin');
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js';
+            script.onload = () => {
+                CMS.init({
+                    config: {
+                        backend: { name: 'git-gateway', branch: 'main' },
+                        media_folder: 'static/uploads',
+                        public_folder: '/uploads',
+                        collections: [{
+                            name: 'creations',
+                            label: 'Creations',
+                            folder: 'content/creations',
+                            create: true,
+                            slug: '{{slug}}',
+                            fields: [
+                                { label: 'Text', name: 'text', widget: 'text', required: true },
+                                { label: 'Image', name: 'image', widget: 'image', required: false },
+                                { label: 'Author', name: 'author', widget: 'string', required: false }
+                            ]
+                        }]
+                    }
+                });
+                window.location.href = '/reviewadmin';
+            };
+            document.body.appendChild(script);
         });
     </script>
 </body>
