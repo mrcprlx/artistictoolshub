@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Artistic Tools Hub - Admin</title>
-    <!-- Load Auth0 SDK -->
     <script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js"></script>
 </head>
 
@@ -20,36 +19,38 @@
     </div>
     <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
     <script>
-        let auth0Client;  // Declare globally so it’s accessible everywhere
+        let auth0Client;  // Make it global
 
         async function initAuth0() {
             try {
-                console.log('Initializing Auth0');
-                auth0Client = await createAuth0Client({
+                if (!window.createAuth0Client) {
+                    throw new Error('Auth0 SDK not loaded');
+                }
+                auth0Client = await window.createAuth0Client({
                     domain: 'dev-d07c5upcmrg0jedl.us.auth0.com',
                     clientId: 'mbJ5rUjoVg7ztjnzO7MsHKlv66KYlkF1',
-                    redirect_uri: window.location.origin + '/admin'
+                    authorizationParams: {
+                        redirect_uri: window.location.origin + '/admin'
+                    }
                 });
-                console.log('Auth0 client initialized');
+                console.log('Auth0 initialized');
 
-                // Check if the user is already logged in
                 const isAuthenticated = await auth0Client.isAuthenticated();
                 if (isAuthenticated) {
                     document.getElementById('logout-btn').style.display = 'block';
                     document.getElementById('cms-content').style.display = 'block';
-                    loadCMS();
+                    CMS.init();  // Load CMS with config.yml
                 } else {
                     document.getElementById('login-btn').style.display = 'block';
                 }
 
-                // Handle redirect after login
                 if (window.location.search.includes('code=')) {
                     await auth0Client.handleRedirectCallback();
                     window.history.replaceState({}, document.title, '/admin');
                     document.getElementById('login-btn').style.display = 'none';
                     document.getElementById('logout-btn').style.display = 'block';
                     document.getElementById('cms-content').style.display = 'block';
-                    loadCMS();
+                    CMS.init();  // Load CMS with config.yml
                 }
             } catch (err) {
                 console.error('Auth0 init error:', err);
@@ -57,40 +58,11 @@
             }
         }
 
-        function loadCMS() {
-            try {
-                console.log('Initializing CMS with inline config');
-                CMS.init({
-                    config: {
-                        backend: {
-                            name: 'git-gateway',
-                            branch: 'main'
-                        },
-                        media_folder: 'static/uploads',
-                        public_folder: '/uploads',
-                        collections: [{
-                            name: 'creations',
-                            label: 'Creations',
-                            folder: 'content/creations',
-                            create: true,
-                            slug: '{{slug}}',
-                            fields: [
-                                { label: 'Text', name: 'text', widget: 'text', required: true },
-                                { label: 'Image', name: 'image', widget: 'image', required: false },
-                                { label: 'Author', name: 'author', widget: 'string', required: false }
-                            ]
-                        }]
-                    }
-                });
-                console.log('CMS initialized');
-            } catch (err) {
-                console.error('CMS init error:', err);
-                document.getElementById('cms-content').innerHTML = '<p>Error loading CMS. Please try again.</p>';
-            }
-        }
-
-        // Event listeners for buttons
         document.getElementById('login-btn').addEventListener('click', async () => {
+            if (!auth0Client) {
+                console.error('Auth0 not initialized');
+                return;
+            }
             try {
                 await auth0Client.loginWithRedirect();
             } catch (err) {
@@ -99,14 +71,17 @@
         });
 
         document.getElementById('logout-btn').addEventListener('click', async () => {
+            if (!auth0Client) {
+                console.error('Auth0 not initialized');
+                return;
+            }
             try {
-                await auth0Client.logout({ returnTo: window.location.origin });
+                await auth0Client.logout({ logoutParams: { returnTo: window.location.origin } });
             } catch (err) {
                 console.error('Logout error:', err);
             }
         });
 
-        // Kick things off
         initAuth0();
     </script>
 </body>
