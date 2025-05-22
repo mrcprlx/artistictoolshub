@@ -5,58 +5,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Artistic Tools Hub - Admin</title>
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <!-- Load Auth0 SDK -->
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js"></script>
 </head>
 
 <body>
+    <div id="app">
+        <h1>Admin Dashboard</h1>
+        <button id="login-btn" style="display: none;">Log In</button>
+        <button id="logout-btn" style="display: none;">Log Out</button>
+        <div id="cms-content" style="display: none;">
+            <!-- CMS will load here -->
+        </div>
+    </div>
+    <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
     <script>
-        // Initialize Netlify Identity
-        netlifyIdentity.init();
-        console.log('Netlify Identity initialized');
+        // Initialize Auth0
+        let auth0Client;
+        async function initAuth0() {
+            auth0Client = await createAuth0Client({
+                domain: 'dev-d07c5upcmrg0jedl.us.auth0.com',
+                clientId: 'mbJ5rUjoVg7ztjnzO7MsHKlv66KYlkF1',
+                authorizationParams: {
+                    redirect_uri: window.location.origin + '/admin'
+                }
+            });
 
-        // Log URL and hash
-        console.log('Full URL:', window.location.href);
-        console.log('Hash:', window.location.hash);
+            // Check if user is logged in
+            const isAuthenticated = await auth0Client.isAuthenticated();
+            if (isAuthenticated) {
+                document.getElementById('logout-btn').style.display = 'block';
+                document.getElementById('cms-content').style.display = 'block';
+                loadCMS();
+            } else {
+                document.getElementById('login-btn').style.display = 'block';
+            }
 
-        // Check for invite token
-        if (window.location.hash.includes('invite_token')) {
-            console.log('Invite token detected:', window.location.hash);
-            netlifyIdentity.open('signup');
-        } else {
-            console.log('No invite token, opening login');
-            netlifyIdentity.open('login');
+            // Handle redirect callback (after login)
+            if (window.location.search.includes('code=')) {
+                await auth0Client.handleRedirectCallback();
+                window.history.replaceState({}, document.title, '/admin');
+                document.getElementById('login-btn').style.display = 'none';
+                document.getElementById('logout-btn').style.display = 'block';
+                document.getElementById('cms-content').style.display = 'block';
+                loadCMS();
+            }
         }
 
-        // Load CMS and redirect after login
-        netlifyIdentity.on('login', () => {
-            console.log('User logged in, loading CMS');
-            const script = document.createElement('script');
-            script.src = 'https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js';
-            script.onload = () => {
-                CMS.init({
-                    config: {
-                        backend: { name: 'git-gateway', branch: 'main' },
-                        media_folder: 'static/uploads',
-                        public_folder: '/uploads',
-                        collections: [{
-                            name: 'creations',
-                            label: 'Creations',
-                            folder: 'content/creations',
-                            create: true,
-                            slug: '{{slug}}',
-                            fields: [
-                                { label: 'Text', name: 'text', widget: 'text', required: true },
-                                { label: 'Image', name: 'image', widget: 'image', required: false },
-                                { label: 'Author', name: 'author', widget: 'string', required: false }
-                            ]
-                        }]
-                    }
-                });
-                console.log('Redirecting to /reviewadmin');
-                window.location.href = '/reviewadmin';
-            };
-            document.body.appendChild(script);
+        // Load CMS
+        function loadCMS() {
+            CMS.init({
+                config: {
+                    backend: { name: 'git-gateway', branch: 'main' },
+                    media_folder: 'static/uploads',
+                    public_folder: '/uploads',
+                    collections: [{
+                        name: 'creations',
+                        label: 'Creations',
+                        folder: 'content/creations',
+                        create: true,
+                        slug: '{{slug}}',
+                        fields: [
+                            { label: 'Text', name: 'text', widget: 'text', required: true },
+                            { label: 'Image', name: 'image', widget: 'image', required: false },
+                            { label: 'Author', name: 'author', widget: 'string', required: false }
+                        ]
+                    }]
+                }
+            });
+        }
+
+        // Login
+        document.getElementById('login-btn').addEventListener('click', async () => {
+            await auth0Client.loginWithRedirect();
         });
+
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            await auth0Client.logout({ logoutParams: { returnTo: window.location.origin } });
+        });
+
+        // Start Auth0
+        initAuth0();
     </script>
 </body>
 
