@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Artistic Tools Hub - Admin</title>
-    <!-- Use npm CDN for Auth0 SDK -->
-    <script src="https://unpkg.com/@auth0/auth0-spa-js@2.1.3/dist/auth0-spa-js.prod.js"></script>
+    <!-- Use Auth0's official CDN -->
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js"></script>
 </head>
 
 <body>
@@ -54,30 +54,36 @@
                 }
             } catch (err) {
                 console.error('Auth0 init error:', err);
+                document.getElementById('app').innerHTML += '<p>Error loading authentication. Please try again later.</p>';
             }
         }
 
         function loadCMS() {
-            CMS.init({
-                config: {
-                    backend: { name: 'git-gateway', branch: 'main' },
-                    media_folder: 'static/uploads',
-                    public_folder: '/uploads',
-                    collections: [{
-                        name: 'creations',
-                        label: 'Creations',
-                        folder: 'content/creations',
-                        create: true,
-                        slug: '{{slug}}',
-                        fields: [
-                            { label: 'Text', name: 'text', widget: 'text', required: true },
-                            { label: 'Image', name: 'image', widget: 'image', required: false },
-                            { label: 'Author', name: 'author', widget: 'string', required: false }
-                        ]
-                    }]
-                }
-            });
-            console.log('CMS initialized');
+            try {
+                CMS.init({
+                    config: {
+                        backend: { name: 'git-gateway', branch: 'main' },
+                        media_folder: 'static/uploads',
+                        public_folder: '/uploads',
+                        collections: [{
+                            name: 'creations',
+                            label: 'Creations',
+                            folder: 'content/creations',
+                            create: true,
+                            slug: '{{slug}}',
+                            fields: [
+                                { label: 'Text', name: 'text', widget: 'text', required: true },
+                                { label: 'Image', name: 'image', widget: 'image', required: false },
+                                { label: 'Author', name: 'author', widget: 'string', required: false }
+                            ]
+                        }]
+                    }
+                });
+                console.log('CMS initialized');
+            } catch (err) {
+                console.error('CMS init error:', err);
+                document.getElementById('cms-content').innerHTML = '<p>Error loading CMS. Please try again.</p>';
+            }
         }
 
         document.getElementById('login-btn').addEventListener('click', async () => {
