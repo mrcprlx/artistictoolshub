@@ -44,22 +44,12 @@
         console.log('Invite token:', inviteToken);
 
         if (inviteToken) {
-            console.log('Opening sign-up with invite token:', inviteToken);
+            console.log('Forcing sign-up UI with token:', inviteToken);
             netlifyIdentity.open('signup');
             netlifyIdentity.on('init', () => {
-                console.log('Identity widget initialized, checking user');
-                const user = netlifyIdentity.gotrue.currentUser();
-                if (user) {
-                    console.log('User found, attempting to accept invite');
-                    user.acceptInvite(inviteToken)
-                        .then(() => {
-                            console.log('Invite accepted, opening login');
-                            netlifyIdentity.open('login');
-                        })
-                        .catch(err => console.error('Invite error:', err));
-                } else {
-                    console.log('No user, sign-up should handle token');
-                }
+                console.log('Identity widget initialized');
+                netlifyIdentity.setWorkflow('invite', { token: inviteToken });
+                console.log('Set invite workflow with token:', inviteToken);
             });
         } else {
             console.log('No invite token, opening login');
