@@ -44,13 +44,17 @@
         console.log('Invite token:', inviteToken);
 
         if (inviteToken) {
-            console.log('Attempting to accept invite with token:', inviteToken);
-            netlifyIdentity.gotrue.acceptInviteExternalUrl(inviteToken, '/reviewadmin')
-                .then(() => {
-                    console.log('Invite accepted, opening sign-up');
-                    netlifyIdentity.open('signup');
-                })
-                .catch(err => console.error('Invite error:', err));
+            console.log('Opening sign-up with invite token:', inviteToken);
+            netlifyIdentity.open('signup');
+            // Netlify Identity widget handles invite token via URL
+            window.netlifyIdentity.on('init', () => {
+                netlifyIdentity.gotrue.currentUser()?.acceptInvite(inviteToken)
+                    .then(() => {
+                        console.log('Invite accepted, user signed up');
+                        netlifyIdentity.open('login');
+                    })
+                    .catch(err => console.error('Invite error:', err));
+            });
         } else {
             console.log('No invite token, opening login');
             netlifyIdentity.open('login');
