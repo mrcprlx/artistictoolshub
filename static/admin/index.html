@@ -30,7 +30,8 @@
                     domain: 'dev-d07c5upcmrg0jedl.us.auth0.com',
                     clientId: 'mbJ5rUjoVg7ztjnzO7MsHKlv66KYlkF1',
                     authorizationParams: {
-                        redirect_uri: window.location.origin + '/admin'
+                        redirect_uri: window.location.origin + '/admin',
+                        audience: 'https://dev-d07c5upcmrg0jedl.us.auth0.com/api/v2/'
                     }
                 });
                 console.log('Auth0 initialized');
@@ -39,7 +40,7 @@
                 if (isAuthenticated) {
                     document.getElementById('logout-btn').style.display = 'block';
                     document.getElementById('cms-content').style.display = 'block';
-                    loadCMS();
+                    await initCMS();
                 } else {
                     document.getElementById('login-btn').style.display = 'block';
                 }
@@ -50,7 +51,7 @@
                     document.getElementById('login-btn').style.display = 'none';
                     document.getElementById('logout-btn').style.display = 'block';
                     document.getElementById('cms-content').style.display = 'block';
-                    loadCMS();
+                    await initCMS();
                 }
             } catch (err) {
                 console.error('Auth0 init error:', err);
@@ -58,8 +59,23 @@
             }
         }
 
-        function loadCMS() {
+        async function initCMS() {
             try {
+                const token = await auth0Client.getTokenSilently();
+                CMS.registerBackend('git-gateway', class {
+                    constructor(config) {
+                        this.config = config;
+                    }
+                    authComponent() {
+                        return () => null; // Skip CMS login UI
+                    }
+                    async login() {
+                        return { token };
+                    }
+                    async getToken() {
+                        return token;
+                    }
+                });
                 CMS.init({
                     config: {
                         backend: {
