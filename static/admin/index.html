@@ -23,10 +23,15 @@
 
         async function initAuth0() {
             try {
-                auth0Client = await createAuth0Client({
+                if (typeof window.createAuth0Client === 'undefined') {
+                    throw new Error('Auth0 SDK not loaded. Check the script tag.');
+                }
+                auth0Client = await window.createAuth0Client({
                     domain: 'dev-d07c5upcmrg0jedl.us.auth0.com',
                     clientId: 'mbJ5rUjoVg7ztjnzO7MsHKlv66KYlkF1',
-                    redirect_uri: window.location.origin + '/admin'
+                    authorizationParams: {
+                        redirect_uri: window.location.origin + '/admin'
+                    }
                 });
                 console.log('Auth0 initialized');
 
@@ -55,7 +60,7 @@
 
         function loadCMS() {
             try {
-                CMS.init();
+                window.CMS.init();
                 console.log('CMS initialized');
             } catch (err) {
                 console.error('CMS init error:', err);
@@ -63,23 +68,9 @@
             }
         }
 
-        document.getElementById('login-btn').addEventListener('click', async () => {
-            try {
-                await auth0Client.loginWithRedirect();
-            } catch (err) {
-                console.error('Login error:', err);
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            initAuth0();
         });
-
-        document.getElementById('logout-btn').addEventListener('click', async () => {
-            try {
-                await auth0Client.logout({ returnTo: window.location.origin });
-            } catch (err) {
-                console.error('Logout error:', err);
-            }
-        });
-
-        initAuth0();
     </script>
 </body>
 
