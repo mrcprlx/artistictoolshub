@@ -1,5 +1,5 @@
 [build]
-  command = "bash build.sh"
+  command = "npm install"  # Simplified, assuming no custom build script is needed
   publish = "."
   functions = "netlify/functions"
 
@@ -17,7 +17,7 @@
 
 [[redirects]]
   from = "/reviewadmin/*"
-  to = "/static/reviewadmin/index.html"
+  to = "/static/admin/index.html"  # Updated to point to the same admin page
   status = 200
   force = true
 
