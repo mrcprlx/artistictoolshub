@@ -6,7 +6,7 @@ backend:
   auth0:
     domain: dev-d07c5upcmrg0jedl.us.auth0.com
     client_id: mbJ5rUjoVg7ztjnzO7MsHKlv66KYlkF1
-    client_secret: kS2TftuG7bM7pSFCKUEzOXm-cR7bGbDCRQn_-tuX6Q4lZCW-pVyjW1lR1r-TAGqD
+    client_secret: YOUR_CLIENT_SECRET  # This will be replaced during build
     authorize_url: https://dev-d07c5upcmrg0jedl.us.auth0.com/authorize
     token_url: https://dev-d07c5upcmrg0jedl.us.auth0.com/oauth/token
     userinfo_url: https://dev-d07c5upcmrg0jedl.us.auth0.com/userinfo
