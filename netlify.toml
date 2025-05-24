@@ -1,33 +1,25 @@
 [build]
-  command = "npm install" # KEEP THIS AS IS ONLY IF YOUR SITE HAS NO OTHER BUILD STEP
-  # If you have a build step (e.g., for a static site generator), change this to:
-  # command = "npm run build"
-  # command = "hugo"
-  # command = "gatsby build"
-
-  # Setting publish to "static" assumes that all your deployable website files,
-  # including your main index.html and the admin folder, reside within a top-level
-  # 'static' directory in your repository.
+  command = "npm install"
   publish = "."
   functions = "netlify/functions"
 
 # Redirects
 [[redirects]]
   from = "/admin/*"
-  to = "/admin/index.html" # Path relative to the 'publish' directory ("static")
+  to = "/static/admin/index.html" # Path relative to the 'publish' directory ("static")
   status = 200
   force = true
 
 [[redirects]]
   from = "/reviewadmin/*"
-  to = "/admin/index.html" # Path relative to the 'publish' directory ("static")
+  to = "/static/admin/index.html" # Path relative to the 'publish' directory ("static")
   status = 200
   force = true
 
 # Catch-all for main index.html (adjust if your main index.html is also in 'static')
 [[redirects]]
   from = "/*"
-  to = "/index.html" # Path relative to the 'publish' directory ("static")
+  to = "/static/index.html" # Path relative to the 'publish' directory ("static")
   status = 200
   force = false
   conditions = { Method = ["GET"], Path = ["/"] }
