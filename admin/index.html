@@ -4,9 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex"> <!-- Prevent search engine indexing -->
+    <meta name="robots" content="noindex">
+    <meta http-equiv="Content-Security-Policy"
+        content="script-src 'self' https://cdn.auth0.com; connect-src 'self' https://login.artistictoolshub.com;">
     <title>Admin - Artistic Tools Hub</title>
-    <link rel="stylesheet" href="/styles.css"> <!-- Use existing styles for mobile/PC compatibility -->
+    <link rel="stylesheet" href="/styles.css">
 </head>
 
 <body>
@@ -19,7 +21,6 @@
             <button onclick="logout()">Logout</button>
         </div>
     </div>
-    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa.min.js"></script>
     <script src="/admin/admin.js"></script>
 </body>
 

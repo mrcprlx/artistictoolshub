@@ -1,20 +1,10 @@
 (async () => {
-    // Wait for Auth0 SDK to load
-    if (!window.auth0) {
-        await new Promise((resolve) => {
-            const script = document.createElement('script');
-            script.src = 'https://cdn.auth0.com/js/auth0-spa-js/3.2.0/auth0-spa-js.production.min.js';
-            script.onload = resolve;
-            document.head.appendChild(script);
-        });
-    }
-
     let auth0Client = null;
 
     async function initAuth0() {
         auth0Client = await window.auth0.createAuth0Client({
             domain: 'login.artistictoolshub.com',
-            clientId: 'mbJ5rUjoVg7ztjnzO7MsHKlv66KYlkF1', // Replace with your Auth0 Client ID
+            clientId: 'YOUR_AUTH0_CLIENT_ID', // Replace with your Auth0 Client ID
             authorizationParams: {
                 redirect_uri: 'https://artistictoolshub.com/admin'
             }
