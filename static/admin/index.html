@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Artistic Tools Hub - Admin</title>
     <script src="https://cdn.auth0.com/js/auth0-spa-js/1.22.5/auth0-spa-js.production.js"></script>
+    <script>window.CMS_MANUAL_INIT = true;</script>
     <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
 </head>
 
@@ -23,9 +24,6 @@
 
         async function initAuth0() {
             try {
-                if (typeof window.createAuth0Client === 'undefined') {
-                    throw new Error('Auth0 SDK not loaded. Check the script tag.');
-                }
                 auth0Client = await window.createAuth0Client({
                     domain: 'dev-d07c5upcmrg0jedl.us.auth0.com',
                     clientId: 'mbJ5rUjoVg7ztjnzO7MsHKlv66KYlkF1',
@@ -41,7 +39,11 @@
                     document.getElementById('cms-content').style.display = 'block';
                     loadCMS();
                 } else {
-                    document.getElementById('login-btn').style.display = 'block';
+                    const loginBtn = document.getElementById('login-btn');
+                    loginBtn.style.display = 'block';
+                    loginBtn.addEventListener('click', async () => {
+                        await auth0Client.loginWithRedirect();
+                    });
                 }
 
                 if (window.location.search.includes('code=')) {
@@ -54,17 +56,17 @@
                 }
             } catch (err) {
                 console.error('Auth0 init error:', err);
-                document.getElementById('app').innerHTML += '<p>Error loading authentication: ' + err.message + '</p>';
             }
         }
 
         function loadCMS() {
             try {
-                window.CMS.init();
+                window.CMS.init({
+                    configUrl: '/admin/config.yml'
+                });
                 console.log('CMS initialized');
             } catch (err) {
                 console.error('CMS init error:', err);
-                document.getElementById('cms-content').innerHTML = '<p>Error loading CMS: ' + err.message + '</p>';
             }
         }
 
