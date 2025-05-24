@@ -1,17 +1,22 @@
 backend:
   name: git-gateway
   branch: main
-  auth_type: oauth
-  provider: auth0
-  auth0:
-    domain: dev-d07c5upcmrg0jedl.us.auth0.com
-    client_id: mbJ5rUjoVg7ztjnzO7MsHKlv66KYlkF1
-    client_secret: YOUR_CLIENT_SECRET  # This will be replaced during build
-    authorize_url: https://dev-d07c5upcmrg0jedl.us.auth0.com/authorize
-    token_url: https://dev-d07c5upcmrg0jedl.us.auth0.com/oauth/token
-    userinfo_url: https://dev-d07c5upcmrg0jedl.us.auth0.com/userinfo
+  # Use auth_backend for external OAuth providers like Auth0
+  auth_backend:
+    name: external_oauth
+    oauth_client_id: 'mbJ5rUjoVg7ztjnzO7MsHKlv66KYlkF1'
+    # These URLs are from your Auth0 tenant
+    oauth_url: 'https://dev-d07c5upcmrg0jedl.us.auth0.com/authorize'
+    oauth_token_url: 'https://dev-d07c5upcmrg0jedl.us.auth0.com/oauth/token'
+    oauth_authorize_url: 'https://dev-d07c5upcmrg0jedl.us.auth0.com/authorize'
+    oauth_userinfo_url: 'https://dev-d07c5upcmrg0jedl.us.auth0.com/userinfo'
+    oauth_pkce_enabled: true # Auth0 typically uses PKCE, enable this for better security
+    # No client_secret here, as it's a public client-side application.
+    # The client secret should never be exposed in frontend code or public config.
+    # If you need to store secrets, use Netlify Environment Variables for backend functions,
+    # but not in client-side config.
 media_folder: "static/uploads"
-public_folder: "/uploads"
+public_folder: "/uploads" # This path is relative to the site root, which will be "static" now.
 collections:
   - name: "creations"
     label: "Creations"

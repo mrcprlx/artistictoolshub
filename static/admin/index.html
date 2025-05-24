@@ -5,11 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Artistic Tools Hub - Admin</title>
-    <!-- Load Auth0 SDK version 1.22.5 -->
     <script src="https://cdn.auth0.com/js/auth0-spa-js/1.22.5/auth0-spa-js.production.js"></script>
-    <!-- Prevent Netlify CMS auto-initialization -->
     <script>window.CMS_MANUAL_INIT = true;</script>
-    <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
+    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 </head>
 
 <body>
@@ -18,7 +16,6 @@
         <button id="login-btn" style="display: none;">Log In</button>
         <button id="logout-btn" style="display: none;">Log Out</button>
         <div id="cms-content" style="display: none;">
-            <!-- CMS will load here -->
         </div>
     </div>
     <script>
@@ -28,8 +25,8 @@
             try {
                 auth0Client = await window.createAuth0Client({
                     domain: 'dev-d07c5upcmrg0jedl.us.auth0.com',
-                    client_id: 'mbJ5rUjoVg7ztjnzO7MsHKlv66KYlkF1',  // Use client_id for version 1.22.5
-                    redirect_uri: window.location.origin + '/admin'  // Moved out of authorizationParams
+                    client_id: 'mbJ5rUjoVg7ztjnzO7MsHKlv66KYlkF1', // Use client_id for version 1.22.5
+                    redirect_uri: window.location.origin + '/admin' // Moved out of authorizationParams
                 });
                 console.log('Auth0 initialized');
 
@@ -63,7 +60,7 @@
         function loadCMS() {
             try {
                 window.CMS.init({
-                    configUrl: '/admin/config.yml'  // Ensure CMS loads the correct config file
+                    configUrl: '/admin/config.yml' // Ensure CMS loads the correct config file
                 });
                 console.log('CMS initialized');
             } catch (err) {
@@ -72,8 +69,20 @@
             }
         }
 
+        // Add logout functionality
         document.addEventListener('DOMContentLoaded', () => {
             initAuth0();
+
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async () => {
+                    await auth0Client.logout({
+                        logoutParams: {
+                            returnTo: window.location.origin + '/admin' // or your desired post-logout URL
+                        }
+                    });
+                });
+            }
         });
     </script>
 </body>

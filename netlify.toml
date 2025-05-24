@@ -4,12 +4,6 @@
   functions = "netlify/functions"
 
 [[redirects]]
-  from = "/invite"
-  to = "/static/invite/index.html"
-  status = 200
-  force = true
-
-[[redirects]]
   from = "/admin/*"
   to = "/static/admin/index.html"
   status = 200
