@@ -4,3 +4,8 @@
   to = "/"
   status = 302
   force = false
+
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    Content-Security-Policy = "script-src 'self' https://cdn.auth0.com blob:; connect-src 'self' https://login.artistictoolshub.com"
