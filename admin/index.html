@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex"> <!-- Prevent search engine indexing -->
+    <title>Admin - Artistic Tools Hub</title>
+    <link rel="stylesheet" href="/styles.css"> <!-- Use existing styles for mobile/PC compatibility -->
+</head>
+
+<body>
+    <div id="app">
+        <h1>Admin Dashboard</h1>
+        <div id="auth-status">Checking authentication...</div>
+        <div id="admin-content" style="display: none;">
+            <h2>Manage Creations</h2>
+            <div id="submissions-list"></div>
+            <button onclick="logout()">Logout</button>
+        </div>
+    </div>
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa.min.js"></script>
+    <script src="/admin/admin.js"></script>
+</body>
+
+</html>
