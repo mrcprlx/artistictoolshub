@@ -14,7 +14,7 @@
     async function initAuth0() {
         auth0Client = await window.auth0.createAuth0Client({
             domain: 'login.artistictoolshub.com',
-            clientId: 'YOUR_AUTH0_CLIENT_ID', // Replace with your Auth0 Client ID
+            clientId: 'mbJ5rUjoVg7ztjnzO7MsHKlv66KYlkF1', // Replace with your Auth0 Client ID
             authorizationParams: {
                 redirect_uri: 'https://artistictoolshub.com/admin'
             }
