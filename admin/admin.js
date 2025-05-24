@@ -2,6 +2,9 @@
     let auth0Client = null;
 
     async function initAuth0() {
+        if (!window.auth0) {
+            throw new Error('Auth0 SDK not loaded');
+        }
         auth0Client = await window.auth0.createAuth0Client({
             domain: 'login.artistictoolshub.com',
             clientId: 'YOUR_AUTH0_CLIENT_ID', // Replace with your Auth0 Client ID
@@ -56,5 +59,10 @@
         });
     }
 
-    await initAuth0();
+    try {
+        await initAuth0();
+    } catch (error) {
+        console.error('Auth0 initialization failed:', error);
+        document.getElementById('auth-status').textContent = 'Authentication error. Please try again.';
+    }
 })();
