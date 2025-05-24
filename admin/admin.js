@@ -1,11 +1,10 @@
+import auth0 from '@auth0/auth0-spa-js';
+
 (async () => {
     let auth0Client = null;
 
     async function initAuth0() {
-        if (!window.auth0) {
-            throw new Error('Auth0 SDK not loaded');
-        }
-        auth0Client = await window.auth0.createAuth0Client({
+        auth0Client = await auth0.createAuth0Client({
             domain: 'login.artistictoolshub.com',
             clientId: 'mbJ5rUjoVg7ztjnzO7MsHKlv66KYlkF1', // Replace with your Auth0 Client ID
             authorizationParams: {
