@@ -17,6 +17,20 @@
             }
         });
 
+        // Check for code and state parameters in URL
+        const query = new URLSearchParams(window.location.search);
+        if (query.get('code') && query.get('state')) {
+            try {
+                await auth0Client.handleRedirectCallback();
+                // Clear query parameters from URL
+                window.history.replaceState({}, document.title, '/admin');
+            } catch (error) {
+                console.error('Error handling redirect callback:', error);
+                document.getElementById('auth-status').textContent = 'Authentication error. Please try again.';
+                return;
+            }
+        }
+
         const isAuthenticated = await auth0Client.isAuthenticated();
         const authStatus = document.getElementById('auth-status');
         const adminContent = document.getElementById('admin-content');
