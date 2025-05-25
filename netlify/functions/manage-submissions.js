@@ -47,7 +47,7 @@ exports.handler = async (event, context) => {
 
         const decoded = await new Promise((resolve, reject) => {
             jwt.verify(token, getKey, {
-                audience: 'https://artistictoolshub.com/api',
+                audience: ['https://artistictoolshub.com/api', 'https://dev-d07c5upcmrg0jedl.us.auth0.com/userinfo'],
                 issuer: 'https://login.artistictoolshub.com/',
                 algorithms: ['RS256']
             }, (err, decoded) => {
