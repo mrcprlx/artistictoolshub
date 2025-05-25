@@ -1,6 +1,11 @@
-import auth0 from '/node_modules/@auth0/auth0-spa-js/dist/auth0-spa-js.production.js';
-
 (async () => {
+    const auth0 = window.auth0;
+    if (!auth0) {
+        console.error('Auth0 SDK not loaded');
+        document.getElementById('auth-status').textContent = 'Authentication error: SDK not loaded.';
+        return;
+    }
+
     let auth0Client = null;
 
     async function initAuth0() {
