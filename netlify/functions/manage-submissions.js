@@ -20,7 +20,7 @@ exports.handler = async (event, context) => {
         // Validate Auth0 JWT token
         const authHeader = event.headers.authorization;
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            console.log('Missing or invalid Authorization header');
+            console.log('Missing or invalid Authorization header:', authHeader);
             return {
                 statusCode: 401,
                 headers: { 'Access-Control-Allow-Origin': '*' },
@@ -30,17 +30,25 @@ exports.handler = async (event, context) => {
 
         const token = authHeader.split(' ')[1];
         const client = jwksClient({
-            jwksUri: 'https://login.artistictoolshub.com/.well-known/jwks.json'
+            jwksUri: 'https://dev-d07c5upcmrg0jedl.us.auth0.com/.well-known/jwks.json'
         });
 
         const getKey = (header, callback) => {
             client.getSigningKey(header.kid, (err, key) => {
                 if (err) {
-                    console.error('Error fetching JWKS key:', err);
+                    console.error('Error fetching JWKS key:', err.message);
                     callback(err);
+                } else if (!key) {
+                    console.error('No signing key found for kid:', header.kid);
+                    callback(new Error('No signing key found'));
                 } else {
-                    const signingKey = key?.publicKey || key?.rsaPublicKey;
-                    callback(null, signingKey);
+                    const signingKey = key.publicKey || key.rsaPublicKey;
+                    if (!signingKey) {
+                        console.error('Invalid signing key for kid:', header.kid);
+                        callback(new Error('Invalid signing key'));
+                    } else {
+                        callback(null, signingKey);
+                    }
                 }
             });
         };
@@ -52,9 +60,10 @@ exports.handler = async (event, context) => {
                 algorithms: ['RS256']
             }, (err, decoded) => {
                 if (err) {
-                    console.error('JWT verification failed:', err.message);
+                    console.error('JWT verification failed:', err.message, { token });
                     reject(err);
                 } else {
+                    console.log('JWT verified successfully:', decoded);
                     resolve(decoded);
                 }
             });
