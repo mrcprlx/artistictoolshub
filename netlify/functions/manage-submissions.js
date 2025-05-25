@@ -29,45 +29,65 @@ exports.handler = async (event, context) => {
         }
 
         const token = authHeader.split(' ')[1];
-        const client = jwksClient({
-            jwksUri: 'https://dev-d07c5upcmrg0jedl.us.auth0.com/.well-known/jwks.json'
-        });
+        console.log('Received token:', token); // Log token for debugging
+        const jwksUris = [
+            'https://dev-d07c5upcmrg0jedl.us.auth0.com/.well-known/jwks.json',
+            'https://login.artistictoolshub.com/.well-known/jwks.json'
+        ];
 
-        const getKey = (header, callback) => {
-            client.getSigningKey(header.kid, (err, key) => {
-                if (err) {
-                    console.error('Error fetching JWKS key:', err.message);
-                    callback(err);
-                } else if (!key) {
-                    console.error('No signing key found for kid:', header.kid);
-                    callback(new Error('No signing key found'));
-                } else {
-                    const signingKey = key.publicKey || key.rsaPublicKey;
-                    if (!signingKey) {
-                        console.error('Invalid signing key for kid:', header.kid);
-                        callback(new Error('Invalid signing key'));
-                    } else {
-                        callback(null, signingKey);
-                    }
-                }
-            });
-        };
+        let lastError = null;
+        for (const uri of jwksUris) {
+            try {
+                const client = jwksClient({ jwksUri: uri });
+                const decoded = await new Promise((resolve, reject) => {
+                    const getKey = (header, callback) => {
+                        client.getSigningKey(header.kid, (err, key) => {
+                            if (err) {
+                                console.error(`Error fetching JWKS key from ${uri}:`, err.message);
+                                callback(err);
+                            } else if (!key) {
+                                console.error(`No signing key found for kid ${header.kid} at ${uri}`);
+                                callback(new Error('No signing key found'));
+                            } else {
+                                const signingKey = key.publicKey || key.rsaPublicKey;
+                                if (!signingKey) {
+                                    console.error(`Invalid signing key for kid ${header.kid} at ${uri}`);
+                                    callback(new Error('Invalid signing key'));
+                                } else {
+                                    callback(null, signingKey);
+                                }
+                            }
+                        });
+                    };
 
-        const decoded = await new Promise((resolve, reject) => {
-            jwt.verify(token, getKey, {
-                audience: ['https://artistictoolshub.com/api', 'https://dev-d07c5upcmrg0jedl.us.auth0.com/userinfo'],
-                issuer: 'https://login.artistictoolshub.com/',
-                algorithms: ['RS256']
-            }, (err, decoded) => {
-                if (err) {
-                    console.error('JWT verification failed:', err.message, { token });
-                    reject(err);
-                } else {
-                    console.log('JWT verified successfully:', decoded);
-                    resolve(decoded);
+                    jwt.verify(token, getKey, {
+                        audience: ['https://artistictoolshub.com/api', 'https://dev-d07c5upcmrg0jedl.us.auth0.com/userinfo'],
+                        issuer: 'https://login.artistictoolshub.com/',
+                        algorithms: ['RS256']
+                    }, (err, decoded) => {
+                        if (err) {
+                            console.error(`JWT verification failed at ${uri}:`, err.message);
+                            reject(err);
+                        } else {
+                            console.log('JWT verified successfully:', decoded);
+                            resolve(decoded);
+                        }
+                    });
+                });
+                // If verification succeeds, proceed
+                if (decoded) {
+                    break;
                 }
-            });
-        });
+            } catch (error) {
+                lastError = error;
+                console.error(`Failed to verify with ${uri}:`, error.message);
+                continue;
+            }
+        }
+
+        if (!decoded) {
+            throw lastError || new Error('All JWKS URIs failed');
+        }
 
         // Configure Cloudinary
         cloudinary.config({
