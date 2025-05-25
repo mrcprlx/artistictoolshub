@@ -1,4 +1,6 @@
 const cloudinary = require('cloudinary').v2;
+const jwt = require('jsonwebtoken');
+const jwksClient = require('jwks-rsa');
 
 exports.handler = async (event, context) => {
     try {
@@ -15,15 +17,38 @@ exports.handler = async (event, context) => {
             };
         }
 
-        // Check for authenticated user (via Netlify Identity or Auth0 token)
-        const { identity } = context.clientContext || {};
-        if (!identity || !identity.user) {
+        // Validate Auth0 JWT token
+        const authHeader = event.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
             return {
                 statusCode: 401,
                 headers: { 'Access-Control-Allow-Origin': '*' },
-                body: JSON.stringify({ message: 'Unauthorized' }),
+                body: JSON.stringify({ message: 'Unauthorized: Missing or invalid token' }),
             };
         }
+
+        const token = authHeader.split(' ')[1];
+        const client = jwksClient({
+            jwksUri: 'https://login.artistictoolshub.com/.well-known/jwks.json'
+        });
+
+        const getKey = (header, callback) => {
+            client.getSigningKey(header.kid, (err, key) => {
+                const signingKey = key?.publicKey || key?.rsaPublicKey;
+                callback(null, signingKey);
+            });
+        };
+
+        const decoded = await new Promise((resolve, reject) => {
+            jwt.verify(token, getKey, {
+                audience: 'https://artistictoolshub.com/api',
+                issuer: 'https://login.artistictoolshub.com/',
+                algorithms: ['RS256']
+            }, (err, decoded) => {
+                if (err) reject(err);
+                else resolve(decoded);
+            });
+        });
 
         // Configure Cloudinary
         cloudinary.config({
@@ -34,7 +59,6 @@ exports.handler = async (event, context) => {
         });
 
         if (event.httpMethod === 'GET') {
-            // Fetch submissions from Cloudinary
             const { resources } = await cloudinary.api.resources({
                 resource_type: 'image',
                 prefix: 'artistictoolshub',
@@ -63,7 +87,6 @@ exports.handler = async (event, context) => {
                     body: JSON.stringify({ message: 'Invalid action or ID' }),
                 };
             }
-            // Update submission status in Cloudinary metadata
             await cloudinary.api.update(id, {
                 context: { custom: { status: action } },
             });
@@ -83,7 +106,6 @@ exports.handler = async (event, context) => {
                     body: JSON.stringify({ message: 'Invalid ID' }),
                 };
             }
-            // Delete submission from Cloudinary
             await cloudinary.uploader.destroy(id);
             return {
                 statusCode: 200,
@@ -100,9 +122,9 @@ exports.handler = async (event, context) => {
     } catch (error) {
         console.error('Error in manage-submissions:', error);
         return {
-            statusCode: 500,
+            statusCode: 401,
             headers: { 'Access-Control-Allow-Origin': '*' },
-            body: JSON.stringify({ message: 'Server error: ' + error.message }),
+            body: JSON.stringify({ message: 'Unauthorized: ' + error.message }),
         };
     }
 };
