@@ -1,1 +1,1 @@
-// Placeholder for future shared scripts
+node_modules/@auth0/auth0-spa-js/dist/auth0-spa-js.production.min.js
