@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+const cloudinary = require('cloudinary').v2;
 
 exports.handler = async (event, context) => {
     try {
@@ -15,6 +15,7 @@ exports.handler = async (event, context) => {
             };
         }
 
+        // Check for authenticated user (via Netlify Identity or Auth0 token)
         const { identity } = context.clientContext || {};
         if (!identity || !identity.user) {
             return {
@@ -24,31 +25,26 @@ exports.handler = async (event, context) => {
             };
         }
 
-        const cloudName = 'drxmkv1si';
-        const apiKey = '874188631367555';
-        const apiSecret = process.env.CLOUDINARY_API_SECRET; // Securely stored in Netlify
-        if (!apiSecret) {
-            return {
-                statusCode: 500,
-                headers: { 'Access-Control-Allow-Origin': '*' },
-                body: JSON.stringify({ message: 'Cloudinary API secret not configured' }),
-            };
-        }
+        // Configure Cloudinary
+        cloudinary.config({
+            cloud_name: 'drxmkv1si',
+            api_key: '874188631367555',
+            api_secret: process.env.CLOUDINARY_API_SECRET,
+            secure: true,
+        });
 
         if (event.httpMethod === 'GET') {
             // Fetch submissions from Cloudinary
-            const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/resources/image/upload?prefix=artistictoolshub`, {
-                method: 'GET',
-                headers: {
-                    Authorization: `Basic ${Buffer.from(`${apiKey}:${apiSecret}`).toString('base64')}`,
-                },
+            const { resources } = await cloudinary.api.resources({
+                resource_type: 'image',
+                prefix: 'artistictoolshub',
+                max_results: 50,
             });
-            const data = await response.json();
-            const submissions = data.resources.map((resource) => ({
+            const submissions = resources.map((resource) => ({
                 id: resource.public_id,
                 url: resource.secure_url,
                 created_at: resource.created_at,
-                status: 'pending', // Placeholder; adjust based on your metadata
+                status: resource.context?.custom?.status || 'pending',
             }));
 
             return {
@@ -67,7 +63,10 @@ exports.handler = async (event, context) => {
                     body: JSON.stringify({ message: 'Invalid action or ID' }),
                 };
             }
-            // Placeholder: Update metadata in Cloudinary (e.g., set status)
+            // Update submission status in Cloudinary metadata
+            await cloudinary.api.update(id, {
+                context: { custom: { status: action } },
+            });
             return {
                 statusCode: 200,
                 headers: { 'Access-Control-Allow-Origin': '*' },
@@ -85,20 +84,7 @@ exports.handler = async (event, context) => {
                 };
             }
             // Delete submission from Cloudinary
-            const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/resources/image/upload/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    Authorization: `Basic ${Buffer.from(`${apiKey}:${apiSecret}`).toString('base64')}`,
-                },
-            });
-            const data = await response.json();
-            if (data.error) {
-                return {
-                    statusCode: 400,
-                    headers: { 'Access-Control-Allow-Origin': '*' },
-                    body: JSON.stringify({ message: data.error.message }),
-                };
-            }
+            await cloudinary.uploader.destroy(id);
             return {
                 statusCode: 200,
                 headers: { 'Access-Control-Allow-Origin': '*' },
