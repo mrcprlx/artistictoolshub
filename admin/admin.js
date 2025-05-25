@@ -1,4 +1,4 @@
-import auth0 from '/node_modules/@auth0/auth0-spa-js/dist/auth0-spa-js.production.min.js';
+import auth0 from '/node_modules/@auth0/auth0-spa-js/dist/auth0-spa-js.production.js';
 
 (async () => {
     let auth0Client = null;
