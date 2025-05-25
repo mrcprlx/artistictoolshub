@@ -11,13 +11,13 @@
     async function initAuth0() {
         auth0Client = await auth0.createAuth0Client({
             domain: 'login.artistictoolshub.com',
-            clientId: 'mbJ5rUjoVg7ztjnzO7MsHKlv66KYlkF1', // Replace with your Auth0 Client ID
+            clientId: 'YOUR_AUTH0_CLIENT_ID', // Replace with your Auth0 Client ID
             authorizationParams: {
-                redirect_uri: 'https://artistictoolshub.com/admin'
+                redirect_uri: 'https://artistictoolshub.com/admin',
+                audience: 'https://artistictoolshub.com/api' // Add audience for API access
             }
         });
 
-        // Handle redirect callback with code and state
         const query = new URLSearchParams(window.location.search);
         if (query.get('code') && query.get('state')) {
             try {
@@ -46,9 +46,13 @@
 
     async function loadSubmissions() {
         try {
+            const token = await auth0Client.getTokenSilently();
             const response = await fetch('/.netlify/functions/manage-submissions', {
                 method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
             });
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -74,15 +78,19 @@
 
     async function approveSubmission(id) {
         try {
+            const token = await auth0Client.getTokenSilently();
             const response = await fetch('/.netlify/functions/manage-submissions', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ id, action: 'approve' })
             });
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            await loadSubmissions(); // Refresh list
+            await loadSubmissions();
         } catch (error) {
             console.error('Error approving submission:', error);
             alert('Failed to approve submission.');
@@ -91,15 +99,19 @@
 
     async function declineSubmission(id) {
         try {
+            const token = await auth0Client.getTokenSilently();
             const response = await fetch('/.netlify/functions/manage-submissions', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ id, action: 'decline' })
             });
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            await loadSubmissions(); // Refresh list
+            await loadSubmissions();
         } catch (error) {
             console.error('Error declining submission:', error);
             alert('Failed to decline submission.');
@@ -108,15 +120,19 @@
 
     async function removeSubmission(id) {
         try {
+            const token = await auth0Client.getTokenSilently();
             const response = await fetch('/.netlify/functions/manage-submissions', {
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ id })
             });
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            await loadSubmissions(); // Refresh list
+            await loadSubmissions();
         } catch (error) {
             console.error('Error removing submission:', error);
             alert('Failed to remove submission.');
