@@ -1,17 +1,15 @@
 [build]
   command = "npm install"
   publish = "."
-
 [[redirects]]
   from = "/admin/*"
   to = "/"
   status = 302
   force = false
-
+  conditions = { Query = {} } # Skip redirect if query parameters (e.g., code, state) are present
 [[headers]]
   for = "/admin/*"
   [headers.values]
     Content-Security-Policy = "script-src 'self' blob:; connect-src 'self' https://login.artistictoolshub.com"
-
 [functions]
   directory = "netlify/functions"
