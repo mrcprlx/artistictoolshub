@@ -40,7 +40,7 @@ exports.handler = async (event, context) => {
         }
         console.log('Decoded token payload:', decoded.payload);
 
-        // Temporary bypass: Accept token if audience includes API
+        // Check audience
         if (!Array.isArray(decoded.payload.aud) || !decoded.payload.aud.includes('https://artistictoolshub.com/api')) {
             console.error('Invalid audience in token:', decoded.payload.aud);
             return {
@@ -51,31 +51,46 @@ exports.handler = async (event, context) => {
         }
 
         // Configure Cloudinary
+        const apiSecret = process.env.CLOUDINARY_API_SECRET;
+        if (!apiSecret) {
+            console.error('CLOUDINARY_API_SECRET is not set');
+            return {
+                statusCode: 500,
+                headers: { 'Access-Control-Allow-Origin': '*' },
+                body: JSON.stringify({ message: 'Server error: Missing Cloudinary API secret' }),
+            };
+        }
+
         cloudinary.config({
             cloud_name: 'drxmkv1si',
             api_key: '874188631367555',
-            api_secret: process.env.CLOUDINARY_API_SECRET,
+            api_secret: apiSecret,
             secure: true,
         });
 
         if (event.httpMethod === 'GET') {
-            const { resources } = await cloudinary.api.resources({
-                resource_type: 'image',
-                prefix: 'artistictoolshub',
-                max_results: 50,
-            });
-            const submissions = resources.map((resource) => ({
-                id: resource.public_id,
-                url: resource.secure_url,
-                created_at: resource.created_at,
-                status: resource.context?.custom?.status || 'pending',
-            }));
+            try {
+                const { resources } = await cloudinary.api.resources({
+                    resource_type: 'image',
+                    prefix: 'artistictoolshub',
+                    max_results: 50,
+                });
+                const submissions = resources.map((resource) => ({
+                    id: resource.public_id,
+                    url: resource.secure_url,
+                    created_at: resource.created_at,
+                    status: resource.context?.custom?.status || 'pending',
+                }));
 
-            return {
-                statusCode: 200,
-                headers: { 'Access-Control-Allow-Origin': '*' },
-                body: JSON.stringify(submissions),
-            };
+                return {
+                    statusCode: 200,
+                    headers: { 'Access-Control-Allow-Origin': '*' },
+                    body: JSON.stringify(submissions),
+                };
+            } catch (cloudinaryError) {
+                console.error('Cloudinary API error:', cloudinaryError.message || cloudinaryError);
+                throw new Error(`Cloudinary error: ${cloudinaryError.message || 'Unknown error'}`);
+            }
         }
 
         if (event.httpMethod === 'POST') {
@@ -87,14 +102,19 @@ exports.handler = async (event, context) => {
                     body: JSON.stringify({ message: 'Invalid action or ID' }),
                 };
             }
-            await cloudinary.api.update(id, {
-                context: { custom: { status: action } },
-            });
-            return {
-                statusCode: 200,
-                headers: { 'Access-Control-Allow-Origin': '*' },
-                body: JSON.stringify({ message: `${action}ed submission ${id}` }),
-            };
+            try {
+                await cloudinary.api.update(id, {
+                    context: { custom: { status: action } },
+                });
+                return {
+                    statusCode: 200,
+                    headers: { 'Access-Control-Allow-Origin': '*' },
+                    body: JSON.stringify({ message: `${action}ed submission ${id}` }),
+                };
+            } catch (cloudinaryError) {
+                console.error('Cloudinary API error:', cloudinaryError.message || cloudinaryError);
+                throw new Error(`Cloudinary error: ${cloudinaryError.message || 'Unknown error'}`);
+            }
         }
 
         if (event.httpMethod === 'DELETE') {
@@ -106,12 +126,17 @@ exports.handler = async (event, context) => {
                     body: JSON.stringify({ message: 'Invalid ID' }),
                 };
             }
-            await cloudinary.uploader.destroy(id);
-            return {
-                statusCode: 200,
-                headers: { 'Access-Control-Allow-Origin': '*' },
-                body: JSON.stringify({ message: `Deleted submission ${id}` }),
-            };
+            try {
+                await cloudinary.uploader.destroy(id);
+                return {
+                    statusCode: 200,
+                    headers: { 'Access-Control-Allow-Origin': '*' },
+                    body: JSON.stringify({ message: `Deleted submission ${id}` }),
+                };
+            } catch (cloudinaryError) {
+                console.error('Cloudinary API error:', cloudinaryError.message || cloudinaryError);
+                throw new Error(`Cloudinary error: ${cloudinaryError.message || 'Unknown error'}`);
+            }
         }
 
         return {
@@ -120,11 +145,11 @@ exports.handler = async (event, context) => {
             body: JSON.stringify({ message: 'Method Not Allowed' }),
         };
     } catch (error) {
-        console.error('Error in manage-submissions:', error.message);
+        console.error('Error in manage-submissions:', error.message || error);
         return {
-            statusCode: 401,
+            statusCode: 500, // Use 500 for non-auth errors
             headers: { 'Access-Control-Allow-Origin': '*' },
-            body: JSON.stringify({ message: 'Unauthorized: ' + error.message }),
+            body: JSON.stringify({ message: `Server error: ${error.message || 'Unknown error'}` }),
         };
     }
 };
