@@ -1,0 +1,17 @@
+[build]
+  command = "npm install"
+  publish = "."
+
+[[redirects]]
+  from = "/admin/*"
+  to = "/"
+  status = 302
+  force = false
+
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    Content-Security-Policy = "script-src 'self' blob:; connect-src 'self' https://login.artistictoolshub.com"
+
+[functions]
+  directory = "netlify/functions"
