@@ -11,7 +11,7 @@
     async function initAuth0() {
         auth0Client = await auth0.createAuth0Client({
             domain: 'login.artistictoolshub.com',
-            clientId: 'bw6bDFqpXc1j4k9xF6308jdfnkG36b8a', // Replace with your Auth0 Client ID
+            clientId: 'mbJ5rUjoVg7ztjnzO7MsHKlv66KYlkF1', // Replace with your Auth0 Client ID
             authorizationParams: {
                 redirect_uri: 'https://artistictoolshub.com/admin',
                 audience: 'https://artistictoolshub.com/api' // Add audience for API access
