@@ -4,7 +4,7 @@ const jwksClient = require('jwks-rsa');
 
 exports.handler = async (event, context) => {
     try {
-        // Handle CORS pre-flight OPTIONS request
+        // Handle CORS pre-flight OPTIONS
         if (event.httpMethod === 'OPTIONS') {
             return {
                 statusCode: 200,
@@ -20,6 +20,7 @@ exports.handler = async (event, context) => {
         // Validate Auth0 JWT token
         const authHeader = event.headers.authorization;
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            console.log('Missing or invalid Authorization header');
             return {
                 statusCode: 401,
                 headers: { 'Access-Control-Allow-Origin': '*' },
@@ -34,8 +35,13 @@ exports.handler = async (event, context) => {
 
         const getKey = (header, callback) => {
             client.getSigningKey(header.kid, (err, key) => {
-                const signingKey = key?.publicKey || key?.rsaPublicKey;
-                callback(null, signingKey);
+                if (err) {
+                    console.error('Error fetching JWKS key:', err);
+                    callback(err);
+                } else {
+                    const signingKey = key?.publicKey || key?.rsaPublicKey;
+                    callback(null, signingKey);
+                }
             });
         };
 
@@ -45,8 +51,12 @@ exports.handler = async (event, context) => {
                 issuer: 'https://login.artistictoolshub.com/',
                 algorithms: ['RS256']
             }, (err, decoded) => {
-                if (err) reject(err);
-                else resolve(decoded);
+                if (err) {
+                    console.error('JWT verification failed:', err.message);
+                    reject(err);
+                } else {
+                    resolve(decoded);
+                }
             });
         });
 
@@ -120,7 +130,7 @@ exports.handler = async (event, context) => {
             body: JSON.stringify({ message: 'Method Not Allowed' }),
         };
     } catch (error) {
-        console.error('Error in manage-submissions:', error);
+        console.error('Error in manage-submissions:', error.message);
         return {
             statusCode: 401,
             headers: { 'Access-Control-Allow-Origin': '*' },
