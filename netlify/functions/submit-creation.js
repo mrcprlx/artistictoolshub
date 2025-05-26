@@ -104,24 +104,33 @@ exports.handler = async (event) => {
         let publicId = public_id || '';
         if (image && !publicId) {
             try {
+                // Sanitize text and author to avoid invalid characters
+                const sanitizedText = text.replace(/\|/g, ' ').replace(/\n/g, ' ').trim();
+                const sanitizedAuthor = author ? author.replace(/\|/g, ' ').replace(/\n/g, ' ').trim() : '';
                 const uploadResult = await cloudinary.uploader.upload(image, {
                     upload_preset: 'artistictoolshub',
                     folder: 'artistictoolshub',
-                    context: `text=${text}|social_links=${author || ''}`
+                    context: {
+                        custom: {
+                            text: sanitizedText,
+                            social_links: sanitizedAuthor
+                        }
+                    }
                 });
                 imageUrl = uploadResult.secure_url;
                 publicId = uploadResult.public_id;
                 console.log('Cloudinary upload success:', {
                     publicId,
                     imageUrl,
-                    context: uploadResult.context?.custom
+                    context: uploadResult.context,
+                    requestContext: { text: sanitizedText, social_links: sanitizedAuthor }
                 });
             } catch (cloudinaryError) {
                 console.error('Cloudinary upload error:', cloudinaryError.message || cloudinaryError);
                 return {
                     statusCode: 500,
                     headers: { 'Access-Control-Allow-Origin': '*' },
-                    body: JSON.stringify({ message: 'Failed to upload image' }),
+                    body: JSON.stringify({ message: 'Failed to upload image: ' + (cloudinaryError.message || 'Unknown error') }),
                 };
             }
         } else if (publicId) {
