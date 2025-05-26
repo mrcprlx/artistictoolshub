@@ -68,6 +68,7 @@ exports.handler = async (event, context) => {
                 const result = await cloudinary.api.resources({
                     resource_type: 'image',
                     type: 'upload',
+                    prefix: 'artistictoolshub',
                     max_results: 50,
                 });
                 console.log('Cloudinary API response:', {
@@ -86,8 +87,8 @@ exports.handler = async (event, context) => {
                     url: resource.secure_url,
                     created_at: resource.created_at,
                     status: resource.context?.custom?.status || 'pending',
-                    text: resource.context?.custom?.text || '', // Poem or lyrics
-                    social_links: resource.context?.custom?.social_links || '' // Social links
+                    text: resource.context?.custom?.text || '',
+                    social_links: resource.context?.custom?.social_links || ''
                 }));
 
                 return {
@@ -102,8 +103,20 @@ exports.handler = async (event, context) => {
         }
 
         if (event.httpMethod === 'POST') {
-            const { id, action } = JSON.parse(event.body);
+            let body;
+            try {
+                body = JSON.parse(event.body);
+            } catch (error) {
+                console.error('JSON parse error in POST:', error);
+                return {
+                    statusCode: 400,
+                    headers: { 'Access-Control-Allow-Origin': '*' },
+                    body: JSON.stringify({ message: 'Invalid request body' }),
+                };
+            }
+            const { id, action } = body;
             if (!id || !['approve', 'decline'].includes(action)) {
+                console.error('Invalid POST data:', { id, action });
                 return {
                     statusCode: 400,
                     headers: { 'Access-Control-Allow-Origin': '*' },
@@ -111,23 +124,40 @@ exports.handler = async (event, context) => {
                 };
             }
             try {
-                await cloudinary.api.update(id, {
-                    context: { custom: { status: action } },
+                const updateResult = await cloudinary.api.update(id, {
+                    context: { custom: { status: action } }
                 });
+                console.log('Cloudinary update success:', { id, action, updateResult });
                 return {
                     statusCode: 200,
                     headers: { 'Access-Control-Allow-Origin': '*' },
                     body: JSON.stringify({ message: `${action}ed submission ${id}` }),
                 };
             } catch (cloudinaryError) {
-                console.error('Cloudinary API error:', cloudinaryError.message || cloudinaryError);
-                throw new Error(`Cloudinary error: ${cloudinaryError.message || 'Unknown error'}`);
+                console.error('Cloudinary update error:', cloudinaryError.message || cloudinaryError);
+                return {
+                    statusCode: 500,
+                    headers: { 'Access-Control-Allow-Origin': '*' },
+                    body: JSON.stringify({ message: `Failed to ${action} submission: ${cloudinaryError.message || 'Unknown error'}` }),
+                };
             }
         }
 
         if (event.httpMethod === 'DELETE') {
-            const { id } = JSON.parse(event.body);
+            let body;
+            try {
+                body = JSON.parse(event.body);
+            } catch (error) {
+                console.error('JSON parse error in DELETE:', error);
+                return {
+                    statusCode: 400,
+                    headers: { 'Access-Control-Allow-Origin': '*' },
+                    body: JSON.stringify({ message: 'Invalid request body' }),
+                };
+            }
+            const { id } = body;
             if (!id) {
+                console.error('Invalid DELETE data:', { id });
                 return {
                     statusCode: 400,
                     headers: { 'Access-Control-Allow-Origin': '*' },
@@ -136,14 +166,19 @@ exports.handler = async (event, context) => {
             }
             try {
                 await cloudinary.uploader.destroy(id);
+                console.log('Cloudinary delete success:', { id });
                 return {
                     statusCode: 200,
                     headers: { 'Access-Control-Allow-Origin': '*' },
                     body: JSON.stringify({ message: `Deleted submission ${id}` }),
                 };
             } catch (cloudinaryError) {
-                console.error('Cloudinary API error:', cloudinaryError.message || cloudinaryError);
-                throw new Error(`Cloudinary error: ${cloudinaryError.message || 'Unknown error'}`);
+                console.error('Cloudinary delete error:', cloudinaryError.message || cloudinaryError);
+                return {
+                    statusCode: 500,
+                    headers: { 'Access-Control-Allow-Origin': '*' },
+                    body: JSON.stringify({ message: `Failed to delete submission: ${cloudinaryError.message || 'Unknown error'}` }),
+                };
             }
         }
 

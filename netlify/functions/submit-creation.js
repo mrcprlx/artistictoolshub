@@ -45,7 +45,7 @@ exports.handler = async (event) => {
             };
         }
 
-        const { text, image, author, 'g-recaptcha-response': recaptchaResponse } = body;
+        const { text, image, author, public_id, 'g-recaptcha-response': recaptchaResponse } = body;
 
         if (!text || !recaptchaResponse) {
             console.error('Missing fields in submit-creation:', { text, recaptchaResponse });
@@ -101,22 +101,21 @@ exports.handler = async (event) => {
         });
 
         let imageUrl = '';
-        let publicId = '';
-        if (image) {
+        let publicId = public_id || '';
+        if (image && !publicId) {
             try {
                 const uploadResult = await cloudinary.uploader.upload(image, {
                     upload_preset: 'artistictoolshub',
                     folder: 'artistictoolshub',
-                    context: {
-                        custom: {
-                            text: text,
-                            social_links: author || ''
-                        }
-                    }
+                    context: `text=${text}|social_links=${author || ''}`
                 });
                 imageUrl = uploadResult.secure_url;
                 publicId = uploadResult.public_id;
-                console.log('Cloudinary upload success:', { publicId, imageUrl });
+                console.log('Cloudinary upload success:', {
+                    publicId,
+                    imageUrl,
+                    context: uploadResult.context?.custom
+                });
             } catch (cloudinaryError) {
                 console.error('Cloudinary upload error:', cloudinaryError.message || cloudinaryError);
                 return {
@@ -125,6 +124,9 @@ exports.handler = async (event) => {
                     body: JSON.stringify({ message: 'Failed to upload image' }),
                 };
             }
+        } else if (publicId) {
+            imageUrl = `https://res.cloudinary.com/drxmkv1si/image/upload/${publicId}`;
+            console.log('Using existing Cloudinary image:', { publicId, imageUrl });
         }
 
         // Create Markdown content for Netlify CMS

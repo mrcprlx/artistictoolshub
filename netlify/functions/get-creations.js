@@ -1,15 +1,46 @@
-// Force redeploy: Updated 2025-05-20
+const cloudinary = require('cloudinary').v2;
+
 exports.handler = async () => {
     try {
         console.log('Function invoked: get-creations');
-        // Placeholder: Return mock data (replace with CMS fetch in production)
-        const creations = Array.from({ length: 50 }, (_, i) => ({
-            id: i + 1,
-            text: `Sample creation ${i + 1}. This is a snippet of creative work shared by an artist.`,
-            image: i % 2 === 0 ? 'https://via.placeholder.com/150' : null,
-            author: i % 3 === 0 ? 'Artist' : i % 3 === 1 ? 'https://x.com/artist' : null,
-            date: new Date(2025, 4, 19 - i).toISOString(),
-        }));
+
+        // Configure Cloudinary
+        const apiSecret = process.env.CLOUDINARY_API_SECRET;
+        if (!apiSecret) {
+            console.error('CLOUDINARY_API_SECRET is not set');
+            return {
+                statusCode: 500,
+                headers: { 'Access-Control-Allow-Origin': '*' },
+                body: JSON.stringify({ message: 'Server configuration error' }),
+            };
+        }
+
+        cloudinary.config({
+            cloud_name: 'drxmkv1si',
+            api_key: '874188631367555',
+            api_secret: apiSecret,
+            secure: true,
+        });
+
+        // Fetch approved submissions
+        const result = await cloudinary.api.resources({
+            resource_type: 'image',
+            type: 'upload',
+            prefix: 'artistictoolshub',
+            max_results: 50,
+        });
+
+        const creations = result.resources
+            .filter(resource => resource.context?.custom?.status === 'approve')
+            .map(resource => ({
+                id: resource.public_id,
+                text: resource.context?.custom?.text || '',
+                image: resource.secure_url || null,
+                author: resource.context?.custom?.social_links || null,
+                date: resource.created_at
+            }));
+
+        console.log('Fetched creations:', { count: creations.length });
 
         return {
             statusCode: 200,
