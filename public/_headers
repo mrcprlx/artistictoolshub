@@ -1,0 +1,2 @@
+/admin/cms
+  Content-Security-Policy: default-src 'self'; script-src 'self' blob: 'unsafe-inline' https://identity.netlify.com https://unpkg.com; style-src 'self' 'unsafe-inline'; connect-src 'self' https://identity.netlify.com; frame-src 'self' https://identity.netlify.com
