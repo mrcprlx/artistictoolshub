@@ -35,7 +35,7 @@ async function submitForm(recaptchaResponse) {
     }
 
     // Validate image (2MB, PNG/JPG)
-    let imageUrl = null;
+    let imageBase64 = null;
     if (image) {
         const maxSize = 2 * 1024 * 1024; // 2MB
         if (image.size > maxSize) {
@@ -48,46 +48,32 @@ async function submitForm(recaptchaResponse) {
             grecaptcha.reset();
             return;
         }
-
-        // Upload to Cloudinary
-        const formData = new FormData();
-        formData.append('file', image);
-        formData.append('upload_preset', 'artistictoolshub');
-        try {
-            const imageResponse = await fetch('https://api.cloudinary.com/v1_1/drxmkv1si/image/upload', {
-                method: 'POST',
-                body: formData,
-            });
-            const imageData = await imageResponse.json();
-            if (!imageData.secure_url) {
-                console.error('Cloudinary error:', imageData);
-                alert('Image upload failed: ' + (imageData.error?.message || 'Unknown error'));
-                grecaptcha.reset();
-                return;
-            }
-            imageUrl = imageData.secure_url;
-        } catch (error) {
-            console.error('Cloudinary upload error:', error);
-            alert('Image upload failed: ' + error.message);
-            grecaptcha.reset();
-            return;
-        }
+        // Convert image to base64
+        imageBase64 = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.readAsDataURL(image);
+        });
     }
 
-    // Submit to Netlify CMS
+    // Submit to Netlify Function
     try {
-        const requestBody = { text, image: imageUrl, author, 'g-recaptcha-response': recaptchaResponse };
+        const requestBody = {
+            text,
+            image: imageBase64,
+            author,
+            'g-recaptcha-response': recaptchaResponse
+        };
         console.log('Sending request to Netlify Function:', {
             url: '/.netlify/functions/submit-creation',
             method: 'POST',
-            body: requestBody
+            body: { ...requestBody, image: imageBase64 ? '[base64]' : null }
         });
         const response = await fetch('/.netlify/functions/submit-creation', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestBody),
         });
-        // Clone response to allow multiple reads
         const responseClone = response.clone();
         let responseBody;
         try {
@@ -159,19 +145,19 @@ function renderCreations() {
         const card = document.createElement('div');
         card.className = 'creation-card';
         card.innerHTML = `
-      <h3>${creation.text.split(/\s+/).slice(0, 5).join(' ') || 'Untitled'}</h3>
-      <p>${creation.text}</p>
-      ${creation.image ? `<img src="${creation.image}" alt="Creation image">` : ''}
-      ${creation.author ? `<a href="${creation.author.startsWith('http') ? creation.author : '#'}" class="author-link">${creation.author}</a>` : ''}
-      <div class="share-container">
-        <button class="share-button">Share</button>
-        <div class="share-submenu">
-          <a href="https://x.com/intent/tweet?text=Check%20out%20this%20creation%20on%20ArtisticToolsHub!&url=${encodeURIComponent(`https://artistictoolshub.com/creations?id=${creation.id}`)}" target="_blank">Share on X</a>
-          <a href="mailto:?subject=Check%20out%20this%20creation!&body=See%20this%20on%20ArtisticToolsHub:%20https://artistictoolshub.com/creations?id=${creation.id}" target="_blank">Email</a>
-          <button onclick="copyLink(${creation.id})">Copy Link</button>
+        <h3>${creation.text.split(/\s+/).slice(0, 5).join(' ') || 'Untitled'}</h3>
+        <p>${creation.text}</p>
+        ${creation.image ? `<img src="${creation.image}" alt="Creation image">` : ''}
+        ${creation.author ? `<a href="${creation.author.startsWith('http') ? creation.author : '#'}" class="author-link">${creation.author}</a>` : ''}
+        <div class="share-container">
+          <button class="share-button">Share</button>
+          <div class="share-submenu">
+            <a href="https://x.com/intent/tweet?text=Check%20out%20this%20creation%20on%20ArtisticToolsHub!&url=${encodeURIComponent(`https://artistictoolshub.com/creations?id=${creation.id}`)}" target="_blank">Share on X</a>
+            <a href="mailto:?subject=Check%20out%20this%20creation!&body=See%20this%20on%20ArtisticToolsHub:%20https://artistictoolshub.com/creations?id=${creation.id}" target="_blank">Email</a>
+            <button onclick="copyLink(${creation.id})">Copy Link</button>
+          </div>
         </div>
-      </div>
-    `;
+      `;
         creationsGrid.appendChild(card);
     });
 
