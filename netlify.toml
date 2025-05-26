@@ -13,3 +13,8 @@
     Content-Security-Policy = "script-src 'self' blob: 'unsafe-inline'; connect-src 'self' https://login.artistictoolshub.com"
 [functions]
   directory = "netlify/functions"
+[[redirects]]
+  from = "/invite"
+  to = "/admin/cms"
+  status = 301
+  force = true
