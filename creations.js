@@ -120,14 +120,7 @@ async function fetchCreations() {
         renderCreations();
     } catch (error) {
         console.error('Error fetching creations:', error);
-        // Fallback to mock data for testing
-        creations = Array.from({ length: 50 }, (_, i) => ({
-            id: i + 1,
-            text: `Sample creation ${i + 1}. This is a snippet of creative work shared by an artist. ${'Lorem ipsum '.repeat(10)}`,
-            image: i % 2 === 0 ? 'https://via.placeholder.com/150' : null,
-            author: i % 3 === 0 ? 'Artist' : i % 3 === 1 ? 'https://x.com/artist' : null,
-            date: new Date(2025, 4, 19 - i).toISOString(),
-        }));
+        creations = [];
         renderCreations();
     }
 }
@@ -154,7 +147,7 @@ function renderCreations() {
           <div class="share-submenu">
             <a href="https://x.com/intent/tweet?text=Check%20out%20this%20creation%20on%20ArtisticToolsHub!&url=${encodeURIComponent(`https://artistictoolshub.com/creations?id=${creation.id}`)}" target="_blank">Share on X</a>
             <a href="mailto:?subject=Check%20out%20this%20creation!&body=See%20this%20on%20ArtisticToolsHub:%20https://artistictoolshub.com/creations?id=${creation.id}" target="_blank">Email</a>
-            <button onclick="copyLink(${creation.id})">Copy Link</button>
+            <button onclick="copyLink('${creation.id}')">Copy Link</button>
           </div>
         </div>
       `;

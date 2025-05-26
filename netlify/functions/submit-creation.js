@@ -1,5 +1,6 @@
 const fetch = require('node-fetch');
 const cloudinary = require('cloudinary').v2;
+const { v4: uuidv4 } = require('uuid');
 
 exports.handler = async (event) => {
     try {
@@ -12,7 +13,6 @@ exports.handler = async (event) => {
         });
 
         if (event.httpMethod === 'OPTIONS') {
-            console.log('Handling OPTIONS request for submit-creation');
             return {
                 statusCode: 200,
                 headers: {
@@ -25,7 +25,7 @@ exports.handler = async (event) => {
         }
 
         if (event.httpMethod !== 'POST') {
-            console.error('Method not allowed in submit-creation:', event.httpMethod);
+            console.error('Method not allowed:', event.httpMethod);
             return {
                 statusCode: 405,
                 headers: { 'Access-Control-Allow-Origin': '*' },
@@ -37,7 +37,7 @@ exports.handler = async (event) => {
         try {
             body = JSON.parse(event.body);
         } catch (error) {
-            console.error('JSON parse error in submit-creation:', error);
+            console.error('JSON parse error:', error);
             return {
                 statusCode: 400,
                 headers: { 'Access-Control-Allow-Origin': '*' },
@@ -45,10 +45,10 @@ exports.handler = async (event) => {
             };
         }
 
-        const { text, image, author, public_id, 'g-recaptcha-response': recaptchaResponse } = body;
+        const { text, image, author, 'g-recaptcha-response': recaptchaResponse } = body;
 
         if (!text || !recaptchaResponse) {
-            console.error('Missing fields in submit-creation:', { text, recaptchaResponse });
+            console.error('Missing fields:', { text, recaptchaResponse });
             return {
                 statusCode: 400,
                 headers: { 'Access-Control-Allow-Origin': '*' },
@@ -59,7 +59,7 @@ exports.handler = async (event) => {
         // Validate reCAPTCHA
         const secretKey = process.env.RECAPTCHA_SECRET_KEY;
         if (!secretKey) {
-            console.error('reCAPTCHA Secret Key not configured in submit-creation');
+            console.error('reCAPTCHA Secret Key not configured');
             return {
                 statusCode: 500,
                 headers: { 'Access-Control-Allow-Origin': '*' },
@@ -74,7 +74,7 @@ exports.handler = async (event) => {
 
         const recaptchaData = await recaptchaVerify.json();
         if (!recaptchaData.success) {
-            console.error('reCAPTCHA verification failed in submit-creation:', recaptchaData);
+            console.error('reCAPTCHA verification failed:', recaptchaData);
             return {
                 statusCode: 400,
                 headers: { 'Access-Control-Allow-Origin': '*' },
@@ -101,69 +101,60 @@ exports.handler = async (event) => {
         });
 
         let imageUrl = '';
-        let publicId = public_id || '';
-        if (image && !publicId) {
+        let publicId = '';
+        if (image) {
             try {
-                // Sanitize inputs
-                const sanitizedText = text.replace(/[\|\n]/g, ' ').trim();
-                const sanitizedAuthor = author ? author.replace(/[\|\n]/g, ' ').trim() : '';
                 const uploadResult = await cloudinary.uploader.upload(image, {
                     upload_preset: 'artistictoolshub',
                     folder: 'artistictoolshub',
-                    context: {
-                        custom: {
-                            text: sanitizedText,
-                            social_links: sanitizedAuthor
-                        }
-                    }
+                    context: { custom: { status: 'pending' } }
                 });
                 imageUrl = uploadResult.secure_url;
                 publicId = uploadResult.public_id;
-                console.log('Cloudinary upload success:', {
-                    public_id: publicId,
-                    image_url: imageUrl,
-                    context_returned: uploadResult.context,
-                    context_sent: { text: sanitizedText, social_links: sanitizedAuthor },
-                    full_response: {
-                        public_id: uploadResult.public_id,
-                        context: uploadResult.context,
-                        created_at: uploadResult.created_at
-                    }
-                });
+                console.log('Cloudinary upload success:', { publicId, imageUrl, context: uploadResult.context });
             } catch (cloudinaryError) {
-                console.error('Cloudinary upload error:', {
-                    message: cloudinaryError.message || 'Unknown error',
-                    error: cloudinaryError
-                });
+                console.error('Cloudinary upload error:', cloudinaryError.message || cloudinaryError);
                 return {
                     statusCode: 500,
                     headers: { 'Access-Control-Allow-Origin': '*' },
-                    body: JSON.stringify({ message: 'Failed to upload image: ' + (cloudinaryError.message || 'Unknown error') }),
+                    body: JSON.stringify({ message: 'Failed to upload image' }),
                 };
             }
-        } else if (publicId) {
-            imageUrl = `https://res.cloudinary.com/drxmkv1si/image/upload/${publicId}`;
-            console.log('Using existing Cloudinary image:', { publicId, imageUrl });
         }
 
-        // Create Markdown content for Netlify CMS
+        // Save to Netlify CMS (mock for now)
+        const submissionId = uuidv4();
         const slug = text.trim().split(/\s+/).slice(0, 5).join('-').toLowerCase();
         const content = `---
-    text: ${text.trim()}
-    ${imageUrl ? `image: ${imageUrl}` : ''}
-    ${author ? `author: ${author}` : ''}
-    ${publicId ? `public_id: ${publicId}` : ''}
-    date: ${new Date().toISOString()}
-    ---
-    ${text.trim()}
-    `;
+submission_id: ${submissionId}
+text: ${text.trim()}
+${imageUrl ? `image: ${imageUrl}` : ''}
+${publicId ? `public_id: ${publicId}` : ''}
+${author ? `author: ${author.trim()}` : ''}
+status: pending
+date: ${new Date().toISOString()}
+---
+${text.trim()}
+`;
 
-        console.log('Saving to content/creations:', { slug, content });
+        // Mock CMS storage (replace with GitHub API/Netlify CMS)
+        global.mockCmsSubmissions = global.mockCmsSubmissions || [];
+        global.mockCmsSubmissions.push({
+            submission_id: submissionId,
+            text: text.trim(),
+            image: imageUrl,
+            public_id: publicId,
+            author: author ? author.trim() : '',
+            status: 'pending',
+            date: new Date().toISOString()
+        });
+
+        console.log('Saved to mock CMS:', { slug, content, submissionId });
 
         return {
             statusCode: 200,
             headers: { 'Access-Control-Allow-Origin': '*' },
-            body: JSON.stringify({ message: 'Submission received', publicId }),
+            body: JSON.stringify({ message: 'Submission received', submissionId, publicId }),
         };
     } catch (error) {
         console.error('Function error in submit-creation:', error);

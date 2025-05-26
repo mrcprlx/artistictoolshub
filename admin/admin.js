@@ -71,14 +71,13 @@
             <p>Status: ${sub.status}</p>
             <p>Created: ${new Date(sub.created_at).toLocaleDateString()}</p>
             <p>Text: ${sub.text || 'No text provided'}</p>
-            <p>Social Links: ${sub.social_links || 'No links provided'}</p>
+            <p>Author: ${sub.social_links || 'No author provided'}</p>
             <button class="approve-btn" data-id="${sub.id}">Approve</button>
             <button class="decline-btn" data-id="${sub.id}">Decline</button>
             <button class="remove-btn" data-id="${sub.id}">Remove</button>
           </div>
         `).join('');
 
-                // Add event listeners to buttons
                 document.querySelectorAll('.approve-btn').forEach(btn => {
                     btn.addEventListener('click', () => approveSubmission(btn.dataset.id));
                 });
