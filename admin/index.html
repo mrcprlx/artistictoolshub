@@ -17,10 +17,19 @@
         <div id="admin-content" style="display: none;">
             <h2>Manage Creations</h2>
             <div id="submissions-list"></div>
-            <button onclick="logout()">Logout</button>
+            <button id="logout-btn">Logout</button>
         </div>
     </div>
     <script type="module" src="/admin/admin.js"></script>
+    <script>
+        document.getElementById('logout-btn')?.addEventListener('click', async () => {
+            try {
+                await window.logout();
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        });
+    </script>
 </body>
 
 </html>

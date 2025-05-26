@@ -65,16 +65,29 @@
                 submissionsList.innerHTML = '<p>No submissions found.</p>';
             } else {
                 submissionsList.innerHTML = submissions.map(sub => `
-                    <div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0;">
-                        <img src="${sub.url}" alt="Submission" style="max-width: 200px; display: ${sub.url ? 'block' : 'none'};">
-                        <p>ID: ${sub.id}</p>
-                        <p>Status: ${sub.status}</p>
-                        <p>Created: ${new Date(sub.created_at).toLocaleDateString()}</p>
-                        <button onclick="approveSubmission('${sub.id}')">Approve</button>
-                        <button onclick="declineSubmission('${sub.id}')">Decline</button>
-                        <button onclick="removeSubmission('${sub.id}')">Remove</button>
-                    </div>
-                `).join('');
+          <div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0;">
+            <img src="${sub.url}" alt="Submission" style="max-width: 200px; display: ${sub.url ? 'block' : 'none'};">
+            <p>ID: ${sub.id}</p>
+            <p>Status: ${sub.status}</p>
+            <p>Created: ${new Date(sub.created_at).toLocaleDateString()}</p>
+            <p>Text: ${sub.text || 'No text provided'}</p>
+            <p>Social Links: ${sub.social_links || 'No links provided'}</p>
+            <button class="approve-btn" data-id="${sub.id}">Approve</button>
+            <button class="decline-btn" data-id="${sub.id}">Decline</button>
+            <button class="remove-btn" data-id="${sub.id}">Remove</button>
+          </div>
+        `).join('');
+
+                // Add event listeners to buttons
+                document.querySelectorAll('.approve-btn').forEach(btn => {
+                    btn.addEventListener('click', () => approveSubmission(btn.dataset.id));
+                });
+                document.querySelectorAll('.decline-btn').forEach(btn => {
+                    btn.addEventListener('click', () => declineSubmission(btn.dataset.id));
+                });
+                document.querySelectorAll('.remove-btn').forEach(btn => {
+                    btn.addEventListener('click', () => removeSubmission(btn.dataset.id));
+                });
             }
         } catch (error) {
             console.error('Error loading submissions:', error);
@@ -146,11 +159,16 @@
     }
 
     async function logout() {
-        await auth0Client.logout({
-            logoutParams: {
-                returnTo: 'https://artistictoolshub.com'
-            }
-        });
+        try {
+            await auth0Client.logout({
+                logoutParams: {
+                    returnTo: 'https://artistictoolshub.com'
+                }
+            });
+        } catch (error) {
+            console.error('Logout failed:', error);
+            alert('Failed to logout. Please try again.');
+        }
     }
 
     try {

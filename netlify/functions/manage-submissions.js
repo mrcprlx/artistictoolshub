@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 
 exports.handler = async (event, context) => {
     try {
-        // Handle CORS pre-flight OPTIONS
         if (event.httpMethod === 'OPTIONS') {
             return {
                 statusCode: 200,
@@ -16,7 +15,6 @@ exports.handler = async (event, context) => {
             };
         }
 
-        // Extract token
         const authHeader = event.headers.authorization;
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
             console.log('Missing or invalid Authorization header:', authHeader);
@@ -48,7 +46,6 @@ exports.handler = async (event, context) => {
             };
         }
 
-        // Configure Cloudinary
         const apiSecret = process.env.CLOUDINARY_API_SECRET;
         if (!apiSecret) {
             console.error('CLOUDINARY_API_SECRET is not set');
@@ -89,6 +86,8 @@ exports.handler = async (event, context) => {
                     url: resource.secure_url,
                     created_at: resource.created_at,
                     status: resource.context?.custom?.status || 'pending',
+                    text: resource.context?.custom?.text || '', // Poem or lyrics
+                    social_links: resource.context?.custom?.social_links || '' // Social links
                 }));
 
                 return {

@@ -6,10 +6,10 @@
   to = "/"
   status = 302
   force = false
-  conditions = { Query = {} } # Skip redirect if query parameters (e.g., code, state) are present
+  conditions = { Query = {} }
 [[headers]]
   for = "/admin/*"
   [headers.values]
-    Content-Security-Policy = "script-src 'self' blob:; connect-src 'self' https://login.artistictoolshub.com"
+    Content-Security-Policy = "script-src 'self' blob: 'unsafe-inline'; connect-src 'self' https://login.artistictoolshub.com"
 [functions]
   directory = "netlify/functions"
