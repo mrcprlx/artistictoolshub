@@ -11,10 +11,10 @@
     async function initAuth0() {
         auth0Client = await auth0.createAuth0Client({
             domain: 'login.artistictoolshub.com',
-            clientId: 'mbJ5rUjoVg7ztjnzO7MsHKlv66KYlkF1', // Replace with your Auth0 Client ID
+            clientId: 'mbJ5rUjoVg7ztjnzO7MsHKlv66KYlkF1',
             authorizationParams: {
                 redirect_uri: 'https://artistictoolshub.com/admin',
-                audience: 'https://artistictoolshub.com/api' // Add audience for API access
+                audience: 'https://artistictoolshub.com/api'
             }
         });
 
@@ -47,7 +47,6 @@
     async function loadSubmissions() {
         try {
             const token = await auth0Client.getTokenSilently();
-            // Decode token payload (for debugging)
             const payload = JSON.parse(atob(token.split('.')[1]));
             console.log('Auth0 Token Payload:', payload);
             const response = await fetch('/.netlify/functions/manage-submissions', {
@@ -62,17 +61,21 @@
             }
             const submissions = await response.json();
             const submissionsList = document.getElementById('submissions-list');
-            submissionsList.innerHTML = submissions.map(sub => `
-      <div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0;">
-        <img src="${sub.url}" alt="Submission" style="max-width: 200px; display: ${sub.url ? 'block' : 'none'};">
-        <p>ID: ${sub.id}</p>
-        <p>Status: ${sub.status}</p>
-        <p>Created: ${new Date(sub.created_at).toLocaleDateString()}</p>
-        <button onclick="approveSubmission('${sub.id}')">Approve</button>
-        <button onclick="declineSubmission('${sub.id}')">Decline</button>
-        <button onclick="removeSubmission('${sub.id}')">Remove</button>
-      </div>
-    `).join('');
+            if (submissions.length === 0) {
+                submissionsList.innerHTML = '<p>No submissions found.</p>';
+            } else {
+                submissionsList.innerHTML = submissions.map(sub => `
+                    <div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0;">
+                        <img src="${sub.url}" alt="Submission" style="max-width: 200px; display: ${sub.url ? 'block' : 'none'};">
+                        <p>ID: ${sub.id}</p>
+                        <p>Status: ${sub.status}</p>
+                        <p>Created: ${new Date(sub.created_at).toLocaleDateString()}</p>
+                        <button onclick="approveSubmission('${sub.id}')">Approve</button>
+                        <button onclick="declineSubmission('${sub.id}')">Decline</button>
+                        <button onclick="removeSubmission('${sub.id}')">Remove</button>
+                    </div>
+                `).join('');
+            }
         } catch (error) {
             console.error('Error loading submissions:', error);
             document.getElementById('submissions-list').innerHTML = '<p>Error loading submissions. Please try again.</p>';
