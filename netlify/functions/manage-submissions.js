@@ -71,11 +71,16 @@ exports.handler = async (event, context) => {
                 const result = await cloudinary.api.resources({
                     resource_type: 'image',
                     type: 'upload',
-                    prefix: 'artistictoolshub',
                     max_results: 50,
                 });
                 console.log('Cloudinary API response:', {
-                    resources: result.resources,
+                    resources: result.resources.map(r => ({
+                        public_id: r.public_id,
+                        url: r.secure_url,
+                        type: r.type,
+                        created_at: r.created_at,
+                        context: r.context
+                    })),
                     total_count: result.total_count,
                     next_cursor: result.next_cursor
                 });
