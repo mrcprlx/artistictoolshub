@@ -1,34 +1,33 @@
-// Mock CMS data (replace with actual Netlify CMS/GitHub API in production)
-let mockCmsSubmissions = [];
+const axios = require('axios');
 
 exports.handler = async () => {
-  try {
-    console.log('Function invoked: get-creations');
+    const githubToken = process.env.GITHUB_TOKEN;
+    const repoOwner = 'your-repo-owner'; // Replace with your GitHub username/organization
+    const repoName = 'your-repo-name';   // Replace with your repository name
+    const branch = 'main';
+    const path = 'content/creations';
 
-    // Fetch approved submissions from CMS
-    const creations = mockCmsSubmissions
-      .filter(sub => sub.status === 'approve')
-      .map(sub => ({
-        id: sub.submission_id,
-        text: sub.text || '',
-        image: sub.image || null,
-        author: sub.author || null,
-        date: sub.date
-      }));
+    const response = await axios.get(
+        `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}?ref=${branch}`,
+        { headers: { Authorization: `Bearer ${githubToken}` } }
+    );
 
-    console.log('Fetched creations:', { count: creations.length });
+    const creations = await Promise.all(
+        response.data
+            .filter(file => file.name.endsWith('.md'))
+            .map(async file => {
+                const fileContent = await axios.get(file.download_url);
+                const content = fileContent.data;
+                const frontmatterMatch = content.match(/---\n([\s\S]*?)\n---/);
+                if (!frontmatterMatch) return null;
+                const frontmatter = frontmatterMatch[1].split('\n').reduce((acc, line) => {
+                    const [key, value] = line.split(': ').map(s => s.trim());
+                    if (key) acc[key] = value.replace(/^"(.*)"$/, '$1');
+                    return acc;
+                }, {});
+                return frontmatter.published === 'true' ? { id: file.name, ...frontmatter } : null;
+            })
+    );
 
-    return {
-      statusCode: 200,
-      headers: { 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify(creations),
-    };
-  } catch (error) {
-    console.error('Function error in get-creations:', error);
-    return {
-      statusCode: 500,
-      headers: { 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ message: 'Server error: ' + error.message }),
-    };
-  }
+    return { statusCode: 200, body: JSON.stringify(creations.filter(c => c !== null)) };
 };

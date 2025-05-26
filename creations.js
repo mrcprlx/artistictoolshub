@@ -15,9 +15,8 @@ document.getElementById('submit-creation').addEventListener('click', (e) => {
     formSection.scrollIntoView({ behavior: 'smooth' });
 });
 
-// Form submission with reCAPTCHA v2 Invisible
+// Form submission with reCAPTCHA
 window.onSubmit = function (token) {
-    console.log('reCAPTCHA token received:', token);
     submitForm(token);
 };
 
@@ -48,7 +47,6 @@ async function submitForm(recaptchaResponse) {
             grecaptcha.reset();
             return;
         }
-        // Convert image to base64
         imageBase64 = await new Promise((resolve) => {
             const reader = new FileReader();
             reader.onload = () => resolve(reader.result);
@@ -58,60 +56,38 @@ async function submitForm(recaptchaResponse) {
 
     // Submit to Netlify Function
     try {
-        const requestBody = {
-            text,
-            image: imageBase64,
-            author,
-            'g-recaptcha-response': recaptchaResponse
-        };
-        console.log('Sending request to Netlify Function:', {
-            url: '/.netlify/functions/submit-creation',
-            method: 'POST',
-            body: { ...requestBody, image: imageBase64 ? '[base64]' : null }
-        });
         const response = await fetch('/.netlify/functions/submit-creation', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(requestBody),
+            body: JSON.stringify({
+                text,
+                image: imageBase64,
+                author,
+                'g-recaptcha-response': recaptchaResponse,
+            }),
         });
-        const responseClone = response.clone();
-        let responseBody;
-        try {
-            responseBody = await response.json();
-        } catch (jsonError) {
-            console.error('Failed to parse JSON:', jsonError);
-            const rawText = await responseClone.text();
-            console.error('Raw response:', rawText.slice(0, 200));
-            throw new Error(`Server error: ${response.status} ${response.statusText} - Non-JSON response`);
-        }
-        if (!response.ok) {
-            console.error('Netlify Function error:', responseBody);
-            throw new Error(responseBody.message || `Submission failed: ${response.status}`);
-        }
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || 'Submission failed');
         document.getElementById('form-message').style.display = 'block';
         document.getElementById('creation-form').reset();
         setTimeout(() => {
             document.getElementById('submission-form').style.display = 'none';
             document.getElementById('form-message').style.display = 'none';
         }, 2000);
-        // Refresh creations
         fetchCreations();
     } catch (error) {
-        console.error('Submission error:', error);
         alert('Submission failed: ' + error.message);
         grecaptcha.reset();
-        return;
     }
 }
 
 // Prevent default form submission
 document.getElementById('creation-form').addEventListener('submit', (e) => {
     e.preventDefault();
-    console.log('Form submitted, executing reCAPTCHA');
     grecaptcha.execute();
 });
 
-// Fetch creations from Netlify CMS
+// Fetch creations
 async function fetchCreations() {
     try {
         const response = await fetch('/.netlify/functions/get-creations');
@@ -129,44 +105,37 @@ async function fetchCreations() {
 function renderCreations() {
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
-    const creationsToShow = creations
-        .sort((a, b) => new Date(b.date) - new Date(a.date)) // Latest first
-        .slice(start, end);
+    const creationsToShow = creations.slice(start, end);
 
     creationsGrid.innerHTML = '';
     creationsToShow.forEach((creation) => {
         const card = document.createElement('div');
         card.className = 'creation-card';
         card.innerHTML = `
-        <h3>${creation.text.split(/\s+/).slice(0, 5).join(' ') || 'Untitled'}</h3>
-        <p>${creation.text}</p>
-        ${creation.image ? `<img src="${creation.image}" alt="Creation image">` : ''}
-        ${creation.author ? `<a href="${creation.author.startsWith('http') ? creation.author : '#'}" class="author-link">${creation.author}</a>` : ''}
-        <div class="share-container">
-          <button class="share-button">Share</button>
-          <div class="share-submenu">
-            <a href="https://x.com/intent/tweet?text=Check%20out%20this%20creation%20on%20ArtisticToolsHub!&url=${encodeURIComponent(`https://artistictoolshub.com/creations?id=${creation.id}`)}" target="_blank">Share on X</a>
-            <a href="mailto:?subject=Check%20out%20this%20creation!&body=See%20this%20on%20ArtisticToolsHub:%20https://artistictoolshub.com/creations?id=${creation.id}" target="_blank">Email</a>
-            <button onclick="copyLink('${creation.id}')">Copy Link</button>
-          </div>
+      <h3>${creation.title || 'Untitled'}</h3>
+      <p>${creation.text}</p>
+      ${creation.image ? `<img src="${creation.image}" alt="Creation image">` : ''}
+      ${creation.creator ? `<a href="${creation.creator.startsWith('http') ? creation.creator : '#'}" class="author-link">${creation.creator}</a>` : ''}
+      <div class="share-container">
+        <button class="share-button">Share</button>
+        <div class="share-submenu">
+          <a href="https://x.com/intent/tweet?text=Check%20out%20this%20creation%20on%20ArtisticToolsHub!&url=${encodeURIComponent(`https://artistictoolshub.com/creations?id=${creation.id}`)}" target="_blank">Share on X</a>
+          <a href="mailto:?subject=Check%20out%20this%20creation!&body=See%20this%20on%20ArtisticToolsHub:%20https://artistictoolshub.com/creations?id=${creation.id}" target="_blank">Email</a>
+          <button onclick="copyLink('${creation.id}')">Copy Link</button>
         </div>
-      `;
+      </div>
+    `;
         creationsGrid.appendChild(card);
     });
 
-    // Update pagination buttons
     prevPageBtn.disabled = currentPage === 1;
     nextPageBtn.disabled = end >= creations.length;
 }
 
-// Copy link to clipboard
+// Copy link
 window.copyLink = function (id) {
     const url = `https://artistictoolshub.com/creations?id=${id}`;
-    navigator.clipboard.writeText(url).then(() => {
-        alert('Link copied to clipboard!');
-    }).catch(() => {
-        alert('Failed to copy link.');
-    });
+    navigator.clipboard.writeText(url).then(() => alert('Link copied!'));
 };
 
 // Pagination controls

@@ -1,19 +1,18 @@
-backend:
-  name: git-gateway
-  branch: admin-only
-media_folder: "public/uploads"
-public_folder: "/uploads"
+media_library:
+  name: cloudinary
+  config:
+    cloud_name: "drxmkv1si"
+    api_key: "874188631367555"
+
 collections:
-  - name: creations
-    label: Creations
+  - name: "creations"
+    label: "Creations"
     folder: "content/creations"
     create: true
     slug: "{{slug}}"
     fields:
-      - { label: "Submission ID", name: "submission_id", widget: "string" }
-      - { label: "Text", name: "text", widget: "text" }
-      - { label: "Image", name: "image", widget: "image", required: false }
-      - { label: "Public ID", name: "public_id", widget: "string", required: false }
-      - { label: "Author", name: "author", widget: "string", required: false }
-      - { label: "Status", name: "status", widget: "select", options: ["pending", "approve", "decline"] }
-      - { label: "Date", name: "date", widget: "datetime" }
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Text", name: "text", widget: "text"}
+      - {label: "Image URL", name: "image", widget: "string"}
+      - {label: "Creator", name: "creator", widget: "string"}
+    publish_mode: editorial_workflow
