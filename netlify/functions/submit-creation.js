@@ -1,5 +1,5 @@
-// Force redeploy: Updated 2025-05-20
 const fetch = require('node-fetch');
+const cloudinary = require('cloudinary').v2;
 
 exports.handler = async (event) => {
     try {
@@ -11,7 +11,6 @@ exports.handler = async (event) => {
             queryStringParameters: event.queryStringParameters
         });
 
-        // Handle CORS pre-flight OPTIONS request
         if (event.httpMethod === 'OPTIONS') {
             console.log('Handling OPTIONS request for submit-creation');
             return {
@@ -83,24 +82,69 @@ exports.handler = async (event) => {
             };
         }
 
+        // Configure Cloudinary
+        const apiSecret = process.env.CLOUDINARY_API_SECRET;
+        if (!apiSecret) {
+            console.error('CLOUDINARY_API_SECRET is not set');
+            return {
+                statusCode: 500,
+                headers: { 'Access-Control-Allow-Origin': '*' },
+                body: JSON.stringify({ message: 'Server error: Missing Cloudinary API secret' }),
+            };
+        }
+
+        cloudinary.config({
+            cloud_name: 'drxmkv1si',
+            api_key: '874188631367555',
+            api_secret: apiSecret,
+            secure: true,
+        });
+
+        let imageUrl = '';
+        let publicId = '';
+        if (image) {
+            try {
+                const uploadResult = await cloudinary.uploader.upload(image, {
+                    upload_preset: 'artistictoolshub',
+                    folder: 'artistictoolshub',
+                    context: {
+                        custom: {
+                            text: text,
+                            social_links: author || ''
+                        }
+                    }
+                });
+                imageUrl = uploadResult.secure_url;
+                publicId = uploadResult.public_id;
+                console.log('Cloudinary upload success:', { publicId, imageUrl });
+            } catch (cloudinaryError) {
+                console.error('Cloudinary upload error:', cloudinaryError.message || cloudinaryError);
+                return {
+                    statusCode: 500,
+                    headers: { 'Access-Control-Allow-Origin': '*' },
+                    body: JSON.stringify({ message: 'Failed to upload image' }),
+                };
+            }
+        }
+
         // Create Markdown content for Netlify CMS
         const slug = text.trim().split(/\s+/).slice(0, 5).join('-').toLowerCase();
         const content = `---
-text: ${text}
-${image ? `image: ${image}` : ''}
-${author ? `author: ${author}` : ''}
-date: ${new Date().toISOString()}
----
-${text}
-`;
+    text: ${text}
+    ${imageUrl ? `image: ${imageUrl}` : ''}
+    ${author ? `author: ${author}` : ''}
+    ${publicId ? `public_id: ${publicId}` : ''}
+    date: ${new Date().toISOString()}
+    ---
+    ${text}
+    `;
 
-        // Placeholder: Log content (replace with GitHub API commit in production)
         console.log('Saving to content/creations:', { slug, content });
 
         return {
             statusCode: 200,
             headers: { 'Access-Control-Allow-Origin': '*' },
-            body: JSON.stringify({ message: 'Submission received' }),
+            body: JSON.stringify({ message: 'Submission received', publicId }),
         };
     } catch (error) {
         console.error('Function error in submit-creation:', error);
