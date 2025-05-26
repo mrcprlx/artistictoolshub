@@ -72,6 +72,7 @@ exports.handler = async (event, context) => {
             try {
                 const { resources } = await cloudinary.api.resources({
                     resource_type: 'image',
+                    type: 'upload', // Specify delivery type
                     prefix: 'artistictoolshub',
                     max_results: 50,
                 });
@@ -147,7 +148,7 @@ exports.handler = async (event, context) => {
     } catch (error) {
         console.error('Error in manage-submissions:', error.message || error);
         return {
-            statusCode: 500, // Use 500 for non-auth errors
+            statusCode: 500,
             headers: { 'Access-Control-Allow-Origin': '*' },
             body: JSON.stringify({ message: `Server error: ${error.message || 'Unknown error'}` }),
         };
