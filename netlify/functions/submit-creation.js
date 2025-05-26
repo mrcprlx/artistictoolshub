@@ -69,7 +69,7 @@ exports.handler = async (event) => {
         const recaptchaVerify = await fetch('https://www.google.com/recaptcha/api/siteverify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `secret=${secretKey}&response=${recaptchaResponse}`,
+            body: `secret=${secretKey}&response=${encodeURIComponent(recaptchaResponse)}`,
         });
 
         const recaptchaData = await recaptchaVerify.json();
@@ -104,9 +104,9 @@ exports.handler = async (event) => {
         let publicId = public_id || '';
         if (image && !publicId) {
             try {
-                // Sanitize text and author to avoid invalid characters
-                const sanitizedText = text.replace(/\|/g, ' ').replace(/\n/g, ' ').trim();
-                const sanitizedAuthor = author ? author.replace(/\|/g, ' ').replace(/\n/g, ' ').trim() : '';
+                // Sanitize inputs
+                const sanitizedText = text.replace(/[\|\n]/g, ' ').trim();
+                const sanitizedAuthor = author ? author.replace(/[\|\n]/g, ' ').trim() : '';
                 const uploadResult = await cloudinary.uploader.upload(image, {
                     upload_preset: 'artistictoolshub',
                     folder: 'artistictoolshub',
@@ -120,13 +120,21 @@ exports.handler = async (event) => {
                 imageUrl = uploadResult.secure_url;
                 publicId = uploadResult.public_id;
                 console.log('Cloudinary upload success:', {
-                    publicId,
-                    imageUrl,
-                    context: uploadResult.context,
-                    requestContext: { text: sanitizedText, social_links: sanitizedAuthor }
+                    public_id: publicId,
+                    image_url: imageUrl,
+                    context_returned: uploadResult.context,
+                    context_sent: { text: sanitizedText, social_links: sanitizedAuthor },
+                    full_response: {
+                        public_id: uploadResult.public_id,
+                        context: uploadResult.context,
+                        created_at: uploadResult.created_at
+                    }
                 });
             } catch (cloudinaryError) {
-                console.error('Cloudinary upload error:', cloudinaryError.message || cloudinaryError);
+                console.error('Cloudinary upload error:', {
+                    message: cloudinaryError.message || 'Unknown error',
+                    error: cloudinaryError
+                });
                 return {
                     statusCode: 500,
                     headers: { 'Access-Control-Allow-Origin': '*' },
@@ -141,13 +149,13 @@ exports.handler = async (event) => {
         // Create Markdown content for Netlify CMS
         const slug = text.trim().split(/\s+/).slice(0, 5).join('-').toLowerCase();
         const content = `---
-    text: ${text}
+    text: ${text.trim()}
     ${imageUrl ? `image: ${imageUrl}` : ''}
     ${author ? `author: ${author}` : ''}
     ${publicId ? `public_id: ${publicId}` : ''}
     date: ${new Date().toISOString()}
     ---
-    ${text}
+    ${text.trim()}
     `;
 
         console.log('Saving to content/creations:', { slug, content });
