@@ -1,18 +1,19 @@
 [build]
   command = "npm install"
   publish = "."
-[[redirects]]
-  from = "/admin/*"
-  to = "/"
-  status = 302
-  force = false
-  conditions = { Query = {} }
+  functions = "netlify/functions"
+
 [[headers]]
   for = "/admin/*"
   [headers.values]
     Content-Security-Policy = "script-src 'self' blob: 'unsafe-inline'; connect-src 'self' https://login.artistictoolshub.com"
-[functions]
-  directory = "netlify/functions"
+
+[[redirects]]
+  from = "/admin/*"
+  to = "/"
+  status = 302
+  conditions = { Query = {} }
+
 [[redirects]]
   from = "/invite"
   to = "/admin/cms"
