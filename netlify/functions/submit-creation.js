@@ -29,8 +29,8 @@ exports.handler = async (event) => {
 
     // Create draft entry in GitHub
     const githubToken = process.env.GITHUB_TOKEN;
-    const repoOwner = 'your-repo-owner'; // Replace with your GitHub username/organization
-    const repoName = 'your-repo-name';   // Replace with your repository name
+    const repoOwner = 'mrcprlx'; // Replace with your GitHub username/organization
+    const repoName = 'artistictoolshub';   // Replace with your repository name
     const branch = 'main';
     const filePath = `content/creations/${uuidv4()}.md`;
     const frontmatter = `---
