@@ -28,7 +28,6 @@ exports.handler = async (event, context) => {
         }
 
         const token = authHeader.split(' ')[1];
-        // Decode token without verification for debugging
         const decoded = jwt.decode(token, { complete: true });
         if (!decoded) {
             console.error('Failed to decode token:', token);
@@ -40,7 +39,6 @@ exports.handler = async (event, context) => {
         }
         console.log('Decoded token payload:', decoded.payload);
 
-        // Check audience
         if (!Array.isArray(decoded.payload.aud) || !decoded.payload.aud.includes('https://artistictoolshub.com/api')) {
             console.error('Invalid audience in token:', decoded.payload.aud);
             return {
@@ -70,13 +68,18 @@ exports.handler = async (event, context) => {
 
         if (event.httpMethod === 'GET') {
             try {
-                const { resources } = await cloudinary.api.resources({
+                const result = await cloudinary.api.resources({
                     resource_type: 'image',
-                    type: 'upload', // Specify delivery type
+                    type: 'upload',
                     prefix: 'artistictoolshub',
                     max_results: 50,
                 });
-                const submissions = resources.map((resource) => ({
+                console.log('Cloudinary API response:', {
+                    resources: result.resources,
+                    total_count: result.total_count,
+                    next_cursor: result.next_cursor
+                });
+                const submissions = result.resources.map((resource) => ({
                     id: resource.public_id,
                     url: resource.secure_url,
                     created_at: resource.created_at,
