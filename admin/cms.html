@@ -34,35 +34,51 @@
     const inviteToken = window.location.hash.match(/invite_token=([^&]+)/);
     if (inviteToken) {
       const token = inviteToken[1];
+
+      // Show the password form only if token is present
       document.getElementById('invite-form').style.display = 'block';
+
       document.getElementById('set-password-form').addEventListener('submit', function (event) {
         event.preventDefault();
         const password = document.getElementById('password').value;
+
+        // Send request to set password using the invite token
         fetch('https://artistictoolshub.com/.netlify/identity/token', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ grant_type: 'invite_token', invite_token: token, password: password })
+          body: JSON.stringify({
+            grant_type: 'invite_token',
+            invite_token: token,
+            password: password
+            // Uncomment and add your Auth0 client ID if required by your setup:
+            // client_id: 'your-auth0-client-id-here'
+          })
         })
           .then(response => {
-            if (response.ok) return response.json();
-            throw new Error('Failed to set password');
+            if (!response.ok) {
+              return response.json().then(err => {
+                throw new Error(err.error_description || 'Failed to set password');
+              });
+            }
+            return response.json();
           })
           .then(data => {
             alert('Password set successfully. Please log in.');
-            netlifyIdentity.open('login');
+            netlifyIdentity.open('login'); // Open login widget for user to log in
           })
           .catch(error => {
             console.error('Error setting password:', error);
-            document.getElementById('cms').innerHTML = '<p>Error setting password. Please try again or request a new invite.</p>';
+            document.getElementById('cms').innerHTML = `<p>${error.message}. Please try again or request a new invite.</p>`;
             document.getElementById('cms').classList.add('error');
           });
       });
     } else {
+      // Handle regular CMS access for authenticated users
       netlifyIdentity.on('init', user => {
         if (user) {
-          CMS.init();
+          CMS.init(); // Load CMS if user is already logged in
         } else {
-          netlifyIdentity.open('login');
+          netlifyIdentity.open('login'); // Prompt login if no user
         }
       });
     }
@@ -70,15 +86,15 @@
     // Handle login redirect
     netlifyIdentity.on('login', () => {
       netlifyIdentity.close();
-      window.location.href = '/admin/cms';
+      window.location.href = '/admin/cms'; // Redirect to CMS after login
     });
 
     // Handle logout
     netlifyIdentity.on('logout', () => {
-      window.location.href = '/';
+      window.location.href = '/'; // Redirect to homepage on logout
     });
 
-    // Handle errors
+    // Handle Netlify Identity errors
     netlifyIdentity.on('error', err => {
       console.error('Netlify Identity error:', err);
       document.getElementById('cms').innerHTML = '<p>Error loading CMS. Please try again.</p>';
