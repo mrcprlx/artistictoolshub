@@ -1,1 +1,2 @@
-node_modules/@auth0/auth0-spa-js/dist/auth0-spa-js.production.min.js
+// scripts.js - Custom JavaScript for Artistic Tools Hub
+// Currently unused; invite token logic is in /admin/cms.html
