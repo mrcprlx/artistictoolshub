@@ -15,6 +15,14 @@
 
 <body>
   <div id="cms"></div>
+  <div id="invite-form" style="display: none;">
+    <h2>Set Your Password</h2>
+    <form id="set-password-form">
+      <label for="password">Password</label>
+      <input type="password" id="password" required>
+      <button type="submit">Set Password</button>
+    </form>
+  </div>
   <script src="https://unpkg.com/decap-cms@3.6.3/dist/decap-cms.js"></script>
   <script>
     // Initialize Netlify Identity
@@ -25,22 +33,35 @@
     // Check for invite token in URL
     const inviteToken = window.location.hash.match(/invite_token=([^&]+)/);
     if (inviteToken) {
-      // Accept the invite token
-      netlifyIdentity.gotrue.acceptInvite(inviteToken[1]).then(() => {
-        // Redirect to CMS after accepting invite
-        window.location.href = '/admin/cms';
-      }).catch(err => {
-        console.error('Invite acceptance failed:', err);
-        document.getElementById('cms').innerHTML = '<p>Error accepting invite. Please try again.</p>';
+      const token = inviteToken[1];
+      document.getElementById('invite-form').style.display = 'block';
+      document.getElementById('set-password-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const password = document.getElementById('password').value;
+        fetch('https://artistictoolshub.com/.netlify/identity/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ grant_type: 'invite_token', invite_token: token, password: password })
+        })
+          .then(response => {
+            if (response.ok) return response.json();
+            throw new Error('Failed to set password');
+          })
+          .then(data => {
+            alert('Password set successfully. Please log in.');
+            netlifyIdentity.open('login');
+          })
+          .catch(error => {
+            console.error('Error setting password:', error);
+            document.getElementById('cms').innerHTML = '<p>Error setting password. Please try again or request a new invite.</p>';
+            document.getElementById('cms').classList.add('error');
+          });
       });
     } else {
-      // No invite token, check user status
       netlifyIdentity.on('init', user => {
         if (user) {
-          // User is logged in, initialize CMS
           CMS.init();
         } else {
-          // No user, open login modal
           netlifyIdentity.open('login');
         }
       });
@@ -55,6 +76,13 @@
     // Handle logout
     netlifyIdentity.on('logout', () => {
       window.location.href = '/';
+    });
+
+    // Handle errors
+    netlifyIdentity.on('error', err => {
+      console.error('Netlify Identity error:', err);
+      document.getElementById('cms').innerHTML = '<p>Error loading CMS. Please try again.</p>';
+      document.getElementById('cms').classList.add('error');
     });
   </script>
 </body>
