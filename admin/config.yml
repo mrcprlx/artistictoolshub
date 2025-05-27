@@ -1,8 +1,16 @@
+backend:
+  name: git-gateway
+  branch: main
+
 media_library:
   name: cloudinary
   config:
     cloud_name: "drxmkv1si"
     api_key: "874188631367555"
+
+publish_mode: editorial_workflow
+media_folder: "content/creations/images"
+public_folder: "/creations/images"
 
 collections:
   - name: "creations"
@@ -15,4 +23,4 @@ collections:
       - {label: "Text", name: "text", widget: "text"}
       - {label: "Image URL", name: "image", widget: "string"}
       - {label: "Creator", name: "creator", widget: "string"}
-    publish_mode: editorial_workflow
+      - {label: "Published", name: "published", widget: "boolean", default: false}

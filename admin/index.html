@@ -4,32 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex">
     <title>Admin - Artistic Tools Hub</title>
     <link rel="stylesheet" href="/styles.css">
-    <script src="/js/auth0-spa-js.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600&display=swap"
+        rel="stylesheet">
 </head>
 
 <body>
-    <div id="app">
-        <h1>Admin Dashboard</h1>
-        <div id="auth-status">Checking authentication...</div>
-        <div id="admin-content" style="display: none;">
-            <h2>Manage Creations</h2>
-            <div id="submissions-list"></div>
-            <button id="logout-btn">Logout</button>
-        </div>
-    </div>
-    <script type="module" src="/admin/admin.js"></script>
+    <div id="admin-root"></div>
     <script>
-        document.getElementById('logout-btn')?.addEventListener('click', async () => {
-            try {
-                await window.logout();
-            } catch (error) {
-                console.error('Logout error:', error);
-            }
-        });
+        window.ENV = {
+            AUTH0_CLIENT_ID: "{{.Env.AUTH0_CLIENT_ID}}",
+            AUTH0_AUDIENCE: "{{.Env.AUTH0_AUDIENCE}}",
+            AUTH0_DOMAIN: "{{.Env.AUTH0_DOMAIN}}",
+            AUTH0_ISSUER_BASE_URL: "{{.Env.AUTH0_ISSUER_BASE_URL}}"
+        };
     </script>
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+    <script src="/admin/admin.js"></script>
 </body>
 
 </html>
