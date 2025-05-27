@@ -3,6 +3,7 @@
     if (!window.auth0) {
         console.error('Auth0 SDK not loaded');
         document.getElementById('auth-status').textContent = 'Authentication error: SDK not loaded.';
+        document.getElementById('auth-status').classList.add('error');
         return;
     }
 

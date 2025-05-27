@@ -28,16 +28,14 @@
         // User is logged in, initialize CMS
         CMS.init();
       } else {
-        // No user, open login modal with Auth0
-        netlifyIdentity.open('login');
-        netlifyIdentity.setProvider({
-          name: 'auth0',
-          login: () => {
-            netlifyIdentity.gotrue.login({
-              provider: 'auth0',
-              connection: 'Username-Password-Authentication'
-            });
-          }
+        // No user, trigger Auth0 login
+        netlifyIdentity.gotrue.login({
+          provider: 'auth0',
+          connection: 'Username-Password-Authentication'
+        }).catch(err => {
+          console.error('Auth0 login failed:', err);
+          document.getElementById('cms').innerHTML = '<p>Error logging in. Please try again.</p>';
+          document.getElementById('cms').classList.add('error');
         });
       }
     });
@@ -57,6 +55,7 @@
     netlifyIdentity.on('error', err => {
       console.error('Netlify Identity error:', err);
       document.getElementById('cms').innerHTML = '<p>Error loading CMS. Please try again.</p>';
+      document.getElementById('cms').classList.add('error');
     });
   </script>
 </body>
