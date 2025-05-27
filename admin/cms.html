@@ -13,35 +13,37 @@
 
 <body>
   <div id="cms"></div>
-  <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
+  <script src="https://unpkg.com/decap-cms@3.6.3/dist/decap-cms.js"></script>
   <script>
     // Initialize Netlify Identity
+    netlifyIdentity.init();
+
+    // Check user status
     netlifyIdentity.on('init', user => {
-      if (!user) {
-        // Handle invite token if present
-        const token = window.location.hash.match(/invite_token=([^&]+)/);
-        if (token) {
-          netlifyIdentity.acceptInvite(token[1]).then(() => {
-            window.location.href = '/admin/cms';
-          }).catch(err => {
-            console.error('Invite acceptance failed:', err);
-            document.getElementById('cms').innerHTML = '<p>Error accepting invite. Please try again.</p>';
-          });
-        }
-      } else {
+      if (user) {
         // User is logged in, initialize CMS
         CMS.init();
+      } else {
+        // No user, open login modal (handles invite tokens automatically)
+        netlifyIdentity.open('login');
       }
     });
 
     // Handle login redirect
     netlifyIdentity.on('login', () => {
+      netlifyIdentity.close();
       window.location.href = '/admin/cms';
     });
 
     // Handle logout
     netlifyIdentity.on('logout', () => {
       window.location.href = '/';
+    });
+
+    // Handle errors
+    netlifyIdentity.on('error', err => {
+      console.error('Netlify Identity error:', err);
+      document.getElementById('cms').innerHTML = '<p>Error loading CMS. Please try again.</p>';
     });
   </script>
 </body>

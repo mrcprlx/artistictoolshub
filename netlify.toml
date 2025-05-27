@@ -7,7 +7,7 @@
 [[headers]]
   for = "/admin/*"
   [headers.values]
-    Content-Security-Policy = "script-src 'self' blob: 'unsafe-inline' 'unsafe-eval' https://identity.netlify.com https://unpkg.com; connect-src 'self' https://login.artistictoolshub.com https://api.netlify.com"
+    Content-Security-Policy = "script-src 'self' blob: 'unsafe-inline' 'unsafe-eval' https://identity.netlify.com https://unpkg.com https://media-library.cloudinary.com; connect-src 'self' https://login.artistictoolshub.com https://api.netlify.com"
 
 [[redirects]]
   from = "/admin/*"
