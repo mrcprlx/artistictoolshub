@@ -565,7 +565,14 @@ footer {
     }
 
     #cms {
-        padding: 1rem;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: var(--bg-color);
+        padding: 2rem;
+        box-sizing: border-box;
     }
 
     #auth-status {

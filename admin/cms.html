@@ -22,16 +22,29 @@
       APIUrl: 'https://artistictoolshub.com/.netlify/identity'
     });
 
-    // Check user status
-    netlifyIdentity.on('init', user => {
-      if (user) {
-        // User is logged in, initialize CMS
-        CMS.init();
-      } else {
-        // No user, open login modal to handle invite token and Auth0
-        netlifyIdentity.open('login');
-      }
-    });
+    // Check for invite token in URL
+    const inviteToken = window.location.hash.match(/invite_token=([^&]+)/);
+    if (inviteToken) {
+      // Accept the invite token
+      netlifyIdentity.gotrue.acceptInvite(inviteToken[1]).then(() => {
+        // Redirect to CMS after accepting invite
+        window.location.href = '/admin/cms';
+      }).catch(err => {
+        console.error('Invite acceptance failed:', err);
+        document.getElementById('cms').innerHTML = '<p>Error accepting invite. Please try again.</p>';
+      });
+    } else {
+      // No invite token, check user status
+      netlifyIdentity.on('init', user => {
+        if (user) {
+          // User is logged in, initialize CMS
+          CMS.init();
+        } else {
+          // No user, open login modal
+          netlifyIdentity.open('login');
+        }
+      });
+    }
 
     // Handle login redirect
     netlifyIdentity.on('login', () => {
@@ -42,13 +55,6 @@
     // Handle logout
     netlifyIdentity.on('logout', () => {
       window.location.href = '/';
-    });
-
-    // Handle errors
-    netlifyIdentity.on('error', err => {
-      console.error('Netlify Identity error:', err);
-      document.getElementById('cms').innerHTML = '<p>Error loading CMS. Please try again.</p>';
-      document.getElementById('cms').classList.add('error');
     });
   </script>
 </body>
