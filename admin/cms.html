@@ -21,7 +21,7 @@
         // Handle invite token if present
         const token = window.location.hash.match(/invite_token=([^&]+)/);
         if (token) {
-          netlifyIdentity.gotrue.acceptInviteExternalUrl('auth0', window.location.href).then(() => {
+          netlifyIdentity.acceptInvite(token[1]).then(() => {
             window.location.href = '/admin/cms';
           }).catch(err => {
             console.error('Invite acceptance failed:', err);

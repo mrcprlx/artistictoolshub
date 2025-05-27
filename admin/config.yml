@@ -19,8 +19,8 @@ collections:
     create: true
     slug: "{{slug}}"
     fields:
-      - {label: "Title", name: "title", widget: "string"}
-      - {label: "Text", name: "text", widget: "text"}
-      - {label: "Image URL", name: "image", widget: "string"}
-      - {label: "Creator", name: "creator", widget: "string"}
-      - {label: "Published", name: "published", widget: "boolean", default: false}
+      - { label: "Title", name: "title", widget: "string", required: true }
+      - { label: "Text", name: "text", widget: "text", required: true }
+      - { label: "Image URL", name: "image", widget: "string", required: false }
+      - { label: "Creator", name: "creator", widget: "string", required: false }
+      - { label: "Published", name: "published", widget: "boolean", default: false }
