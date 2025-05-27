@@ -44,7 +44,12 @@
                 loginButton.textContent = 'Log in';
                 loginButton.className = 'cta-button';
                 loginButton.onclick = async () => {
-                    await auth0Client.loginWithRedirect();
+                    await auth0Client.loginWithRedirect({
+                        authorizationParams: {
+                            connection: 'auth0', // Use Auth0 connection for Netlify Identity
+                            redirect_uri: 'https://artistictoolshub.com/.netlify/identity/callback'
+                        }
+                    });
                 };
                 adminContent.innerHTML = '';
                 adminContent.appendChild(loginButton);
