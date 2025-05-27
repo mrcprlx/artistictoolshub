@@ -7,6 +7,7 @@ media_library:
   config:
     cloud_name: "drxmkv1si"
     api_key: "874188631367555"
+    upload_preset: "artistictoolshub"
 
 publish_mode: editorial_workflow
 media_folder: "content/creations/images"

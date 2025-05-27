@@ -14,8 +14,9 @@
                 domain: window.ENV.AUTH0_DOMAIN,
                 clientId: window.ENV.AUTH0_CLIENT_ID,
                 authorizationParams: {
-                    redirect_uri: 'https://artistictoolshub.com/admin',
-                    audience: window.ENV.AUTH0_AUDIENCE
+                    redirect_uri: 'https://artistictoolshub.com/.netlify/identity/callback',
+                    audience: window.ENV.AUTH0_AUDIENCE,
+                    connection: 'Username-Password-Authentication'
                 },
                 cacheLocation: 'localstorage'
             });
@@ -25,6 +26,8 @@
             if (query.get('code') && query.get('state')) {
                 await auth0Client.handleRedirectCallback();
                 window.history.replaceState({}, document.title, '/admin');
+                // Redirect to CMS
+                window.location.href = '/admin/cms';
             }
 
             // Check authentication status
@@ -40,13 +43,14 @@
             } else {
                 authStatus.style.display = 'block';
                 authStatus.textContent = 'Please log in to manage submissions.';
+                authStatus.classList.add('error');
                 const loginButton = document.createElement('button');
                 loginButton.textContent = 'Log in';
                 loginButton.className = 'cta-button';
                 loginButton.onclick = async () => {
                     await auth0Client.loginWithRedirect({
                         authorizationParams: {
-                            connection: 'auth0', // Use Auth0 connection for Netlify Identity
+                            connection: 'Username-Password-Authentication',
                             redirect_uri: 'https://artistictoolshub.com/.netlify/identity/callback'
                         }
                     });
@@ -57,6 +61,7 @@
         } catch (error) {
             console.error('Auth0 initialization failed:', error);
             document.getElementById('auth-status').textContent = 'Authentication error. Please try again.';
+            document.getElementById('auth-status').classList.add('error');
         }
     }
 
