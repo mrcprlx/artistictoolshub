@@ -20,11 +20,9 @@ body {
     margin: 0;
     padding: 0;
     height: 100vh;
-    background-color: var(--bg-color);
     font-family: 'Open Sans', sans-serif;
     color: var(--text-color);
     line-height: 1.6;
-    background: linear-gradient(rgba(168, 181, 162, 0.3), rgba(249, 174, 97, 0.3));
 }
 
 header {
@@ -473,22 +471,6 @@ footer {
 }
 
 /* Admin page styles */
-#cms {
-    height: 100vh;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    background-color: var(--bg-color);
-    padding: 0;
-    margin: 0;
-}
-
-#cms>* {
-    background-color: var(--bg-color) !important;
-}
-
 #auth-status {
     text-align: center;
     font-size: 1.2rem;
@@ -630,10 +612,6 @@ footer {
     .share-submenu {
         left: auto;
         right: 0;
-    }
-
-    #cms {
-        padding: 0;
     }
 
     #auth-status {
