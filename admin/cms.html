@@ -8,21 +8,20 @@
   <link rel="stylesheet" href="/styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600&display=swap"
     rel="stylesheet">
-  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <!-- Inline script to capture token early -->
+  <script>
+    // Capture invite_token from hash as soon as the page loads
+    window.inviteToken = window.location.hash.match(/invite_token=([^&]+)/)?.[1];
+    if (window.inviteToken) {
+      // Clear the hash to prevent CMS interference
+      window.location.hash = '';
+    }
+  </script>
 </head>
 
 <body>
   <div id="cms"></div>
-  <div id="invite-form" style="display: none;">
-    <h2>Set Your Password</h2>
-    <form id="set-password-form">
-      <label for="password">Password</label>
-      <input type="password" id="password" required>
-      <button type="submit">Set Password</button>
-    </form>
-  </div>
   <script src="https://unpkg.com/decap-cms@3.6.3/dist/decap-cms.js"></script>
   <script>
     // Initialize Netlify Identity
@@ -30,66 +29,33 @@
       APIUrl: 'https://artistictoolshub.com/.netlify/identity'
     });
 
-    // Extract and store the invite token, then clear the hash
-    let inviteToken = null;
-    const tokenMatch = window.location.hash.match(/invite_token=([^&]+)/);
-    if (tokenMatch) {
-      inviteToken = tokenMatch[1];
-      window.location.hash = ''; // Clear the hash to prevent CMS interference
-    }
+    // Handle CMS access and token logic
+    netlifyIdentity.on('init', user => {
+      if (window.inviteToken && !user) {
+        // If there's an invite token and no user, let the widget handle it
+        netlifyIdentity.open('signup'); // Open signup for invite flow
+      } else if (user) {
+        CMS.init(); // Load CMS if user is logged in
+      } else {
+        netlifyIdentity.open('login'); // Prompt login if no user or token
+      }
+    });
 
-    // Handle invite flow if token exists
-    if (inviteToken) {
-      document.getElementById('invite-form').style.display = 'block';
-      document.getElementById('set-password-form').addEventListener('submit', function (event) {
-        event.preventDefault();
-        const password = document.getElementById('password').value;
-        fetch('https://artistictoolshub.com/.netlify/identity/token', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            grant_type: 'invite_token',
-            invite_token: inviteToken,
-            password: password
-          })
-        })
-          .then(response => {
-            if (!response.ok) {
-              return response.json().then(err => {
-                throw new Error(err.error_description || 'Failed to set password');
-              });
-            }
-            return response.json();
-          })
-          .then(data => {
-            alert('Password set successfully. Please log in.');
-            netlifyIdentity.open('login');
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            document.getElementById('cms').innerHTML = `<p>${error.message}. Please try again or request a new invite.</p>`;
-          });
-      });
-    } else {
-      // Regular CMS access
-      netlifyIdentity.on('init', user => {
-        if (user) {
-          CMS.init();
-        } else {
-          netlifyIdentity.open('login');
-        }
-      });
-    }
-
-    // Redirect after login
+    // Handle login redirect
     netlifyIdentity.on('login', () => {
       netlifyIdentity.close();
       window.location.href = '/admin/cms';
     });
 
-    // Redirect after logout
+    // Handle logout
     netlifyIdentity.on('logout', () => {
       window.location.href = '/';
+    });
+
+    // Log errors for debugging
+    netlifyIdentity.on('error', err => {
+      console.error('Netlify Identity error:', err);
+      document.getElementById('cms').innerHTML = '<p>Error loading CMS. Please try again.</p>';
     });
   </script>
 </body>
