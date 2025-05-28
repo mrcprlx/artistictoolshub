@@ -30,25 +30,26 @@
       APIUrl: 'https://artistictoolshub.com/.netlify/identity'
     });
 
-    // Check for invite token in URL
-    const inviteToken = window.location.hash.match(/invite_token=([^&]+)/);
+    // Extract and store the invite token, then clear the hash
+    let inviteToken = null;
+    const tokenMatch = window.location.hash.match(/invite_token=([^&]+)/);
+    if (tokenMatch) {
+      inviteToken = tokenMatch[1];
+      window.location.hash = ''; // Clear the hash to prevent CMS interference
+    }
+
+    // Handle invite flow if token exists
     if (inviteToken) {
-      const token = inviteToken[1];
-
-      // Show the password form only if token is present
       document.getElementById('invite-form').style.display = 'block';
-
       document.getElementById('set-password-form').addEventListener('submit', function (event) {
         event.preventDefault();
         const password = document.getElementById('password').value;
-
-        // Send request to set password using the invite token (no Auth0 params)
         fetch('https://artistictoolshub.com/.netlify/identity/token', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             grant_type: 'invite_token',
-            invite_token: token,
+            invite_token: inviteToken,
             password: password
           })
         })
@@ -62,41 +63,33 @@
           })
           .then(data => {
             alert('Password set successfully. Please log in.');
-            netlifyIdentity.open('login'); // Open login widget for user to log in
+            netlifyIdentity.open('login');
           })
           .catch(error => {
-            console.error('Error setting password:', error);
+            console.error('Error:', error);
             document.getElementById('cms').innerHTML = `<p>${error.message}. Please try again or request a new invite.</p>`;
-            document.getElementById('cms').classList.add('error');
           });
       });
     } else {
-      // Handle regular CMS access for authenticated users
+      // Regular CMS access
       netlifyIdentity.on('init', user => {
         if (user) {
-          CMS.init(); // Load CMS if user is already logged in
+          CMS.init();
         } else {
-          netlifyIdentity.open('login'); // Prompt login if no user
+          netlifyIdentity.open('login');
         }
       });
     }
 
-    // Handle login redirect
+    // Redirect after login
     netlifyIdentity.on('login', () => {
       netlifyIdentity.close();
-      window.location.href = '/admin/cms'; // Redirect to CMS after login
+      window.location.href = '/admin/cms';
     });
 
-    // Handle logout
+    // Redirect after logout
     netlifyIdentity.on('logout', () => {
-      window.location.href = '/'; // Redirect to homepage on logout
-    });
-
-    // Handle Netlify Identity errors
-    netlifyIdentity.on('error', err => {
-      console.error('Netlify Identity error:', err);
-      document.getElementById('cms').innerHTML = '<p>Error loading CMS. Please try again.</p>';
-      document.getElementById('cms').classList.add('error');
+      window.location.href = '/';
     });
   </script>
 </body>
