@@ -42,16 +42,14 @@
         event.preventDefault();
         const password = document.getElementById('password').value;
 
-        // Send request to set password using the invite token with Auth0 parameters
+        // Send request to set password using the invite token (no Auth0 params)
         fetch('https://artistictoolshub.com/.netlify/identity/token', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             grant_type: 'invite_token',
             invite_token: token,
-            password: password,
-            client_id: 'mbJ5rUjoVg7ztjnzO7MsHKlv66KYlkF1', // Your Auth0 Client ID
-            connection: 'Username-Password-Authentication' // Your Auth0 Connection
+            password: password
           })
         })
           .then(response => {
