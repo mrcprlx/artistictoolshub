@@ -14,9 +14,3 @@
   to = "/"
   status = 302
   conditions = { Query = {} }
-
-[[redirects]]
-  from = "/invite"
-  to = "/admin/cms"
-  status = 301
-  force = true

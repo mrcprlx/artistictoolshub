@@ -1,27 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin CMS - Artistic Tools Hub</title>
-  <link rel="stylesheet" href="/styles.css">
-  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600&display=swap"
-    rel="stylesheet">
+  <title>Admin CMS</title>
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  <!-- Inline script to capture token early -->
   <script>
-    // Capture invite_token from hash as soon as the page loads
+    // Capture the invite token from the hash early and clear it to prevent interference
     window.inviteToken = window.location.hash.match(/invite_token=([^&]+)/)?.[1];
     if (window.inviteToken) {
-      // Clear the hash to prevent CMS interference
-      window.location.hash = '';
+      window.location.hash = ''; // Clear the hash to avoid CMS conflicts
     }
   </script>
 </head>
 
 <body>
-  <div id="cms"></div>
+  <!-- Custom invite form, hidden by default -->
+  <div id="invite-form" style="display: none;">
+    <h2>Set Your Password</h2>
+    <form id="set-password-form">
+      <label for="password">Password</label>
+      <input type="password" id="password" required>
+      <button type="submit">Set Password</button>
+    </form>
+    <div id="error-message" style="color: red;"></div>
+  </div>
+
+  <!-- Load CMS and handle logic -->
   <script src="https://unpkg.com/decap-cms@3.6.3/dist/decap-cms.js"></script>
   <script>
     // Initialize Netlify Identity
@@ -29,33 +33,45 @@
       APIUrl: 'https://artistictoolshub.com/.netlify/identity'
     });
 
-    // Handle CMS access and token logic
-    netlifyIdentity.on('init', user => {
-      if (window.inviteToken && !user) {
-        // If there's an invite token and no user, let the widget handle it
-        netlifyIdentity.open('signup'); // Open signup for invite flow
-      } else if (user) {
-        CMS.init(); // Load CMS if user is logged in
-      } else {
-        netlifyIdentity.open('login'); // Prompt login if no user or token
-      }
-    });
+    // If there's an invite token, show the form and handle submission
+    if (window.inviteToken) {
+      document.getElementById('invite-form').style.display = 'block';
+      document.getElementById('set-password-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const password = document.getElementById('password').value;
+        try {
+          // Accept the invite using GoTrue API
+          const user = await netlifyIdentity.gotrue.acceptInvite({
+            invite_token: window.inviteToken,
+            password: password
+          });
+          // User is now logged in, so initialize the CMS
+          CMS.init();
+        } catch (error) {
+          console.error('Invite error:', error);
+          document.getElementById('error-message').textContent = error.message || 'Failed to set password';
+        }
+      });
+    } else {
+      // No invite token: check if user is logged in
+      netlifyIdentity.on('init', user => {
+        if (user) {
+          CMS.init(); // User is logged in, load CMS
+        } else {
+          netlifyIdentity.open('login'); // Prompt login
+        }
+      });
+    }
 
-    // Handle login redirect
+    // Handle login events from the widget (e.g., manual logins)
     netlifyIdentity.on('login', () => {
       netlifyIdentity.close();
-      window.location.href = '/admin/cms';
+      CMS.init();
     });
 
-    // Handle logout
+    // Redirect to home on logout
     netlifyIdentity.on('logout', () => {
       window.location.href = '/';
-    });
-
-    // Log errors for debugging
-    netlifyIdentity.on('error', err => {
-      console.error('Netlify Identity error:', err);
-      document.getElementById('cms').innerHTML = '<p>Error loading CMS. Please try again.</p>';
     });
   </script>
 </body>
