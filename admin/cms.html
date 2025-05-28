@@ -1,20 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-  <title>Admin CMS</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin CMS - Artistic Tools Hub</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600&display=swap"
+    rel="stylesheet">
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <!-- Capture token early -->
   <script>
-    // Capture the invite token from the hash early and clear it to prevent interference
     window.inviteToken = window.location.hash.match(/invite_token=([^&]+)/)?.[1];
     if (window.inviteToken) {
-      window.location.hash = ''; // Clear the hash to avoid CMS conflicts
+      window.location.hash = ''; // Clear hash to prevent CMS interference
     }
   </script>
 </head>
 
 <body>
-  <!-- Custom invite form, hidden by default -->
+  <div id="cms"></div>
   <div id="invite-form" style="display: none;">
     <h2>Set Your Password</h2>
     <form id="set-password-form">
@@ -24,8 +29,6 @@
     </form>
     <div id="error-message" style="color: red;"></div>
   </div>
-
-  <!-- Load CMS and handle logic -->
   <script src="https://unpkg.com/decap-cms@3.6.3/dist/decap-cms.js"></script>
   <script>
     // Initialize Netlify Identity
@@ -33,45 +36,58 @@
       APIUrl: 'https://artistictoolshub.com/.netlify/identity'
     });
 
-    // If there's an invite token, show the form and handle submission
+    // Handle invite flow
     if (window.inviteToken) {
       document.getElementById('invite-form').style.display = 'block';
       document.getElementById('set-password-form').addEventListener('submit', async (event) => {
         event.preventDefault();
         const password = document.getElementById('password').value;
         try {
-          // Accept the invite using GoTrue API
-          const user = await netlifyIdentity.gotrue.acceptInvite({
-            invite_token: window.inviteToken,
-            password: password
+          const response = await fetch('https://artistictoolshub.com/.netlify/identity/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              grant_type: 'invite_token',
+              invite_token: window.inviteToken,
+              password: password
+            })
           });
-          // User is now logged in, so initialize the CMS
-          CMS.init();
+          if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error_description || 'Failed to set password');
+          }
+          alert('Password set successfully. Please log in.');
+          netlifyIdentity.open('login');
         } catch (error) {
-          console.error('Invite error:', error);
-          document.getElementById('error-message').textContent = error.message || 'Failed to set password';
+          console.error('Error:', error);
+          document.getElementById('error-message').textContent = error.message;
         }
       });
     } else {
-      // No invite token: check if user is logged in
       netlifyIdentity.on('init', user => {
         if (user) {
-          CMS.init(); // User is logged in, load CMS
+          CMS.init();
         } else {
-          netlifyIdentity.open('login'); // Prompt login
+          netlifyIdentity.open('login');
         }
       });
     }
 
-    // Handle login events from the widget (e.g., manual logins)
+    // Handle login redirect
     netlifyIdentity.on('login', () => {
       netlifyIdentity.close();
-      CMS.init();
+      window.location.href = '/admin/cms';
     });
 
-    // Redirect to home on logout
+    // Handle logout
     netlifyIdentity.on('logout', () => {
       window.location.href = '/';
+    });
+
+    // Handle errors
+    netlifyIdentity.on('error', err => {
+      console.error('Netlify Identity error:', err);
+      document.getElementById('cms').innerHTML = '<p>Error loading CMS. Please try again.</p>';
     });
   </script>
 </body>
