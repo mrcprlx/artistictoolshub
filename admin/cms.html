@@ -52,15 +52,19 @@
               password: password
             })
           });
+          const data = await response.json();
           if (!response.ok) {
-            const err = await response.json();
-            throw new Error(err.error_description || 'Failed to set password');
+            console.error('API Response:', data); // Log detailed error
+            throw new Error(data.error_description || 'Failed to set password');
           }
+          console.log('Success:', data);
           alert('Password set successfully. Please log in.');
           netlifyIdentity.open('login');
         } catch (error) {
           console.error('Error:', error);
           document.getElementById('error-message').textContent = error.message;
+          // Fallback to widget's invite handling
+          netlifyIdentity.open('signup');
         }
       });
     } else {
