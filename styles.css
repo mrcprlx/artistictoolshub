@@ -1,25 +1,17 @@
 :root {
     --bg-color: #fffaf5;
-    /* Creamy base for cozy feel */
     --text-color: #1a1a1a;
-    /* Dark text for contrast */
     --primary-color: #2a9d8f;
-    /* Teal for buttons */
     --secondary-color: #d9786a;
-    /* Terracotta for hover */
     --accent-color: #e8b923;
-    /* Mustard for highlights */
     --nav-bg: #a8b5a2;
-    /* Sage green for nav/footer */
     --hero-bg: #f9e9df;
-    /* Light terracotta for hero */
 }
 
 html,
 body {
     margin: 0;
     padding: 0;
-    height: 100vh;
     font-family: 'Open Sans', sans-serif;
     color: var(--text-color);
     line-height: 1.6;
@@ -48,7 +40,6 @@ nav {
     color: var(--text-color);
 }
 
-/* Hamburger menu styles */
 .nav-toggle {
     display: none;
 }
@@ -470,87 +461,6 @@ footer {
     display: block;
 }
 
-/* Admin page styles */
-#auth-status {
-    text-align: center;
-    font-size: 1.2rem;
-    color: #2c2c2c;
-    margin: 1rem 0;
-    padding: 1rem;
-    border-radius: 5px;
-    width: 100%;
-    max-width: 600px;
-}
-
-#auth-status.error {
-    background-color: #f9e9df;
-    /* Light terracotta for errors */
-    border: 1px solid var(--secondary-color);
-}
-
-#admin-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    max-width: 600px;
-    margin: 0 auto;
-    width: 100%;
-}
-
-#invite-form {
-    max-width: 400px;
-    margin: 2rem auto;
-    padding: 1.5rem;
-    background-color: var(--bg-color);
-    border: 1px solid var(--nav-bg);
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-#invite-form h2 {
-    font-family: 'Lora', serif;
-    font-size: 1.5rem;
-    color: #2c2c2c;
-    text-align: center;
-    margin-bottom: 1rem;
-}
-
-#invite-form form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-#invite-form label {
-    font-weight: 600;
-    color: #2c2c2c;
-}
-
-#invite-form input[type="password"] {
-    padding: 0.5rem;
-    font-size: 1rem;
-    border: 1px solid var(--nav-bg);
-    border-radius: 5px;
-    background-color: var(--bg-color);
-    color: #2c2c2c;
-}
-
-#invite-form button {
-    background-color: var(--primary-color);
-    color: #ffffff;
-    padding: 0.75rem;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-#invite-form button:hover {
-    background-color: var(--secondary-color);
-}
-
 @media (max-width: 768px) {
     .nav-toggle-label {
         display: block;
@@ -614,25 +524,10 @@ footer {
         right: 0;
     }
 
-    #auth-status {
-        font-size: 1rem;
-        margin: 0.5rem 0;
-        padding: 0.5rem;
-    }
-
-    #admin-content {
-        padding: 0.5rem;
-    }
-
     .cta-button {
         width: 100%;
         max-width: 300px;
         font-size: 0.9rem;
         padding: 0.5rem 1rem;
-    }
-
-    #invite-form {
-        margin: 1rem auto;
-        padding: 1rem;
     }
 }

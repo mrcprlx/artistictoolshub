@@ -7,18 +7,10 @@
 [[headers]]
   for = "/admin/*"
   [headers.values]
-    # Consider simplifying CSP if Auth0 is no longer used for /admin
-    # Example: "script-src 'self' blob: 'unsafe-inline' https://identity.netlify.com https://unpkg.com https://media-library.cloudinary.com; connect-src 'self' https://api.netlify.com"
-    Content-Security-Policy = "script-src 'self' blob: 'unsafe-inline' 'unsafe-eval' https://identity.netlify.com https://unpkg.com https://media-library.cloudinary.com; connect-src 'self' https://login.artistictoolshub.com https://api.netlify.com" # Review connect-src if Auth0 is fully removed
-
-# [[redirects]]
-#   from = "/admin/*"  # Comment out or remove this rule
-#   to = "/"
-#   status = 302
-#   conditions = { Query = {} }
+    Content-Security-Policy = "script-src 'self' blob: 'unsafe-inline' 'unsafe-eval' https://identity.netlify.com https://unpkg.com https://media-library.cloudinary.com; connect-src 'self' https://api.netlify.com"
 
 [[redirects]]
-  from = "/invite" # This redirect might be unnecessary as Netlify Identity has its own invite link format.
-  to = "/admin/"   # If kept, point to /admin/ (which serves index.html)
+  from = "/invite"
+  to = "/admin/"
   status = 301
   force = true
