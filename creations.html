@@ -47,7 +47,8 @@
                     content. Social links may be reviewed for
                     appropriateness. Latest 50 creations displayed; older ones archived but accessible via direct links
                     for 2 years.</p>
-                <form id="creation-form" method="POST" enctype="multipart/form-data">
+                <form id="creation-form" method="POST" enctype="multipart/form-data" data-netlify="true">
+                    <input type="hidden" name="form-name" value="creation-submission">
                     <label for="creation-title">Title (max 100 characters)</label>
                     <input type="text" id="creation-title" name="title" maxlength="100" required>
                     <label for="creation-text">Your Creation (max 500 words)</label>

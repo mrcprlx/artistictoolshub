@@ -7,7 +7,12 @@
 [[headers]]
   for = "/admin/*"
   [headers.values]
-    Content-Security-Policy = "script-src 'self' blob: 'unsafe-inline' 'unsafe-eval' https://identity.netlify.com https://unpkg.com https://media-library.cloudinary.com; connect-src 'self' https://api.netlify.com"
+    Content-Security-Policy = "script-src 'self' blob: 'unsafe-inline' 'unsafe-eval' https://identity.netlify.com https://unpkg.com https://media-library.cloudinary.com; connect-src 'self' https://api.netlify.com; frame-ancestors 'self' https://www.google.com https://recaptcha.google.com"
+
+[[headers]]
+  for = "/creations"
+  [headers.values]
+    Content-Security-Policy = "script-src 'self' blob: 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://pagead2.googlesyndication.com; connect-src 'self' https://www.google.com; frame-ancestors 'self' https://www.google.com https://recaptcha.google.com"
 
 [[redirects]]
   from = "/invite"

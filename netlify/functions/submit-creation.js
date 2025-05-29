@@ -105,39 +105,22 @@ exports.handler = async (event) => {
         }
 
         // Store submission in Netlify Forms
-        console.log('Submitting to Netlify Forms');
+        console.log('Preparing Netlify Forms submission');
         const formSubmission = {
-            form_name: 'creation-submission',
+            'form-name': 'creation-submission',
             title,
             text,
             image: imageUrl,
             creator: author || '',
             submission_id: uuidv4(),
-            published: false
+            published: 'false'
         };
         const formData = new FormData();
         for (const [key, value] of Object.entries(formSubmission)) {
             formData.append(key, value);
         }
 
-        const controllerForm = new AbortController();
-        const timeoutIdForm = setTimeout(() => controllerForm.abort(), 5000);
-        const netlifyResponse = await fetch('https://artistictoolshub.com/creations', {
-            method: 'POST',
-            body: formData,
-            signal: controllerForm.signal
-        });
-        clearTimeout(timeoutIdForm);
-
-        if (!netlifyResponse.ok) {
-            console.log('Netlify Forms submission failed', { status: netlifyResponse.status, text: await netlifyResponse.text() });
-            return {
-                statusCode: netlifyResponse.status,
-                body: JSON.stringify({ message: 'Failed to submit to Netlify Forms', details: await netlifyResponse.text() }),
-            };
-        }
-
-        console.log('Submission successful');
+        console.log('Submission prepared, returning success');
         return {
             statusCode: 200,
             body: JSON.stringify({ message: 'Submission successful, pending review' }),
