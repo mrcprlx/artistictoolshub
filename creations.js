@@ -49,7 +49,11 @@ async function submitForm(recaptchaResponse) {
         }
         imageBase64 = await new Promise((resolve) => {
             const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
+            reader.onload = () => {
+                // Remove Data URL prefix (e.g., "data:image/png;base64,")
+                const base64String = reader.result.split(',')[1];
+                resolve(base64String);
+            };
             reader.readAsDataURL(image);
         });
     }
