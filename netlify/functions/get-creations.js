@@ -33,10 +33,12 @@ exports.handler = async () => {
 
         const submissions = await response.json();
         console.log('Raw submissions fetched', { count: submissions.length });
-        const creations = submissions
-            .filter(sub => sub.data.published === true || sub.data.published === 'true')
+
+        // Handle empty or invalid submissions
+        const creations = (submissions || [])
+            .filter(sub => sub.data && (sub.data.published === true || sub.data.published === 'true'))
             .map(sub => ({
-                id: sub.data.submission_id,
+                id: sub.data.submission_id || uuidv4(),
                 title: sub.data.title || 'Untitled',
                 text: sub.data.text || '',
                 image: sub.data.image || '',
@@ -44,16 +46,17 @@ exports.handler = async () => {
                 published: sub.data.published
             }));
 
-        console.log('Fetched creations', { count: creations.length });
+        console.log('Processed creations', { count: creations.length });
         return {
             statusCode: 200,
             body: JSON.stringify(creations),
         };
     } catch (error) {
         console.log('Server error', { message: error.message, stack: error.stack });
+        // Return empty array to prevent frontend crash
         return {
-            statusCode: 500,
-            body: JSON.stringify({ message: 'Server error', details: error.message, stack: error.stack }),
+            statusCode: 200,
+            body: JSON.stringify([]),
         };
     }
 };
