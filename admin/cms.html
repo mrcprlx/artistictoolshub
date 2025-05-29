@@ -9,26 +9,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600&display=swap"
     rel="stylesheet">
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  <!-- Capture token early -->
-  <script>
-    window.inviteToken = window.location.hash.match(/invite_token=([^&]+)/)?.[1];
-    if (window.inviteToken) {
-      window.location.hash = ''; // Clear hash to prevent CMS interference
-    }
-  </script>
 </head>
 
 <body>
   <div id="cms"></div>
-  <div id="invite-form" style="display: none;">
-    <h2>Set Your Password</h2>
-    <form id="set-password-form">
-      <label for="password">Password</label>
-      <input type="password" id="password" required>
-      <button type="submit">Set Password</button>
-    </form>
-    <div id="error-message" style="color: red;"></div>
-  </div>
   <script src="https://unpkg.com/decap-cms@3.6.3/dist/decap-cms.js"></script>
   <script>
     // Initialize Netlify Identity
@@ -36,54 +20,21 @@
       APIUrl: 'https://artistictoolshub.com/.netlify/identity'
     });
 
-    // Handle invite flow
-    if (window.inviteToken) {
-      document.getElementById('invite-form').style.display = 'block';
-      document.getElementById('set-password-form').addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const password = document.getElementById('password').value;
-        try {
-          const response = await fetch('https://artistictoolshub.com/.netlify/identity/token', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              grant_type: 'invite_token',
-              invite_token: window.inviteToken,
-              password: password
-            })
-          });
-          const data = await response.json();
-          if (!response.ok) {
-            console.error('API Response:', data); // Log detailed error
-            throw new Error(data.error_description || 'Failed to set password');
-          }
-          console.log('Success:', data);
-          alert('Password set successfully. Please log in.');
-          netlifyIdentity.open('login');
-        } catch (error) {
-          console.error('Error:', error);
-          document.getElementById('error-message').textContent = error.message;
-          // Fallback to widget's invite handling
-          netlifyIdentity.open('signup');
-        }
-      });
-    } else {
-      netlifyIdentity.on('init', user => {
-        if (user) {
+    // Wait for Netlify Identity to handle the invite token before loading CMS
+    netlifyIdentity.on('init', user => {
+      if (user) {
+        CMS.init(); // Load CMS only if user is logged in
+      } else {
+        // If no user, let the widget handle the invite token or prompt login
+        netlifyIdentity.on('login', () => {
+          netlifyIdentity.close();
           CMS.init();
-        } else {
-          netlifyIdentity.open('login');
-        }
-      });
-    }
-
-    // Handle login redirect
-    netlifyIdentity.on('login', () => {
-      netlifyIdentity.close();
-      window.location.href = '/admin/cms';
+        });
+        // Do nothing here; widget will automatically handle #invite_token
+      }
     });
 
-    // Handle logout
+    // Redirect to homepage on logout
     netlifyIdentity.on('logout', () => {
       window.location.href = '/';
     });
