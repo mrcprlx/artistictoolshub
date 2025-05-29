@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Artistic Tools Hub</title>
-    <link rel="stylesheet" href="/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600&display=swap"
         rel="stylesheet">
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
@@ -13,55 +12,46 @@
 
 <body>
     <div id="cms"></div>
-    <script src="https://unpkg.com/decap-cms@3.6.3/dist/decap-cms.js"></script>
+    <script src="https://unpkg.com/decap-cms@3.5.0/dist/decap-cms.js"></script>
     <script>
         // Initialize Netlify Identity
-        // The widget will automatically handle invite tokens from the URL fragment.
         if (window.netlifyIdentity) {
             netlifyIdentity.on('init', user => {
                 if (!user) {
-                    // If no user, the widget handles login or invite.
-                    // On successful login/invite acceptance, initialize or redirect to CMS.
                     netlifyIdentity.on('login', () => {
-                        netlifyIdentity.close(); // Close the login modal
-                        // Ensure Decap CMS (CMS object) is available and initialize it.
-                        // Decap CMS usually auto-initializes if config.yml is at /admin/config.yml
-                        // and this script runs on /admin/index.html.
+                        netlifyIdentity.close();
                         if (window.CMS) {
                             window.CMS.init();
                         } else {
-                            console.error('Decap CMS (CMS object) not found. Make sure it is loaded.');
+                            console.error('Decap CMS not found.');
                         }
                     });
                 } else {
-                    // User is already logged in. Initialize CMS.
-                    console.log('User already logged in via Netlify Identity.');
+                    console.log('User already logged in.');
                     if (window.CMS) {
                         window.CMS.init();
                     } else {
-                        console.error('Decap CMS (CMS object) not found. Make sure it is loaded.');
+                        console.error('Decap CMS not found.');
                     }
                 }
             });
 
-            // Redirect to homepage on logout
             netlifyIdentity.on('logout', () => {
                 window.location.href = '/';
             });
 
-            // Handle Netlify Identity errors
             netlifyIdentity.on('error', err => {
                 console.error('Netlify Identity error:', err);
                 const cmsContainer = document.getElementById('cms');
                 if (cmsContainer) {
-                    cmsContainer.innerHTML = '<p>Netlify Identity Error. Please check console and try again.</p>';
+                    cmsContainer.innerHTML = '<p>Authentication Error. Please try again.</p>';
                 }
             });
         } else {
             console.error('Netlify Identity widget not loaded.');
             const cmsContainer = document.getElementById('cms');
             if (cmsContainer) {
-                cmsContainer.innerHTML = '<p>Error loading authentication widget. Please try again.</p>';
+                cmsContainer.innerHTML = '<p>Error loading authentication. Please try again.</p>';
             }
         }
     </script>
