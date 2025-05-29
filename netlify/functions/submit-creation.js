@@ -1,20 +1,35 @@
 const axios = require('axios');
 const FormData = require('form-data');
 const { v4: uuidv4 } = require('uuid');
-const fetch = require('node-fetch'); // Added for reCAPTCHA verification
+const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
     try {
         console.log('Starting submit-creation function');
         // Parse request body
-        const { text, image, author, 'g-recaptcha-response': recaptchaResponse } = JSON.parse(event.body);
+        const { title, text, image, author, 'g-recaptcha-response': recaptchaResponse } = JSON.parse(event.body);
 
         // Validate inputs
-        if (!text || !recaptchaResponse) {
+        if (!title || !text || !recaptchaResponse) {
             console.log('Missing required fields');
             return {
                 statusCode: 400,
-                body: JSON.stringify({ message: 'Missing required fields: text or reCAPTCHA response' }),
+                body: JSON.stringify({ message: 'Missing required fields: title, text, or reCAPTCHA response' }),
+            };
+        }
+        if (title.length > 100) {
+            console.log('Title exceeds 100 characters');
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: 'Title exceeds 100 characters' }),
+            };
+        }
+        const wordCount = text.trim().split(/\s+/).length;
+        if (wordCount > 500) {
+            console.log('Text exceeds 500 words');
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: 'Text exceeds 500 words' }),
             };
         }
 
@@ -86,57 +101,36 @@ exports.handler = async (event) => {
             }
         }
 
-        // Create draft entry in GitHub
-        const githubToken = process.env.GITHUB_TOKEN;
-        if (!githubToken) {
-            console.log('Missing GitHub token');
-            return {
-                statusCode: 500,
-                body: JSON.stringify({ message: 'Server configuration error: Missing GitHub token' }),
-            };
+        // Store submission in Netlify Forms
+        console.log('Submitting to Netlify Forms');
+        const formSubmission = {
+            form_name: 'creation-submission',
+            title,
+            text,
+            image: imageUrl,
+            creator: author || '',
+            submission_id: uuidv4(),
+            published: false
+        };
+        const formData = new FormData();
+        for (const [key, value] of Object.entries(formSubmission)) {
+            formData.append(key, value);
         }
-        const repoOwner = 'mrcprlx';
-        const repoName = 'artistictoolshub';
-        const branch = 'main';
-        const filePath = `content/creations/${uuidv4()}.md`;
-        // Escape special characters in text for YAML
-        const escapedText = text.replace(/"/g, '\\"').replace(/\n/g, '\\n');
-        const frontmatter = `---
-title: "${escapedText.split(/\s+/).slice(0, 5).join(' ')}"
-text: "${escapedText}"
-image: "${imageUrl}"
-creator: "${author || ''}"
-published: false
----`;
-        const content = Buffer.from(frontmatter).toString('base64');
 
-        try {
-            console.log('Creating GitHub file:', filePath);
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
-            await axios.put(
-                `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`,
-                {
-                    message: 'New creation submission',
-                    content: content,
-                    branch: branch,
-                },
-                {
-                    headers: { Authorization: `Bearer ${githubToken}` },
-                    signal: controller.signal
-                }
-            );
-            clearTimeout(timeoutId);
-            console.log('GitHub file created successfully');
-        } catch (githubError) {
-            console.log('GitHub error:', githubError.message);
+        const controllerForm = new AbortController();
+        const timeoutIdForm = setTimeout(() => controllerForm.abort(), 5000); // 5s timeout
+        const netlifyResponse = await fetch('https://artistictoolshub.com/.netlify/functions/submit-creation', {
+            method: 'POST',
+            body: formData,
+            signal: controllerForm.signal
+        });
+        clearTimeout(timeoutIdForm);
+
+        if (!netlifyResponse.ok) {
+            console.log('Netlify Forms submission failed:', await netlifyResponse.text());
             return {
-                statusCode: 500,
-                body: JSON.stringify({
-                    message: 'Failed to create GitHub file',
-                    details: githubError.message,
-                    response: githubError.response?.data
-                }),
+                statusCode: netlifyResponse.status,
+                body: JSON.stringify({ message: 'Failed to submit to Netlify Forms' }),
             };
         }
 

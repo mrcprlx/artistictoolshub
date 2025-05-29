@@ -2,7 +2,7 @@
   command = "npm install"
   publish = "."
   functions = "netlify/functions"
-  environment = { NODE_VERSION = "16" }
+  environment = { NODE_VERSION = "18" }
 
 [[headers]]
   for = "/admin/*"

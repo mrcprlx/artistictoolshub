@@ -1,33 +1,57 @@
-const axios = require('axios');
+const fetch = require('node-fetch');
 
 exports.handler = async () => {
-    const githubToken = process.env.GITHUB_TOKEN;
-    const repoOwner = 'mrcprlx'; // Replace with your GitHub username/organization
-    const repoName = 'artistictoolshub';   // Replace with your repository name
-    const branch = 'main';
-    const path = 'content/creations';
+    try {
+        console.log('Starting get-creations function');
+        const netlifyApiToken = process.env.NETLIFY_API_TOKEN;
+        if (!netlifyApiToken) {
+            console.log('Missing Netlify API token');
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ message: 'Server configuration error: Missing Netlify API token' }),
+            };
+        }
 
-    const response = await axios.get(
-        `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}?ref=${branch}`,
-        { headers: { Authorization: `Bearer ${githubToken}` } }
-    );
+        // Fetch form submissions from Netlify
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+        const response = await fetch('https://api.netlify.com/api/v1/forms/creation-submission/submissions', {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${netlifyApiToken}` },
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
 
-    const creations = await Promise.all(
-        response.data
-            .filter(file => file.name.endsWith('.md'))
-            .map(async file => {
-                const fileContent = await axios.get(file.download_url);
-                const content = fileContent.data;
-                const frontmatterMatch = content.match(/---\n([\s\S]*?)\n---/);
-                if (!frontmatterMatch) return null;
-                const frontmatter = frontmatterMatch[1].split('\n').reduce((acc, line) => {
-                    const [key, value] = line.split(': ').map(s => s.trim());
-                    if (key) acc[key] = value.replace(/^"(.*)"$/, '$1');
-                    return acc;
-                }, {});
-                return frontmatter.published === 'true' ? { id: file.name, ...frontmatter } : null;
-            })
-    );
+        if (!response.ok) {
+            console.log('Failed to fetch Netlify Forms submissions:', await response.text());
+            return {
+                statusCode: response.status,
+                body: JSON.stringify({ message: 'Failed to fetch submissions' }),
+            };
+        }
 
-    return { statusCode: 200, body: JSON.stringify(creations.filter(c => c !== null)) };
+        const submissions = await response.json();
+        const creations = submissions
+            .filter(sub => sub.data.published) // Only include published submissions
+            .map(sub => ({
+                id: sub.data.submission_id,
+                title: sub.data.title,
+                text: sub.data.text,
+                image: sub.data.image || '',
+                creator: sub.data.creator || '',
+                published: sub.data.published
+            }));
+
+        console.log('Fetched creations:', creations.length);
+        return {
+            statusCode: 200,
+            body: JSON.stringify(creations),
+        };
+    } catch (error) {
+        console.log('Server error:', error.message);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ message: 'Server error', details: error.message }),
+        };
+    }
 };
