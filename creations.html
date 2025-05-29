@@ -43,10 +43,13 @@
         <section class="submission-form" id="submission-form" style="display: none;">
             <div class="form-container">
                 <h2>Submit Your Creation</h2>
-                <p>Guidelines: Max 500 words, 2MB PNG/JPG images, no explicit content. Social links may be reviewed for
+                <p>Guidelines: Max 100 characters for title, 500 words for text, 2MB PNG/JPG images, no explicit
+                    content. Social links may be reviewed for
                     appropriateness. Latest 50 creations displayed; older ones archived but accessible via direct links
                     for 2 years.</p>
                 <form id="creation-form" method="POST" enctype="multipart/form-data">
+                    <label for="creation-title">Title (max 100 characters)</label>
+                    <input type="text" id="creation-title" name="title" maxlength="100" required>
                     <label for="creation-text">Your Creation (max 500 words)</label>
                     <textarea id="creation-text" name="text" maxlength="500" required></textarea>
                     <label for="creation-image">Add Image (optional, 2MB max, PNG/JPG)</label>

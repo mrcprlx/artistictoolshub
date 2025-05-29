@@ -21,9 +21,17 @@ window.onSubmit = function (token) {
 };
 
 async function submitForm(recaptchaResponse) {
+    const title = document.getElementById('creation-title').value;
     const text = document.getElementById('creation-text').value;
     const image = document.getElementById('creation-image').files[0];
     const author = document.getElementById('creation-author').value;
+
+    // Validate title (100 characters)
+    if (title.length > 100) {
+        alert('Title exceeds 100 characters.');
+        grecaptcha.reset();
+        return;
+    }
 
     // Validate text (500 words)
     const wordCount = text.trim().split(/\s+/).length;
@@ -64,6 +72,7 @@ async function submitForm(recaptchaResponse) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+                title,
                 text,
                 image: imageBase64,
                 author,
