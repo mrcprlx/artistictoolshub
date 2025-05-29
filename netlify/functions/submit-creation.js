@@ -5,20 +5,20 @@ const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
     try {
-        console.log('Starting submit-creation function');
+        console.log('Starting submit-creation function', { body: event.body });
         // Parse request body
         const { title, text, image, author, 'g-recaptcha-response': recaptchaResponse } = JSON.parse(event.body);
 
         // Validate inputs
         if (!title || !text || !recaptchaResponse) {
-            console.log('Missing required fields');
+            console.log('Missing required fields', { title, text, recaptchaResponse });
             return {
                 statusCode: 400,
                 body: JSON.stringify({ message: 'Missing required fields: title, text, or reCAPTCHA response' }),
             };
         }
         if (title.length > 100) {
-            console.log('Title exceeds 100 characters');
+            console.log('Title exceeds 100 characters', { titleLength: title.length });
             return {
                 statusCode: 400,
                 body: JSON.stringify({ message: 'Title exceeds 100 characters' }),
@@ -26,14 +26,14 @@ exports.handler = async (event) => {
         }
         const wordCount = text.trim().split(/\s+/).length;
         if (wordCount > 500) {
-            console.log('Text exceeds 500 words');
+            console.log('Text exceeds 500 words', { wordCount });
             return {
                 statusCode: 400,
                 body: JSON.stringify({ message: 'Text exceeds 500 words' }),
             };
         }
 
-        // Validate reCAPTCHA
+        // Validate reCAPTCHA v2 Invisible
         const secretKey = process.env.RECAPTCHA_SECRET_KEY;
         if (!secretKey) {
             console.log('Missing reCAPTCHA secret key');
@@ -42,9 +42,9 @@ exports.handler = async (event) => {
                 body: JSON.stringify({ message: 'Server configuration error: Missing reCAPTCHA secret key' }),
             };
         }
-        console.log('Verifying reCAPTCHA');
+        console.log('Verifying reCAPTCHA v2 Invisible');
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
         const recaptchaVerify = await fetch('https://www.google.com/recaptcha/api/siteverify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -54,7 +54,7 @@ exports.handler = async (event) => {
         clearTimeout(timeoutId);
         const recaptchaData = await recaptchaVerify.json();
         if (!recaptchaData.success) {
-            console.log('reCAPTCHA verification failed:', recaptchaData);
+            console.log('reCAPTCHA v2 Invisible verification failed', recaptchaData);
             return {
                 statusCode: 400,
                 body: JSON.stringify({ message: 'reCAPTCHA verification failed', details: recaptchaData }),
@@ -65,7 +65,7 @@ exports.handler = async (event) => {
         let imageUrl = '';
         if (image) {
             if (typeof image !== 'string' || image.length === 0) {
-                console.log('Invalid image data');
+                console.log('Invalid image data', { image });
                 return {
                     statusCode: 400,
                     body: JSON.stringify({ message: 'Invalid image data: must be a non-empty base64 string' }),
@@ -78,7 +78,7 @@ exports.handler = async (event) => {
                 formData.append('upload_preset', 'artistictoolshub');
 
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
                 const cloudinaryResponse = await axios.post(
                     'https://api.cloudinary.com/v1_1/drxmkv1si/image/upload',
                     formData,
@@ -87,9 +87,12 @@ exports.handler = async (event) => {
                 clearTimeout(timeoutId);
 
                 imageUrl = cloudinaryResponse.data.secure_url;
-                console.log('Cloudinary upload successful:', imageUrl);
+                console.log('Cloudinary upload successful', { imageUrl });
             } catch (cloudinaryError) {
-                console.log('Cloudinary error:', cloudinaryError.message);
+                console.log('Cloudinary error', {
+                    message: cloudinaryError.message,
+                    response: cloudinaryError.response?.data
+                });
                 return {
                     statusCode: 500,
                     body: JSON.stringify({
@@ -118,8 +121,8 @@ exports.handler = async (event) => {
         }
 
         const controllerForm = new AbortController();
-        const timeoutIdForm = setTimeout(() => controllerForm.abort(), 5000); // 5s timeout
-        const netlifyResponse = await fetch('https://artistictoolshub.com/.netlify/functions/submit-creation', {
+        const timeoutIdForm = setTimeout(() => controllerForm.abort(), 5000);
+        const netlifyResponse = await fetch('https://artistictoolshub.com/creations', {
             method: 'POST',
             body: formData,
             signal: controllerForm.signal
@@ -127,10 +130,10 @@ exports.handler = async (event) => {
         clearTimeout(timeoutIdForm);
 
         if (!netlifyResponse.ok) {
-            console.log('Netlify Forms submission failed:', await netlifyResponse.text());
+            console.log('Netlify Forms submission failed', { status: netlifyResponse.status, text: await netlifyResponse.text() });
             return {
                 statusCode: netlifyResponse.status,
-                body: JSON.stringify({ message: 'Failed to submit to Netlify Forms' }),
+                body: JSON.stringify({ message: 'Failed to submit to Netlify Forms', details: await netlifyResponse.text() }),
             };
         }
 
@@ -140,10 +143,10 @@ exports.handler = async (event) => {
             body: JSON.stringify({ message: 'Submission successful, pending review' }),
         };
     } catch (error) {
-        console.log('Server error:', error.message);
+        console.log('Server error', { message: error.message, stack: error.stack });
         return {
             statusCode: 500,
-            body: JSON.stringify({ message: 'Server error', details: error.message }),
+            body: JSON.stringify({ message: 'Server error', details: error.message, stack: error.stack }),
         };
     }
 };

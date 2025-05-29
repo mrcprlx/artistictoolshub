@@ -13,8 +13,9 @@ exports.handler = async () => {
         }
 
         // Fetch form submissions from Netlify
+        console.log('Fetching submissions from Netlify Forms');
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
         const response = await fetch('https://api.netlify.com/api/v1/forms/creation-submission/submissions', {
             method: 'GET',
             headers: { Authorization: `Bearer ${netlifyApiToken}` },
@@ -23,35 +24,36 @@ exports.handler = async () => {
         clearTimeout(timeoutId);
 
         if (!response.ok) {
-            console.log('Failed to fetch Netlify Forms submissions:', await response.text());
+            console.log('Failed to fetch Netlify Forms submissions', { status: response.status, text: await response.text() });
             return {
                 statusCode: response.status,
-                body: JSON.stringify({ message: 'Failed to fetch submissions' }),
+                body: JSON.stringify({ message: 'Failed to fetch submissions', details: await response.text() }),
             };
         }
 
         const submissions = await response.json();
+        console.log('Raw submissions fetched', { count: submissions.length });
         const creations = submissions
-            .filter(sub => sub.data.published) // Only include published submissions
+            .filter(sub => sub.data.published === true || sub.data.published === 'true')
             .map(sub => ({
                 id: sub.data.submission_id,
-                title: sub.data.title,
-                text: sub.data.text,
+                title: sub.data.title || 'Untitled',
+                text: sub.data.text || '',
                 image: sub.data.image || '',
                 creator: sub.data.creator || '',
                 published: sub.data.published
             }));
 
-        console.log('Fetched creations:', creations.length);
+        console.log('Fetched creations', { count: creations.length });
         return {
             statusCode: 200,
             body: JSON.stringify(creations),
         };
     } catch (error) {
-        console.log('Server error:', error.message);
+        console.log('Server error', { message: error.message, stack: error.stack });
         return {
             statusCode: 500,
-            body: JSON.stringify({ message: 'Server error', details: error.message }),
+            body: JSON.stringify({ message: 'Server error', details: error.message, stack: error.stack }),
         };
     }
 };
