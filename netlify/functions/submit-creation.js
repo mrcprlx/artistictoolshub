@@ -1,6 +1,7 @@
 const axios = require('axios');
 const FormData = require('form-data');
 const { v4: uuidv4 } = require('uuid');
+const fetch = require('node-fetch'); // Added for reCAPTCHA verification
 
 exports.handler = async (event) => {
     try {
@@ -27,11 +28,15 @@ exports.handler = async (event) => {
             };
         }
         console.log('Verifying reCAPTCHA');
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
         const recaptchaVerify = await fetch('https://www.google.com/recaptcha/api/siteverify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `secret=${secretKey}&response=${encodeURIComponent(recaptchaResponse)}`,
+            signal: controller.signal,
         });
+        clearTimeout(timeoutId);
         const recaptchaData = await recaptchaVerify.json();
         if (!recaptchaData.success) {
             console.log('reCAPTCHA verification failed:', recaptchaData);
