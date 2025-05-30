@@ -1,7 +1,6 @@
 backend:
   name: git-gateway
-  branch: submissions  # Use submissions branch for CMS
-  repo: mrcprlx/artistictoolshub  # Replace with actual repo owner and name
+  branch: main
 
 media_library:
   name: cloudinary
