@@ -21,6 +21,7 @@ exports.handler = async (event) => {
         console.log('Publishing submission', { submissionId });
         const githubToken = process.env.GITHUB_TOKEN;
         const repo = 'mrcprlx/artistictoolshub';
+        // Ensure the path matches the submission file name format
         const path = `content/creations/${submissionId}.md`;
 
         // Fetch submission from submissions branch

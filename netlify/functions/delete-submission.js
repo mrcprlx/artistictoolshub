@@ -33,7 +33,7 @@ exports.handler = async (event) => {
         });
 
         for (const id of idsToDelete) {
-            const path = `content/creations/submission-${id}.md`;
+            const path = `content/creations/${id}.md`;
 
             // Fetch submission to get image URL
             let file;
