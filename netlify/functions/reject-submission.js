@@ -18,23 +18,44 @@ exports.handler = async (event) => {
             };
         }
 
+        // Validate submissionId format (submission-<uuid>)
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+        const submissionIdParts = submissionId.split('submission-');
+        if (submissionIdParts.length !== 2 || !uuidRegex.test(submissionIdParts[1])) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: 'Invalid submissionId format. Expected: submission-<uuid>' }),
+            };
+        }
+
         console.log('Rejecting submission', { submissionId });
         const githubToken = process.env.GITHUB_TOKEN;
         const repo = 'mrcprlx/artistictoolshub';
-        // Ensure the path matches the submission file name format
-        const path = `content/creations/submission-${submissionId}.md`;
+        const path = `content/creations/${submissionId}.md`;
 
         // Fetch submission from submissions branch
-        const fileResponse = await axios.get(
-            `https://api.github.com/repos/${repo}/contents/${path}?ref=submissions`,
-            {
-                headers: {
-                    Authorization: `token ${githubToken}`,
-                    Accept: 'application/vnd.github.v3+json',
-                },
+        let file;
+        try {
+            const fileResponse = await axios.get(
+                `https://api.github.com/repos/${repo}/contents/${path}?ref=submissions`,
+                {
+                    headers: {
+                        Authorization: `token ${githubToken}`,
+                        Accept: 'application/vnd.github.v3+json',
+                    },
+                }
+            );
+            file = fileResponse.data;
+        } catch (error) {
+            if (error.response?.status === 404) {
+                return {
+                    statusCode: 404,
+                    body: JSON.stringify({ message: `Submission not found: ${submissionId}` }),
+                };
             }
-        );
-        const file = fileResponse.data;
+            throw error;
+        }
+
         const fileContent = Buffer.from(file.content, 'base64').toString('utf-8');
         const { data, content: markdownContent } = matter(fileContent);
 
