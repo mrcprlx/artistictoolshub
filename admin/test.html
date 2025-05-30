@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test CMS - Artistic Tools Hub</title>
+</head>
+
+<body>
+    <div id="cms"></div>
+    <!-- Test with 3.4.0 first -->
+    <script src="https://unpkg.com/decap-cms@3.4.0/dist/decap-cms.js"></script>
+    <!-- If 3.4.0 fails, comment out the above and uncomment the below to test 3.6.0 -->
+    <!-- <script src="https://unpkg.com/decap-cms@3.6.0/dist/decap-cms.js"></script> -->
+    <script>
+        try {
+            if (window.CMS) {
+                console.log('Decap CMS script loaded, version:', window.CMS.VERSION);
+                window.CMS.init();
+                console.log('Decap CMS initialized successfully in test mode.');
+            } else {
+                throw new Error('Decap CMS not found.');
+            }
+        } catch (error) {
+            console.error('Test CMS initialization error:', error);
+            const cmsContainer = document.getElementById('cms');
+            if (cmsContainer) {
+                cmsContainer.innerHTML = `<p style="color: red; text-align: center;">Failed to initialize CMS: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+
+</html>
