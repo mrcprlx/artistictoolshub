@@ -130,7 +130,6 @@ published: false
         const repo = 'mrcprlx/artistictoolshub';
         const branch = 'submissions';
         try {
-            // Check if submissions branch exists
             await axios.get(`https://api.github.com/repos/${repo}/branches/${branch}`, {
                 headers: {
                     Authorization: `token ${githubToken}`,
@@ -140,14 +139,12 @@ published: false
         } catch (error) {
             if (error.response?.status === 404) {
                 console.log('Submissions branch not found, creating it');
-                // Get main branch SHA
                 const mainBranch = await axios.get(`https://api.github.com/repos/${repo}/branches/main`, {
                     headers: {
                         Authorization: `token ${githubToken}`,
                         Accept: 'application/vnd.github.v3+json',
                     },
                 });
-                // Create submissions branch
                 await axios.post(
                     `https://api.github.com/repos/${repo}/git/refs`,
                     {

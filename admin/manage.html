@@ -46,6 +46,11 @@
             margin-top: 20px;
         }
 
+        img {
+            max-width: 200px;
+            height: auto;
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 10px;
@@ -54,6 +59,10 @@
             button {
                 width: 100%;
                 margin: 5px 0;
+            }
+
+            img {
+                max-width: 100%;
             }
         }
     </style>
@@ -97,7 +106,7 @@
                     <div class="submission">
                         <h3>${sub.title}</h3>
                         <p>${sub.text}</p>
-                        ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" style="max-width: 200px;">` : ''}
+                        ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy">` : ''}
                         <p>Creator: ${sub.creator || 'Anonymous'}</p>
                         <p>Published: ${sub.published ? 'Yes' : 'No'}</p>
                         <button onclick="publishSubmission('${sub.id}')">Publish</button>
