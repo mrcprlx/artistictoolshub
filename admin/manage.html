@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Submissions - Artistic Tools Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600&display=swap"
+        rel="stylesheet">
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'Lora', serif;
+        }
+
+        .submission {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        button {
+            padding: 5px 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #message {
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+
+            button {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Manage Submissions</h1>
+        <div id="submissions-list"></div>
+        <p id="message" style="display: none;"></p>
+    </div>
+    <script>
+        if (window.netlifyIdentity) {
+            netlifyIdentity.on('init', user => {
+                if (!user) {
+                    netlifyIdentity.open('login');
+                } else {
+                    loadSubmissions();
+                }
+            });
+
+            netlifyIdentity.on('logout', () => {
+                window.location.href = '/';
+            });
+        }
+
+        async function loadSubmissions() {
+            const user = netlifyIdentity.currentUser();
+            if (!user) return;
+
+            const token = await user.jwt();
+            const messageEl = document.getElementById('message');
+            const listEl = document.getElementById('submissions-list');
+
+            try {
+                const response = await fetch('/.netlify/functions/get-submissions', {
+                    headers: { 'X-Netlify-Identity-User': token },
+                });
+                const submissions = await response.json();
+                listEl.innerHTML = submissions.map(sub => `
+                    <div class="submission">
+                        <h3>${sub.title}</h3>
+                        <p>${sub.text}</p>
+                        ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" style="max-width: 200px;">` : ''}
+                        <p>Creator: ${sub.creator || 'Anonymous'}</p>
+                        <p>Published: ${sub.published ? 'Yes' : 'No'}</p>
+                        <button onclick="publishSubmission('${sub.id}')">Publish</button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                messageEl.style.display = 'block';
+                messageEl.textContent = `Error loading submissions: ${error.message}`;
+            }
+        }
+
+        async function publishSubmission(submissionId) {
+            const user = netlifyIdentity.currentUser();
+            if (!user) return;
+
+            const token = await user.jwt();
+            const messageEl = document.getElementById('message');
+            messageEl.style.display = 'block';
+            messageEl.textContent = 'Publishing submission...';
+
+            try {
+                const response = await fetch('/.netlify/functions/publish-submission', {
+                    method: 'POST',
+                    headers: { 'X-Netlify-Identity-User': token },
+                    body: JSON.stringify({ submissionId }),
+                });
+                const result = await response.json();
+                messageEl.textContent = result.message;
+                loadSubmissions(); // Refresh the list
+            } catch (error) {
+                messageEl.textContent = `Error publishing submission: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+
+</html>
