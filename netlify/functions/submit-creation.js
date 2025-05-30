@@ -1,4 +1,5 @@
 const axios = require('axios');
+const FormData = require('form-data');
 const { v4: uuidv4 } = require('uuid');
 
 exports.handler = async (event) => {
@@ -41,12 +42,16 @@ exports.handler = async (event) => {
             };
         }
         console.log('Verifying reCAPTCHA v2 Invisible');
+        const controllerRecaptcha = new AbortController();
+        const timeoutRecaptcha = setTimeout(() => controllerRecaptcha.abort(), 5000);
         const recaptchaVerify = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
             params: {
                 secret: secretKey,
                 response: recaptchaResponse,
             },
+            signal: controllerRecaptcha.signal,
         });
+        clearTimeout(timeoutRecaptcha);
         const recaptchaData = recaptchaVerify.data;
         if (!recaptchaData.success) {
             console.log('reCAPTCHA v2 Invisible verification failed', recaptchaData);
@@ -71,11 +76,14 @@ exports.handler = async (event) => {
                 const formData = new FormData();
                 formData.append('file', `data:image/jpeg;base64,${image}`);
                 formData.append('upload_preset', 'artistictoolshub');
+                const controllerCloudinary = new AbortController();
+                const timeoutCloudinary = setTimeout(() => controllerCloudinary.abort(), 5000);
                 const cloudinaryResponse = await axios.post(
                     'https://api.cloudinary.com/v1_1/drxmkv1si/image/upload',
                     formData,
-                    { headers: formData.getHeaders() }
+                    { headers: formData.getHeaders(), signal: controllerCloudinary.signal }
                 );
+                clearTimeout(timeoutCloudinary);
                 imageUrl = cloudinaryResponse.data.secure_url;
                 console.log('Cloudinary upload successful', { imageUrl });
             } catch (cloudinaryError) {
@@ -112,6 +120,8 @@ published: false
         const repo = 'mrcprlx/artistictoolshub'; // Replace with actual repo owner and name
         const path = `content/creations/submission-${submissionId}.md`;
         try {
+            const controllerGitHub = new AbortController();
+            const timeoutGitHub = setTimeout(() => controllerGitHub.abort(), 5000);
             await axios.put(
                 `https://api.github.com/repos/${repo}/contents/${path}`,
                 {
@@ -123,8 +133,10 @@ published: false
                         Authorization: `token ${githubToken}`,
                         Accept: 'application/vnd.github.v3+json',
                     },
+                    signal: controllerGitHub.signal,
                 }
             );
+            clearTimeout(timeoutGitHub);
             console.log('File created in GitHub repo', { path });
         } catch (githubError) {
             console.log('GitHub API error', {
