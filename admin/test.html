@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test CMS - Artistic Tools Hub</title>
+</head>
+
+<body>
+    <div id="cms"></div>
+    <script src="https://unpkg.com/decap-cms@3.5.0/dist/decap-cms.js"></script>
+    <script>
+        try {
+            if (window.CMS) {
+                window.CMS.init();
+                console.log('Decap CMS initialized successfully in test mode.');
+            } else {
+                throw new Error('Decap CMS not found.');
+            }
+        } catch (error) {
+            console.error('Test CMS initialization error:', error);
+            const cmsContainer = document.getElementById('cms');
+            if (cmsContainer) {
+                cmsContainer.innerHTML = `<p style="color: red; text-align: center;">Failed to initialize CMS: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+
+</html>
