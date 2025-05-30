@@ -58,7 +58,12 @@ exports.handler = async (event) => {
             allFiles.map(async (file) => {
                 if (file.type === 'file' && file.name.endsWith('.md')) {
                     try {
-                        const fileResponse = await axios.get(file.download_url);
+                        // Fetch raw content directly to avoid caching issues
+                        const fileResponse = await axios.get(file.download_url, {
+                            headers: {
+                                'Cache-Control': 'no-cache',
+                            },
+                        });
                         const { data } = matter(fileResponse.data);
                         return {
                             id: file.name.replace('.md', ''),

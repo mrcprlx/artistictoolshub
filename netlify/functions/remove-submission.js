@@ -32,6 +32,12 @@ exports.handler = async (event) => {
             api_secret: process.env.CLOUDINARY_API_SECRET,
         });
 
+        // Validate Cloudinary credentials
+        if (!process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+            console.log('Cloudinary credentials missing');
+            // Proceed with deletion even if credentials are missing
+        }
+
         // Fetch submission to get image URL
         const fileResponse = await axios.get(
             `https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`,
@@ -49,11 +55,20 @@ exports.handler = async (event) => {
         // Delete image from Cloudinary if exists
         if (data.image) {
             try {
-                const publicId = data.image.split('/').pop().split('.')[0];
-                await cloudinary.uploader.destroy(`artistictoolshub/${publicId}`, { invalidate: true });
-                console.log('Deleted image from Cloudinary', { publicId });
+                // Extract public_id from Cloudinary URL
+                // URL format: https://res.cloudinary.com/drxmkv1si/image/upload/v<timestamp>/<public_id>.<extension>
+                const urlParts = data.image.split('/');
+                const fileName = urlParts[urlParts.length - 1]; // e.g., <public_id>.<extension>
+                const publicId = fileName.split('.')[0]; // Remove extension
+                const fullPublicId = `artistictoolshub/${publicId}`; // Prepend folder
+                console.log('Attempting to delete Cloudinary image', { publicId: fullPublicId });
+                await cloudinary.uploader.destroy(fullPublicId, { invalidate: true });
+                console.log('Deleted image from Cloudinary', { publicId: fullPublicId });
             } catch (cloudinaryError) {
-                console.log('Cloudinary deletion error', { message: cloudinaryError.message });
+                console.log('Cloudinary deletion error', {
+                    message: cloudinaryError.message,
+                    details: cloudinaryError.response?.data || 'No additional details'
+                });
                 // Continue with deletion even if Cloudinary fails
             }
         }

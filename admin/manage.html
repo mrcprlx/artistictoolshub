@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,32 +9,120 @@
         rel="stylesheet">
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <style>
-        body { font-family: 'Open Sans', sans-serif; margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        h1 { font-family: 'Lora', serif; }
-        .tabs { display: flex; margin-bottom: 20px; }
-        .tab { padding: 10px 20px; background: #f0f0f0; cursor: pointer; border: 1px solid #ccc; border-bottom: none; }
-        .tab.active { background: #fff; font-weight: bold; }
-        .tab-content { display: none; border: 1px solid #ccc; padding: 20px; }
-        .tab-content.active { display: block; }
-        .submission { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
-        button { padding: 5px 10px; background: #007bff; color: white; border: none; cursor: pointer; margin-right: 5px; }
-        button:hover { background: #0056b3; }
-        button.reject, button.remove { background: #dc3545; }
-        button.reject:hover, button.remove:hover { background: #c82333; }
-        #message { margin-top: 20px; }
-        img { max-width: 200px; height: auto; }
-        .bulk-actions { margin-bottom: 20px; }
-        input[type="checkbox"] { margin-right: 5px; }
+        body {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'Lora', serif;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-bottom: none;
+        }
+
+        .tab.active {
+            background: #fff;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+            border: 1px solid #ccc;
+            padding: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .submission {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        button {
+            padding: 5px 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        button.reject,
+        button.remove {
+            background: #dc3545;
+        }
+
+        button.reject:hover,
+        button.remove:hover {
+            background: #c82333;
+        }
+
+        #message {
+            margin-top: 20px;
+        }
+
+        img {
+            max-width: 200px;
+            height: auto;
+        }
+
+        .bulk-actions {
+            margin-bottom: 20px;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
         @media (max-width: 600px) {
-            .container { padding: 10px; }
-            .tabs { flex-direction: column; }
-            .tab { border-bottom: 1px solid #ccc; }
-            button { width: 100%; margin: 5px 0; }
-            img { max-width: 100%; }
+            .container {
+                padding: 10px;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab {
+                border-bottom: 1px solid #ccc;
+            }
+
+            button {
+                width: 100%;
+                margin: 5px 0;
+            }
+
+            img {
+                max-width: 100%;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>Manage Submissions</h1>
@@ -84,7 +173,11 @@
                 const response = await fetch('/.netlify/functions/get-submissions', {
                     headers: { 'X-Netlify-Identity-User': token },
                 });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 submissions = await response.json();
+                console.log('Fetched submissions:', submissions); // Debug log
                 renderSubmissions();
             } catch (error) {
                 messageEl.style.display = 'block';
@@ -97,10 +190,12 @@
             const rejectedEl = document.getElementById('rejected-submissions');
             const publishedEl = document.getElementById('published-submissions');
 
+            console.log('Rendering submissions:', submissions); // Debug log
+
             // Review Tab (status: pending)
             const reviewSubs = submissions.filter(sub => sub.status === 'pending');
             reviewEl.innerHTML = reviewSubs.map(sub => `
-                <div class="submission">
+                <div class="submission" data-id="${sub.id}">
                     <h3>${sub.title}</h3>
                     <p>${sub.text}</p>
                     ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy" onerror="this.style.display='none';">` : ''}
@@ -113,7 +208,7 @@
             // Rejected Tab (status: rejected)
             const rejectedSubs = submissions.filter(sub => sub.status === 'rejected');
             rejectedEl.innerHTML = rejectedSubs.map(sub => `
-                <div class="submission">
+                <div class="submission" data-id="${sub.id}">
                     <input type="checkbox" class="delete-checkbox" data-id="${sub.id}">
                     <h3>${sub.title}</h3>
                     <p>${sub.text}</p>
@@ -126,7 +221,7 @@
             // Published Tab (status: published)
             const publishedSubs = submissions.filter(sub => sub.status === 'published');
             publishedEl.innerHTML = publishedSubs.map(sub => `
-                <div class="submission">
+                <div class="submission" data-id="${sub.id}">
                     <h3>${sub.title}</h3>
                     <p>${sub.text}</p>
                     ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy" onerror="this.style.display='none';">` : ''}
@@ -152,8 +247,11 @@
                     body: JSON.stringify({ submissionId }),
                 });
                 const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.message || 'Failed to publish submission');
+                }
                 messageEl.textContent = result.message;
-                loadSubmissions();
+                await loadSubmissions(); // Ensure fresh data
             } catch (error) {
                 messageEl.textContent = `Error publishing submission: ${error.message}`;
             }
@@ -175,8 +273,11 @@
                     body: JSON.stringify({ submissionId }),
                 });
                 const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.message || 'Failed to reject submission');
+                }
                 messageEl.textContent = result.message;
-                loadSubmissions();
+                await loadSubmissions(); // Ensure fresh data
             } catch (error) {
                 messageEl.textContent = `Error rejecting submission: ${error.message}`;
             }
@@ -200,8 +301,11 @@
                     body: JSON.stringify({ submissionId }),
                 });
                 const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.message || 'Failed to delete submission');
+                }
                 messageEl.textContent = result.message;
-                loadSubmissions();
+                await loadSubmissions();
             } catch (error) {
                 messageEl.textContent = `Error deleting submission: ${error.message}`;
             }
@@ -225,8 +329,11 @@
                     body: JSON.stringify({ submissionId }),
                 });
                 const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.message || 'Failed to remove submission');
+                }
                 messageEl.textContent = result.message;
-                loadSubmissions();
+                await loadSubmissions();
             } catch (error) {
                 messageEl.textContent = `Error removing submission: ${error.message}`;
             }
@@ -256,8 +363,11 @@
                     body: JSON.stringify({ submissionIds }),
                 });
                 const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.message || 'Failed to delete submissions');
+                }
                 messageEl.textContent = result.message;
-                loadSubmissions();
+                await loadSubmissions();
             } catch (error) {
                 messageEl.textContent = `Error deleting submissions: ${error.message}`;
             }
@@ -277,4 +387,5 @@
         document.getElementById('bulk-delete').addEventListener('click', bulkDeleteSubmissions);
     </script>
 </body>
+
 </html>
