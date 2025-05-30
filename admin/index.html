@@ -12,7 +12,7 @@
 
 <body>
     <div id="cms"></div>
-    <script src="https://unpkg.com/decap-cms@latest/dist/decap-cms.js"></script>
+    <script src="https://unpkg.com/decap-cms@3.5.0/dist/decap-cms.js"></script>
     <script>
         // Initialize Netlify Identity
         if (window.netlifyIdentity) {
@@ -20,19 +20,11 @@
                 if (!user) {
                     netlifyIdentity.on('login', () => {
                         netlifyIdentity.close();
-                        if (window.CMS) {
-                            window.CMS.init();
-                        } else {
-                            console.error('Decap CMS not found.');
-                        }
+                        initializeCMS();
                     });
                 } else {
                     console.log('User already logged in.');
-                    if (window.CMS) {
-                        window.CMS.init();
-                    } else {
-                        console.error('Decap CMS not found.');
-                    }
+                    initializeCMS();
                 }
             });
 
@@ -42,16 +34,40 @@
 
             netlifyIdentity.on('error', err => {
                 console.error('Netlify Identity error:', err);
-                const cmsContainer = document.getElementById('cms');
-                if (cmsContainer) {
-                    cmsContainer.innerHTML = '<p>Authentication Error. Please try again.</p>';
-                }
+                displayError('Authentication Error. Please try again.');
             });
         } else {
             console.error('Netlify Identity widget not loaded.');
+            displayError('Error loading authentication. Please try again.');
+        }
+
+        function initializeCMS() {
+            try {
+                if (window.CMS) {
+                    // Configure CMS manually to ensure Cloudinary integration
+                    window.CMS.registerMediaLibrary({
+                        name: 'cloudinary',
+                        config: {
+                            cloud_name: 'drxmkv1si',
+                            api_key: '874188631367555',
+                            upload_preset: 'artistictoolshub'
+                        }
+                    });
+                    window.CMS.init();
+                    console.log('Decap CMS initialized successfully.');
+                } else {
+                    throw new Error('Decap CMS not found.');
+                }
+            } catch (error) {
+                console.error('CMS initialization error:', error);
+                displayError('Failed to initialize CMS. Please refresh the page or contact support.');
+            }
+        }
+
+        function displayError(message) {
             const cmsContainer = document.getElementById('cms');
             if (cmsContainer) {
-                cmsContainer.innerHTML = '<p>Error loading authentication. Please try again.</p>';
+                cmsContainer.innerHTML = `<p style="color: red; text-align: center;">${message}</p>`;
             }
         }
     </script>
