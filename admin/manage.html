@@ -177,7 +177,7 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 submissions = await response.json();
-                console.log('Fetched submissions:', submissions); // Debug log
+                console.log('Fetched submissions:', submissions);
                 renderSubmissions();
             } catch (error) {
                 messageEl.style.display = 'block';
@@ -190,10 +190,11 @@
             const rejectedEl = document.getElementById('rejected-submissions');
             const publishedEl = document.getElementById('published-submissions');
 
-            console.log('Rendering submissions:', submissions); // Debug log
+            console.log('Rendering submissions:', submissions);
 
             // Review Tab (status: pending)
             const reviewSubs = submissions.filter(sub => sub.status === 'pending');
+            console.log('Review submissions:', reviewSubs);
             reviewEl.innerHTML = reviewSubs.map(sub => `
                 <div class="submission" data-id="${sub.id}">
                     <h3>${sub.title}</h3>
@@ -207,6 +208,7 @@
 
             // Rejected Tab (status: rejected)
             const rejectedSubs = submissions.filter(sub => sub.status === 'rejected');
+            console.log('Rejected submissions:', rejectedSubs);
             rejectedEl.innerHTML = rejectedSubs.map(sub => `
                 <div class="submission" data-id="${sub.id}">
                     <input type="checkbox" class="delete-checkbox" data-id="${sub.id}">
@@ -220,6 +222,7 @@
 
             // Published Tab (status: published)
             const publishedSubs = submissions.filter(sub => sub.status === 'published');
+            console.log('Published submissions:', publishedSubs);
             publishedEl.innerHTML = publishedSubs.map(sub => `
                 <div class="submission" data-id="${sub.id}">
                     <h3>${sub.title}</h3>
@@ -251,7 +254,7 @@
                     throw new Error(result.message || 'Failed to publish submission');
                 }
                 messageEl.textContent = result.message;
-                await loadSubmissions(); // Ensure fresh data
+                await loadSubmissions();
             } catch (error) {
                 messageEl.textContent = `Error publishing submission: ${error.message}`;
             }
@@ -277,7 +280,7 @@
                     throw new Error(result.message || 'Failed to reject submission');
                 }
                 messageEl.textContent = result.message;
-                await loadSubmissions(); // Ensure fresh data
+                await loadSubmissions();
             } catch (error) {
                 messageEl.textContent = `Error rejecting submission: ${error.message}`;
             }

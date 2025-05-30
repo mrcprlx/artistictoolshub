@@ -36,6 +36,8 @@ exports.handler = async (event) => {
         if (!process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
             console.log('Cloudinary credentials missing');
             // Proceed with deletion even if credentials are missing
+        } else {
+            console.log('Cloudinary configured successfully');
         }
 
         for (const id of idsToDelete) {
@@ -69,20 +71,24 @@ exports.handler = async (event) => {
                 data = parsed.data;
             } catch (parseError) {
                 console.log('Failed to parse frontmatter', { id, error: parseError.message });
-                // Continue with deletion even if parsing fails
                 data = { image: '' };
             }
 
             // Delete image from Cloudinary if exists
-            if (data.image) {
+            if (data.image && typeof data.image === 'string' && data.image.trim() !== '') {
                 try {
                     const urlParts = data.image.split('/');
                     const fileName = urlParts[urlParts.length - 1];
                     const publicId = fileName.split('.')[0];
                     const fullPublicId = `artistictoolshub/${publicId}`;
-                    console.log('Attempting to delete Cloudinary image', { publicId: fullPublicId });
-                    await cloudinary.uploader.destroy(fullPublicId, { invalidate: true });
-                    console.log('Deleted image from Cloudinary', { publicId: fullPublicId });
+                    console.log('Attempting to delete Cloudinary image', { publicId: fullPublicId, imageUrl: data.image });
+                    const destroyResult = await cloudinary.uploader.destroy(fullPublicId, { invalidate: true });
+                    console.log('Cloudinary destroy result', { result: destroyResult });
+                    if (destroyResult.result !== 'ok') {
+                        console.log('Failed to delete Cloudinary image', { result: destroyResult });
+                    } else {
+                        console.log('Deleted image from Cloudinary', { publicId: fullPublicId });
+                    }
                 } catch (cloudinaryError) {
                     console.log('Cloudinary deletion error', {
                         message: cloudinaryError.message,
@@ -90,6 +96,8 @@ exports.handler = async (event) => {
                     });
                     // Continue with deletion even if Cloudinary fails
                 }
+            } else {
+                console.log('No valid image to delete from Cloudinary', { image: data.image });
             }
 
             // Delete submission from GitHub

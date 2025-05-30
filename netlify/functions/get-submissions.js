@@ -26,6 +26,7 @@ exports.handler = async (event) => {
                     headers: {
                         Authorization: `token ${githubToken}`,
                         Accept: 'application/vnd.github.v3+json',
+                        'If-None-Match': '', // Force fetch to bypass caching
                     },
                 }
             );
@@ -43,6 +44,7 @@ exports.handler = async (event) => {
                     headers: {
                         Authorization: `token ${githubToken}`,
                         Accept: 'application/vnd.github.v3+json',
+                        'If-None-Match': '', // Force fetch to bypass caching
                     },
                 }
             );
@@ -56,12 +58,13 @@ exports.handler = async (event) => {
         const allFiles = [...submissionsFiles, ...mainFiles];
         const submissions = await Promise.all(
             allFiles.map(async (file) => {
-                if (file.type === 'file' && file.name.endsWith('.md')) {
+                if (file.type === 'file' && file.name.endsWith('.md') && file.name !== '.gitkeep') {
                     try {
                         // Fetch raw content directly to avoid caching issues
                         const fileResponse = await axios.get(file.download_url, {
                             headers: {
                                 'Cache-Control': 'no-cache',
+                                'If-None-Match': '', // Force fetch
                             },
                         });
                         const { data } = matter(fileResponse.data);
@@ -83,7 +86,7 @@ exports.handler = async (event) => {
         );
 
         const filteredSubmissions = submissions.filter(s => s !== null);
-        console.log('Fetched submissions', { count: filteredSubmissions.length });
+        console.log('Fetched submissions', { count: filteredSubmissions.length, submissions: filteredSubmissions });
         return {
             statusCode: 200,
             body: JSON.stringify(filteredSubmissions),
