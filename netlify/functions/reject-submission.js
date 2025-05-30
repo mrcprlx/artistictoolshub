@@ -18,7 +18,7 @@ exports.handler = async (event) => {
             };
         }
 
-        console.log('Publishing submission', { submissionId });
+        console.log('Rejecting submission', { submissionId });
         const githubToken = process.env.GITHUB_TOKEN;
         const repo = 'mrcprlx/artistictoolshub';
         const path = `content/creations/${submissionId}.md`;
@@ -37,26 +37,27 @@ exports.handler = async (event) => {
         const fileContent = Buffer.from(file.content, 'base64').toString('utf-8');
         const { data, content: markdownContent } = matter(fileContent);
 
-        // Update status to published
-        data.status = 'published';
+        // Update status to rejected
+        data.status = 'rejected';
         const updatedContent = `---
 title: "${data.title.replace(/"/g, '\\"')}"
 text: |
   ${data.text.split('\n').map(line => `  ${line}`).join('\n')}
 image: "${data.image || ''}"
 creator: "${data.creator || ''}"
-status: "published"
+status: "rejected"
 ---
 ${markdownContent}`;
         const base64Content = Buffer.from(updatedContent).toString('base64');
 
-        // Move to main branch
+        // Update file in submissions branch
         await axios.put(
             `https://api.github.com/repos/${repo}/contents/${path}`,
             {
-                message: `Publish submission: ${data.title}`,
+                message: `Reject submission: ${data.title}`,
                 content: base64Content,
-                branch: 'main'
+                sha: file.sha,
+                branch: 'submissions'
             },
             {
                 headers: {
@@ -66,32 +67,9 @@ ${markdownContent}`;
             }
         );
 
-        // Delete from submissions branch
-        await axios.delete(
-            `https://api.github.com/repos/${repo}/contents/${path}`,
-            {
-                headers: {
-                    Authorization: `token ${githubToken}`,
-                    Accept: 'application/vnd.github.v3+json',
-                },
-                data: {
-                    message: `Remove published submission: ${data.title}`,
-                    sha: file.sha,
-                    branch: 'submissions'
-                },
-            }
-        );
-
-        // Trigger Netlify build
-        const buildHook = process.env.NETLIFY_BUILD_HOOK;
-        if (buildHook) {
-            await axios.post(buildHook);
-            console.log('Triggered Netlify build');
-        }
-
         return {
             statusCode: 200,
-            body: JSON.stringify({ message: 'Submission published successfully' }),
+            body: JSON.stringify({ message: 'Submission rejected successfully' }),
         };
     } catch (error) {
         console.log('Server error', { message: error.message, stack: error.stack });

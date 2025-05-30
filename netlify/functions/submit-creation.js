@@ -120,7 +120,7 @@ text: |
   ${text.split('\n').map(line => `  ${line}`).join('\n')}
 image: "${imageUrl}"
 creator: "${author || ''}"
-published: false
+status: "pending"
 ---
 `;
         const base64Content = Buffer.from(content).toString('base64');

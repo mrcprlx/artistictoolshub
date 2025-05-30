@@ -24,6 +24,34 @@
             font-family: 'Lora', serif;
         }
 
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-bottom: none;
+        }
+
+        .tab.active {
+            background: #fff;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+            border: 1px solid #ccc;
+            padding: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
         .submission {
             border: 1px solid #ccc;
             padding: 10px;
@@ -36,10 +64,19 @@
             color: white;
             border: none;
             cursor: pointer;
+            margin-right: 5px;
         }
 
         button:hover {
             background: #0056b3;
+        }
+
+        button.reject {
+            background: #dc3545;
+        }
+
+        button.reject:hover {
+            background: #c82333;
         }
 
         #message {
@@ -51,9 +88,25 @@
             height: auto;
         }
 
+        .bulk-actions {
+            margin-bottom: 20px;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 10px;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab {
+                border-bottom: 1px solid #ccc;
             }
 
             button {
@@ -71,7 +124,23 @@
 <body>
     <div class="container">
         <h1>Manage Submissions</h1>
-        <div id="submissions-list"></div>
+        <div class="tabs">
+            <div class="tab active" data-tab="review">Review</div>
+            <div class="tab" data-tab="rejected">Rejected</div>
+            <div class="tab" data-tab="published">Published</div>
+        </div>
+        <div id="review" class="tab-content active">
+            <div id="review-submissions"></div>
+        </div>
+        <div id="rejected" class="tab-content">
+            <div class="bulk-actions">
+                <button id="bulk-delete" style="background: #dc3545;">Bulk Delete Selected</button>
+            </div>
+            <div id="rejected-submissions"></div>
+        </div>
+        <div id="published" class="tab-content">
+            <div id="published-submissions"></div>
+        </div>
         <p id="message" style="display: none;"></p>
     </div>
     <script>
@@ -89,33 +158,68 @@
             });
         }
 
+        let submissions = [];
+
         async function loadSubmissions() {
             const user = netlifyIdentity.currentUser();
             if (!user) return;
 
             const token = await user.jwt();
             const messageEl = document.getElementById('message');
-            const listEl = document.getElementById('submissions-list');
 
             try {
                 const response = await fetch('/.netlify/functions/get-submissions', {
                     headers: { 'X-Netlify-Identity-User': token },
                 });
-                const submissions = await response.json();
-                listEl.innerHTML = submissions.map(sub => `
-                    <div class="submission">
-                        <h3>${sub.title}</h3>
-                        <p>${sub.text}</p>
-                        ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy">` : ''}
-                        <p>Creator: ${sub.creator || 'Anonymous'}</p>
-                        <p>Published: ${sub.published ? 'Yes' : 'No'}</p>
-                        <button onclick="publishSubmission('${sub.id}')">Publish</button>
-                    </div>
-                `).join('');
+                submissions = await response.json();
+                renderSubmissions();
             } catch (error) {
                 messageEl.style.display = 'block';
                 messageEl.textContent = `Error loading submissions: ${error.message}`;
             }
+        }
+
+        function renderSubmissions() {
+            const reviewEl = document.getElementById('review-submissions');
+            const rejectedEl = document.getElementById('rejected-submissions');
+            const publishedEl = document.getElementById('published-submissions');
+
+            // Review Tab (status: pending)
+            const reviewSubs = submissions.filter(sub => sub.status === 'pending');
+            reviewEl.innerHTML = reviewSubs.map(sub => `
+                <div class="submission">
+                    <h3>${sub.title}</h3>
+                    <p>${sub.text}</p>
+                    ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy">` : ''}
+                    <p>Creator: ${sub.creator || 'Anonymous'}</p>
+                    <button onclick="publishSubmission('${sub.id}')">Publish</button>
+                    <button class="reject" onclick="rejectSubmission('${sub.id}')">Reject</button>
+                </div>
+            `).join('');
+
+            // Rejected Tab (status: rejected)
+            const rejectedSubs = submissions.filter(sub => sub.status === 'rejected');
+            rejectedEl.innerHTML = rejectedSubs.map(sub => `
+                <div class="submission">
+                    <input type="checkbox" class="delete-checkbox" data-id="${sub.id}">
+                    <h3>${sub.title}</h3>
+                    <p>${sub.text}</p>
+                    ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy">` : ''}
+                    <p>Creator: ${sub.creator || 'Anonymous'}</p>
+                    <button class="reject" onclick="deleteSubmission('${sub.id}')">Delete</button>
+                </div>
+            `).join('');
+
+            // Published Tab (status: published)
+            const publishedSubs = submissions.filter(sub => sub.status === 'published');
+            publishedEl.innerHTML = publishedSubs.map(sub => `
+                <div class="submission">
+                    <h3>${sub.title}</h3>
+                    <p>${sub.text}</p>
+                    ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy">` : ''}
+                    <p>Creator: ${sub.creator || 'Anonymous'}</p>
+                </div>
+            `).join('');
         }
 
         async function publishSubmission(submissionId) {
@@ -135,11 +239,103 @@
                 });
                 const result = await response.json();
                 messageEl.textContent = result.message;
-                loadSubmissions(); // Refresh the list
+                loadSubmissions();
             } catch (error) {
                 messageEl.textContent = `Error publishing submission: ${error.message}`;
             }
         }
+
+        async function rejectSubmission(submissionId) {
+            const user = netlifyIdentity.currentUser();
+            if (!user) return;
+
+            const token = await user.jwt();
+            const messageEl = document.getElementById('message');
+            messageEl.style.display = 'block';
+            messageEl.textContent = 'Rejecting submission...';
+
+            try {
+                const response = await fetch('/.netlify/functions/reject-submission', {
+                    method: 'POST',
+                    headers: { 'X-Netlify-Identity-User': token },
+                    body: JSON.stringify({ submissionId }),
+                });
+                const result = await response.json();
+                messageEl.textContent = result.message;
+                loadSubmissions();
+            } catch (error) {
+                messageEl.textContent = `Error rejecting submission: ${error.message}`;
+            }
+        }
+
+        async function deleteSubmission(submissionId) {
+            if (!confirm('Are you sure you want to permanently delete this submission?')) return;
+
+            const user = netlifyIdentity.currentUser();
+            if (!user) return;
+
+            const token = await user.jwt();
+            const messageEl = document.getElementById('message');
+            messageEl.style.display = 'block';
+            messageEl.textContent = 'Deleting submission...';
+
+            try {
+                const response = await fetch('/.netlify/functions/delete-submission', {
+                    method: 'POST',
+                    headers: { 'X-Netlify-Identity-User': token },
+                    body: JSON.stringify({ submissionId }),
+                });
+                const result = await response.json();
+                messageEl.textContent = result.message;
+                loadSubmissions();
+            } catch (error) {
+                messageEl.textContent = `Error deleting submission: ${error.message}`;
+            }
+        }
+
+        async function bulkDeleteSubmissions() {
+            const checkboxes = document.querySelectorAll('.delete-checkbox:checked');
+            if (checkboxes.length === 0) {
+                alert('Please select at least one submission to delete.');
+                return;
+            }
+            if (!confirm(`Are you sure you want to permanently delete ${checkboxes.length} submission(s)?`)) return;
+
+            const user = netlifyIdentity.currentUser();
+            if (!user) return;
+
+            const token = await user.jwt();
+            const messageEl = document.getElementById('message');
+            messageEl.style.display = 'block';
+            messageEl.textContent = 'Deleting submissions...';
+
+            try {
+                const submissionIds = Array.from(checkboxes).map(cb => cb.dataset.id);
+                const response = await fetch('/.netlify/functions/delete-submission', {
+                    method: 'POST',
+                    headers: { 'X-Netlify-Identity-User': token },
+                    body: JSON.stringify({ submissionIds }),
+                });
+                const result = await response.json();
+                messageEl.textContent = result.message;
+                loadSubmissions();
+            } catch (error) {
+                messageEl.textContent = `Error deleting submissions: ${error.message}`;
+            }
+        }
+
+        // Tab navigation
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Bulk delete button
+        document.getElementById('bulk-delete').addEventListener('click', bulkDeleteSubmissions);
     </script>
 </body>
 

@@ -14,7 +14,11 @@ exports.handler = async (event) => {
         const githubToken = process.env.GITHUB_TOKEN;
         const repo = 'mrcprlx/artistictoolshub';
 
-        let files = [];
+        // Fetch submissions from both branches
+        let submissionsFiles = [];
+        let mainFiles = [];
+
+        // Fetch from submissions branch (pending and rejected)
         try {
             const response = await axios.get(
                 `https://api.github.com/repos/${repo}/contents/content/creations?ref=submissions`,
@@ -25,31 +29,49 @@ exports.handler = async (event) => {
                     },
                 }
             );
-            files = response.data;
+            submissionsFiles = response.data;
         } catch (error) {
-            if (error.response?.status === 404) {
-                console.log('No submissions found');
-                return {
-                    statusCode: 200,
-                    body: JSON.stringify([]),
-                };
-            }
-            throw error;
+            if (error.response?.status !== 404) throw error;
+            console.log('No submissions found in submissions branch');
         }
 
+        // Fetch from main branch (published)
+        try {
+            const response = await axios.get(
+                `https://api.github.com/repos/${repo}/contents/content/creations?ref=main`,
+                {
+                    headers: {
+                        Authorization: `token ${githubToken}`,
+                        Accept: 'application/vnd.github.v3+json',
+                    },
+                }
+            );
+            mainFiles = response.data;
+        } catch (error) {
+            if (error.response?.status !== 404) throw error;
+            console.log('No submissions found in main branch');
+        }
+
+        // Process submissions from both branches
+        const allFiles = [...submissionsFiles, ...mainFiles];
         const submissions = await Promise.all(
-            files.map(async (file) => {
+            allFiles.map(async (file) => {
                 if (file.type === 'file' && file.name.endsWith('.md')) {
-                    const fileResponse = await axios.get(file.download_url);
-                    const { data } = matter(fileResponse.data);
-                    return {
-                        id: file.name.replace('.md', ''),
-                        title: data.title || 'Untitled',
-                        text: data.text || '',
-                        image: data.image || '',
-                        creator: data.creator || '',
-                        published: data.published || false,
-                    };
+                    try {
+                        const fileResponse = await axios.get(file.download_url);
+                        const { data } = matter(fileResponse.data);
+                        return {
+                            id: file.name.replace('.md', ''),
+                            title: data.title || 'Untitled',
+                            text: data.text || '',
+                            image: data.image || '',
+                            creator: data.creator || '',
+                            status: data.status || (file.path.includes('ref=main') ? 'published' : 'pending'),
+                        };
+                    } catch (error) {
+                        console.log('Error processing file', { path: file.path, error: error.message });
+                        return null;
+                    }
                 }
                 return null;
             })
