@@ -1,17 +1,10 @@
 backend:
   name: git-gateway
-  branch: submissions
+  branch: main  # Test with main branch first
   repo: mrcprlx/artistictoolshub
 
-# Temporarily disable Cloudinary media library to isolate the issue
-# media_library:
-#   name: cloudinary
-#   config:
-#     cloud_name: "drxmkv1si"
-#     api_key: "874188631367555"
-#     upload_preset: "artistictoolshub"
-
-publish_mode: editorial_workflow
+# Remove editorial_workflow to simplify
+# publish_mode: editorial_workflow
 media_folder: "content/creations/images"
 public_folder: "/creations/images"
 
