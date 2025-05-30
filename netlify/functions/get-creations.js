@@ -1,53 +1,43 @@
-const fetch = require('node-fetch');
+const axios = require('axios');
+const matter = require('gray-matter');
 
 exports.handler = async () => {
     try {
         console.log('Starting get-creations function');
-        const netlifyApiToken = process.env.NETLIFY_API_TOKEN;
-        if (!netlifyApiToken) {
-            console.log('Missing Netlify API token');
-            return {
-                statusCode: 500,
-                body: JSON.stringify({ message: 'Server configuration error: Missing Netlify API token' }),
-            };
-        }
+        const githubToken = process.env.GITHUB_TOKEN;
+        const repo = 'mrcprlx/artistictoolshub'; // Replace with actual repo owner and name
 
-        // Fetch form submissions from Netlify
-        console.log('Fetching submissions from Netlify Forms');
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
-        const response = await fetch('https://api.netlify.com/api/v1/forms/creation-submission/submissions', {
-            method: 'GET',
-            headers: { Authorization: `Bearer ${netlifyApiToken}` },
-            signal: controller.signal
-        });
-        clearTimeout(timeoutId);
+        // Get list of files in content/creations
+        const response = await axios.get(
+            `https://api.github.com/repos/${repo}/contents/content/creations`,
+            {
+                headers: {
+                    Authorization: `token ${githubToken}`,
+                    Accept: 'application/vnd.github.v3+json',
+                },
+            }
+        );
+        const files = response.data;
 
-        if (!response.ok) {
-            console.log('Failed to fetch Netlify Forms submissions', { status: response.status, text: await response.text() });
-            return {
-                statusCode: response.status,
-                body: JSON.stringify({ message: 'Failed to fetch submissions', details: await response.text() }),
-            };
-        }
+        // Fetch each file's content and parse front matter
+        const creations = await Promise.all(
+            files.map(async (file) => {
+                if (file.type === 'file' && file.name.endsWith('.md')) {
+                    const fileResponse = await axios.get(file.download_url);
+                    const { data } = matter(fileResponse.data);
+                    if (data.published) {
+                        return { ...data, id: file.name.replace('.md', '') };
+                    }
+                }
+                return null;
+            })
+        );
 
-        const submissions = await response.json();
-        console.log('Raw submissions fetched', { count: submissions.length });
-        const creations = submissions
-            .filter(sub => sub.data.published === true || sub.data.published === 'true')
-            .map(sub => ({
-                id: sub.data.submission_id,
-                title: sub.data.title || 'Untitled',
-                text: sub.data.text || '',
-                image: sub.data.image || '',
-                creator: sub.data.creator || '',
-                published: sub.data.published
-            }));
-
-        console.log('Fetched creations', { count: creations.length });
+        const publishedCreations = creations.filter((c) => c !== null);
+        console.log('Published creations', { count: publishedCreations.length });
         return {
             statusCode: 200,
-            body: JSON.stringify(creations),
+            body: JSON.stringify(publishedCreations),
         };
     } catch (error) {
         console.log('Server error', { message: error.message, stack: error.stack });

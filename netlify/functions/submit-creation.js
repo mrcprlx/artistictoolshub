@@ -1,7 +1,5 @@
 const axios = require('axios');
-const FormData = require('form-data');
 const { v4: uuidv4 } = require('uuid');
-const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
     try {
@@ -43,16 +41,13 @@ exports.handler = async (event) => {
             };
         }
         console.log('Verifying reCAPTCHA v2 Invisible');
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
-        const recaptchaVerify = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `secret=${secretKey}&response=${encodeURIComponent(recaptchaResponse)}`,
-            signal: controller.signal,
+        const recaptchaVerify = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
+            params: {
+                secret: secretKey,
+                response: recaptchaResponse,
+            },
         });
-        clearTimeout(timeoutId);
-        const recaptchaData = await recaptchaVerify.json();
+        const recaptchaData = recaptchaVerify.data;
         if (!recaptchaData.success) {
             console.log('reCAPTCHA v2 Invisible verification failed', recaptchaData);
             return {
@@ -76,16 +71,11 @@ exports.handler = async (event) => {
                 const formData = new FormData();
                 formData.append('file', `data:image/jpeg;base64,${image}`);
                 formData.append('upload_preset', 'artistictoolshub');
-
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 5000);
                 const cloudinaryResponse = await axios.post(
                     'https://api.cloudinary.com/v1_1/drxmkv1si/image/upload',
                     formData,
-                    { headers: formData.getHeaders(), signal: controller.signal }
+                    { headers: formData.getHeaders() }
                 );
-                clearTimeout(timeoutId);
-
                 imageUrl = cloudinaryResponse.data.secure_url;
                 console.log('Cloudinary upload successful', { imageUrl });
             } catch (cloudinaryError) {
@@ -104,23 +94,53 @@ exports.handler = async (event) => {
             }
         }
 
-        // Store submission in Netlify Forms
-        console.log('Preparing Netlify Forms submission');
-        const formSubmission = {
-            'form-name': 'creation-submission',
-            title,
-            text,
-            image: imageUrl,
-            creator: author || '',
-            submission_id: uuidv4(),
-            published: 'false'
-        };
-        const formData = new FormData();
-        for (const [key, value] of Object.entries(formSubmission)) {
-            formData.append(key, value);
+        // Create markdown content
+        const submissionId = uuidv4();
+        const content = `---
+title: "${title.replace(/"/g, '\\"')}"
+text: |
+${text.split('\n').map(line => `  ${line}`).join('\n')}
+image: "${imageUrl}"
+creator: "${author || ''}"
+published: false
+---
+`;
+        const base64Content = Buffer.from(content).toString('base64');
+
+        // Create file in GitHub repo
+        const githubToken = process.env.GITHUB_TOKEN;
+        const repo = 'mrcprlx/artistictoolshub'; // Replace with actual repo owner and name
+        const path = `content/creations/submission-${submissionId}.md`;
+        try {
+            await axios.put(
+                `https://api.github.com/repos/${repo}/contents/${path}`,
+                {
+                    message: `New creation submission: ${title}`,
+                    content: base64Content,
+                },
+                {
+                    headers: {
+                        Authorization: `token ${githubToken}`,
+                        Accept: 'application/vnd.github.v3+json',
+                    },
+                }
+            );
+            console.log('File created in GitHub repo', { path });
+        } catch (githubError) {
+            console.log('GitHub API error', {
+                message: githubError.message,
+                response: githubError.response?.data
+            });
+            return {
+                statusCode: 500,
+                body: JSON.stringify({
+                    message: 'Failed to create file in GitHub repo',
+                    details: githubError.message,
+                    response: githubError.response?.data
+                }),
+            };
         }
 
-        console.log('Submission prepared, returning success');
         return {
             statusCode: 200,
             body: JSON.stringify({ message: 'Submission successful, pending review' }),
