@@ -35,14 +35,25 @@ exports.handler = async (event) => {
             cloud_name: 'drxmkv1si',
             api_key: process.env.CLOUDINARY_API_KEY,
             api_secret: process.env.CLOUDINARY_API_SECRET,
+            secure: true,
         });
 
         // Validate Cloudinary credentials
         if (!process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-            console.log('Cloudinary credentials missing');
+            console.log('Cloudinary credentials missing - cannot delete image');
             // Proceed with deletion even if credentials are missing
         } else {
             console.log('Cloudinary configured successfully');
+            // Test Cloudinary connectivity
+            try {
+                const pingResult = await cloudinary.api.ping();
+                console.log('Cloudinary API ping result', { result: pingResult });
+            } catch (pingError) {
+                console.log('Cloudinary API ping failed', {
+                    message: pingError.message,
+                    details: pingError.response?.data || 'No additional details',
+                });
+            }
         }
 
         for (const id of idsToDelete) {
@@ -87,6 +98,11 @@ exports.handler = async (event) => {
                     const publicId = fileName.split('.')[0];
                     const fullPublicId = `artistictoolshub/${publicId}`;
                     console.log('Attempting to delete Cloudinary image', { publicId: fullPublicId, imageUrl: data.image });
+
+                    if (!process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+                        throw new Error('Cannot delete image: Cloudinary credentials missing');
+                    }
+
                     const destroyResult = await cloudinary.uploader.destroy(fullPublicId, { invalidate: true });
                     console.log('Cloudinary destroy result', { result: destroyResult });
                     if (destroyResult.result !== 'ok') {
@@ -97,7 +113,7 @@ exports.handler = async (event) => {
                 } catch (cloudinaryError) {
                     console.log('Cloudinary deletion error', {
                         message: cloudinaryError.message,
-                        details: cloudinaryError.response?.data || 'No additional details'
+                        details: cloudinaryError.response?.data || 'No additional details',
                     });
                     // Continue with deletion even if Cloudinary fails
                 }
