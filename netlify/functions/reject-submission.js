@@ -18,16 +18,6 @@ exports.handler = async (event) => {
             };
         }
 
-        // Validate submissionId format (submission-<uuid>)
-        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
-        const submissionIdParts = submissionId.split('submission-');
-        if (submissionIdParts.length !== 2 || !uuidRegex.test(submissionIdParts[1])) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: 'Invalid submissionId format. Expected: submission-<uuid>' }),
-            };
-        }
-
         console.log('Rejecting submission', { submissionId });
         const githubToken = process.env.GITHUB_TOKEN;
         const repo = 'mrcprlx/artistictoolshub';
