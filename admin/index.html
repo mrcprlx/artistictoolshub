@@ -44,15 +44,6 @@
         function initializeCMS() {
             try {
                 if (window.CMS) {
-                    // Configure CMS manually to ensure Cloudinary integration
-                    window.CMS.registerMediaLibrary({
-                        name: 'cloudinary',
-                        config: {
-                            cloud_name: 'drxmkv1si',
-                            api_key: '874188631367555',
-                            upload_preset: 'artistictoolshub'
-                        }
-                    });
                     window.CMS.init();
                     console.log('Decap CMS initialized successfully.');
                 } else {
