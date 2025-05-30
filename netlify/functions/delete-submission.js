@@ -26,6 +26,11 @@ exports.handler = async (event) => {
         const branch = 'submissions';
 
         // Configure Cloudinary
+        console.log('Configuring Cloudinary', {
+            cloud_name: 'drxmkv1si',
+            api_key: process.env.CLOUDINARY_API_KEY ? '****' : 'undefined',
+            api_secret: process.env.CLOUDINARY_API_SECRET ? '****' : 'undefined',
+        });
         cloudinary.config({
             cloud_name: 'drxmkv1si',
             api_key: process.env.CLOUDINARY_API_KEY,

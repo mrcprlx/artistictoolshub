@@ -27,7 +27,7 @@ exports.handler = async (event) => {
         let file;
         try {
             const fileResponse = await axios.get(
-                `https://api.github.com/repos/${repo}/contents/${path}?ref=submissions`,
+                `https://api.github.com/repos/${repo}/contents/${path}?ref=submissions&t=${Date.now()}`,
                 {
                     headers: {
                         Authorization: `token ${githubToken}`,
@@ -72,6 +72,7 @@ creator: "${data.creator || ''}"
 status: "rejected"
 ---
 ${markdownContent}`;
+        console.log('Updated file content:', updatedContent); // Debug log
         const base64Content = Buffer.from(updatedContent).toString('base64');
 
         // Update file in submissions branch

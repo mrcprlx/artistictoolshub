@@ -21,7 +21,7 @@ exports.handler = async (event) => {
         // Fetch from submissions branch (pending and rejected)
         try {
             const response = await axios.get(
-                `https://api.github.com/repos/${repo}/contents/content/creations?ref=submissions`,
+                `https://api.github.com/repos/${repo}/contents/content/creations?ref=submissions&t=${Date.now()}`,
                 {
                     headers: {
                         Authorization: `token ${githubToken}`,
@@ -39,7 +39,7 @@ exports.handler = async (event) => {
         // Fetch from main branch (published)
         try {
             const response = await axios.get(
-                `https://api.github.com/repos/${repo}/contents/content/creations?ref=main`,
+                `https://api.github.com/repos/${repo}/contents/content/creations?ref=main&t=${Date.now()}`,
                 {
                     headers: {
                         Authorization: `token ${githubToken}`,
@@ -60,14 +60,19 @@ exports.handler = async (event) => {
             allFiles.map(async (file) => {
                 if (file.type === 'file' && file.name.endsWith('.md') && file.name !== '.gitkeep') {
                     try {
-                        // Fetch raw content directly to avoid caching issues
-                        const fileResponse = await axios.get(file.download_url, {
-                            headers: {
-                                'Cache-Control': 'no-cache',
-                                'If-None-Match': '', // Force fetch
-                            },
-                        });
-                        const { data } = matter(fileResponse.data);
+                        // Fetch file content directly via GitHub API to avoid CDN caching
+                        const fileResponse = await axios.get(
+                            `https://api.github.com/repos/${repo}/contents/${file.path}?ref=${file.path.includes('ref=main') ? 'main' : 'submissions'}&t=${Date.now()}`,
+                            {
+                                headers: {
+                                    Authorization: `token ${githubToken}`,
+                                    Accept: 'application/vnd.github.v3+json',
+                                    'If-None-Match': '', // Force fetch
+                                },
+                            }
+                        );
+                        const fileContent = Buffer.from(fileResponse.data.content, 'base64').toString('utf-8');
+                        const { data } = matter(fileContent);
                         return {
                             id: file.name.replace('.md', ''),
                             title: data.title || 'Untitled',
