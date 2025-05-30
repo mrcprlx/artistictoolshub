@@ -63,12 +63,19 @@ exports.handler = async (event) => {
             }
 
             const fileContent = Buffer.from(file.content, 'base64').toString('utf-8');
-            const { data } = matter(fileContent);
+            let data;
+            try {
+                const parsed = matter(fileContent);
+                data = parsed.data;
+            } catch (parseError) {
+                console.log('Failed to parse frontmatter', { id, error: parseError.message });
+                // Continue with deletion even if parsing fails
+                data = { image: '' };
+            }
 
             // Delete image from Cloudinary if exists
             if (data.image) {
                 try {
-                    // Extract public_id from Cloudinary URL
                     const urlParts = data.image.split('/');
                     const fileName = urlParts[urlParts.length - 1];
                     const publicId = fileName.split('.')[0];
@@ -101,6 +108,41 @@ exports.handler = async (event) => {
                 }
             );
             console.log('Deleted submission from GitHub', { id });
+        }
+
+        // Check if directory is empty and add .gitkeep if needed
+        let remainingFiles = [];
+        try {
+            const response = await axios.get(
+                `https://api.github.com/repos/${repo}/contents/content/creations?ref=${branch}`,
+                {
+                    headers: {
+                        Authorization: `token ${githubToken}`,
+                        Accept: 'application/vnd.github.v3+json',
+                    },
+                }
+            );
+            remainingFiles = response.data.filter(file => !idsToDelete.includes(file.name.replace('.md', '')));
+        } catch (error) {
+            if (error.response?.status !== 404) throw error;
+        }
+
+        if (remainingFiles.length === 0) {
+            const gitkeepContent = Buffer.from('').toString('base64');
+            await axios.put(
+                `https://api.github.com/repos/${repo}/contents/content/creations/.gitkeep`,
+                {
+                    message: 'Add .gitkeep to content/creations after delete',
+                    content: gitkeepContent,
+                    branch: 'submissions'
+                },
+                {
+                    headers: {
+                        Authorization: `token ${githubToken}`,
+                        Accept: 'application/vnd.github.v3+json',
+                    },
+                }
+            );
         }
 
         return {

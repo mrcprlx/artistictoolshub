@@ -115,12 +115,13 @@ exports.handler = async (event) => {
             }
         }
 
-        // Create markdown content
+        // Create markdown content with proper YAML formatting
         const submissionId = uuidv4();
+        const textLines = text.split('\n').map(line => `  ${line.trim()}`).join('\n');
         const content = `---
 title: "${title.replace(/"/g, '\\"')}"
 text: |
-  ${text.split('\n').map(line => `  ${line}`).join('\n')}
+${textLines}
 image: "${imageUrl}"
 creator: "${author || ''}"
 status: "pending"
@@ -162,6 +163,37 @@ status: "pending"
                     }
                 );
                 console.log('Created submissions branch');
+            } else {
+                throw error;
+            }
+        }
+
+        // Ensure content/creations directory exists by creating a .gitkeep file if needed
+        try {
+            await axios.get(`https://api.github.com/repos/${repo}/contents/content/creations/.gitkeep?ref=${branch}`, {
+                headers: {
+                    Authorization: `token ${githubToken}`,
+                    Accept: 'application/vnd.github.v3+json',
+                },
+            });
+        } catch (error) {
+            if (error.response?.status === 404) {
+                console.log('Creating .gitkeep in content/creations');
+                const gitkeepContent = Buffer.from('').toString('base64');
+                await axios.put(
+                    `https://api.github.com/repos/${repo}/contents/content/creations/.gitkeep`,
+                    {
+                        message: 'Add .gitkeep to content/creations',
+                        content: gitkeepContent,
+                        branch: 'submissions'
+                    },
+                    {
+                        headers: {
+                            Authorization: `token ${githubToken}`,
+                            Accept: 'application/vnd.github.v3+json',
+                        },
+                    }
+                );
             } else {
                 throw error;
             }

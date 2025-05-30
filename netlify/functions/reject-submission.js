@@ -47,14 +47,26 @@ exports.handler = async (event) => {
         }
 
         const fileContent = Buffer.from(file.content, 'base64').toString('utf-8');
-        const { data, content: markdownContent } = matter(fileContent);
+        let data, markdownContent;
+        try {
+            const parsed = matter(fileContent);
+            data = parsed.data;
+            markdownContent = parsed.content;
+        } catch (parseError) {
+            console.log('Failed to parse frontmatter', { error: parseError.message });
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: 'Invalid submission format: failed to parse frontmatter', details: parseError.message }),
+            };
+        }
 
         // Update status to rejected
         data.status = 'rejected';
+        const textLines = (data.text || '').split('\n').map(line => `  ${line.trim()}`).join('\n');
         const updatedContent = `---
-title: "${data.title.replace(/"/g, '\\"')}"
+title: "${(data.title || 'Untitled').replace(/"/g, '\\"')}"
 text: |
-  ${data.text.split('\n').map(line => `  ${line}`).join('\n')}
+${textLines}
 image: "${data.image || ''}"
 creator: "${data.creator || ''}"
 status: "rejected"
@@ -66,7 +78,7 @@ ${markdownContent}`;
         await axios.put(
             `https://api.github.com/repos/${repo}/contents/${path}`,
             {
-                message: `Reject submission: ${data.title}`,
+                message: `Reject submission: ${data.title || 'Untitled'}`,
                 content: base64Content,
                 sha: file.sha,
                 branch: 'submissions'
