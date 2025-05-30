@@ -94,6 +94,9 @@ exports.handler = async (event) => {
                     { headers: formData.getHeaders(), signal: controllerCloudinary.signal }
                 );
                 clearTimeout(timeoutCloudinary);
+                if (!cloudinaryResponse.data.secure_url) {
+                    throw new Error('Cloudinary upload failed: No secure_url returned');
+                }
                 imageUrl = cloudinaryResponse.data.secure_url;
                 console.log('Cloudinary upload successful', { imageUrl });
             } catch (cloudinaryError) {

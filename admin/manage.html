@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,118 +8,32 @@
         rel="stylesheet">
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <style>
-        body {
-            font-family: 'Open Sans', sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        h1 {
-            font-family: 'Lora', serif;
-        }
-
-        .tabs {
-            display: flex;
-            margin-bottom: 20px;
-        }
-
-        .tab {
-            padding: 10px 20px;
-            background: #f0f0f0;
-            cursor: pointer;
-            border: 1px solid #ccc;
-            border-bottom: none;
-        }
-
-        .tab.active {
-            background: #fff;
-            font-weight: bold;
-        }
-
-        .tab-content {
-            display: none;
-            border: 1px solid #ccc;
-            padding: 20px;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .submission {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin: 10px 0;
-        }
-
-        button {
-            padding: 5px 10px;
-            background: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-            margin-right: 5px;
-        }
-
-        button:hover {
-            background: #0056b3;
-        }
-
-        button.reject {
-            background: #dc3545;
-        }
-
-        button.reject:hover {
-            background: #c82333;
-        }
-
-        #message {
-            margin-top: 20px;
-        }
-
-        img {
-            max-width: 200px;
-            height: auto;
-        }
-
-        .bulk-actions {
-            margin-bottom: 20px;
-        }
-
-        input[type="checkbox"] {
-            margin-right: 5px;
-        }
-
+        body { font-family: 'Open Sans', sans-serif; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { font-family: 'Lora', serif; }
+        .tabs { display: flex; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; background: #f0f0f0; cursor: pointer; border: 1px solid #ccc; border-bottom: none; }
+        .tab.active { background: #fff; font-weight: bold; }
+        .tab-content { display: none; border: 1px solid #ccc; padding: 20px; }
+        .tab-content.active { display: block; }
+        .submission { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+        button { padding: 5px 10px; background: #007bff; color: white; border: none; cursor: pointer; margin-right: 5px; }
+        button:hover { background: #0056b3; }
+        button.reject, button.remove { background: #dc3545; }
+        button.reject:hover, button.remove:hover { background: #c82333; }
+        #message { margin-top: 20px; }
+        img { max-width: 200px; height: auto; }
+        .bulk-actions { margin-bottom: 20px; }
+        input[type="checkbox"] { margin-right: 5px; }
         @media (max-width: 600px) {
-            .container {
-                padding: 10px;
-            }
-
-            .tabs {
-                flex-direction: column;
-            }
-
-            .tab {
-                border-bottom: 1px solid #ccc;
-            }
-
-            button {
-                width: 100%;
-                margin: 5px 0;
-            }
-
-            img {
-                max-width: 100%;
-            }
+            .container { padding: 10px; }
+            .tabs { flex-direction: column; }
+            .tab { border-bottom: 1px solid #ccc; }
+            button { width: 100%; margin: 5px 0; }
+            img { max-width: 100%; }
         }
     </style>
 </head>
-
 <body>
     <div class="container">
         <h1>Manage Submissions</h1>
@@ -190,7 +103,7 @@
                 <div class="submission">
                     <h3>${sub.title}</h3>
                     <p>${sub.text}</p>
-                    ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy">` : ''}
+                    ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy" onerror="this.style.display='none';">` : ''}
                     <p>Creator: ${sub.creator || 'Anonymous'}</p>
                     <button onclick="publishSubmission('${sub.id}')">Publish</button>
                     <button class="reject" onclick="rejectSubmission('${sub.id}')">Reject</button>
@@ -204,7 +117,7 @@
                     <input type="checkbox" class="delete-checkbox" data-id="${sub.id}">
                     <h3>${sub.title}</h3>
                     <p>${sub.text}</p>
-                    ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy">` : ''}
+                    ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy" onerror="this.style.display='none';">` : ''}
                     <p>Creator: ${sub.creator || 'Anonymous'}</p>
                     <button class="reject" onclick="deleteSubmission('${sub.id}')">Delete</button>
                 </div>
@@ -216,8 +129,9 @@
                 <div class="submission">
                     <h3>${sub.title}</h3>
                     <p>${sub.text}</p>
-                    ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy">` : ''}
+                    ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy" onerror="this.style.display='none';">` : ''}
                     <p>Creator: ${sub.creator || 'Anonymous'}</p>
+                    <button class="remove" onclick="removeSubmission('${sub.id}')">Remove</button>
                 </div>
             `).join('');
         }
@@ -293,6 +207,31 @@
             }
         }
 
+        async function removeSubmission(submissionId) {
+            if (!confirm('Are you sure you want to permanently remove this published submission? This action is irreversible.')) return;
+
+            const user = netlifyIdentity.currentUser();
+            if (!user) return;
+
+            const token = await user.jwt();
+            const messageEl = document.getElementById('message');
+            messageEl.style.display = 'block';
+            messageEl.textContent = 'Removing submission...';
+
+            try {
+                const response = await fetch('/.netlify/functions/remove-submission', {
+                    method: 'POST',
+                    headers: { 'X-Netlify-Identity-User': token },
+                    body: JSON.stringify({ submissionId }),
+                });
+                const result = await response.json();
+                messageEl.textContent = result.message;
+                loadSubmissions();
+            } catch (error) {
+                messageEl.textContent = `Error removing submission: ${error.message}`;
+            }
+        }
+
         async function bulkDeleteSubmissions() {
             const checkboxes = document.querySelectorAll('.delete-checkbox:checked');
             if (checkboxes.length === 0) {
@@ -338,5 +277,4 @@
         document.getElementById('bulk-delete').addEventListener('click', bulkDeleteSubmissions);
     </script>
 </body>
-
 </html>

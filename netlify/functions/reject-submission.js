@@ -21,7 +21,8 @@ exports.handler = async (event) => {
         console.log('Rejecting submission', { submissionId });
         const githubToken = process.env.GITHUB_TOKEN;
         const repo = 'mrcprlx/artistictoolshub';
-        const path = `content/creations/${submissionId}.md`;
+        // Ensure the path matches the submission file name format
+        const path = `content/creations/submission-${submissionId}.md`;
 
         // Fetch submission from submissions branch
         const fileResponse = await axios.get(
