@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migrate Submissions - Artistic Tools Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600&display=swap"
+        rel="stylesheet">
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'Lora', serif;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #message {
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Migrate Approved Submissions</h1>
+        <p>Click below to migrate approved submissions from the submissions branch to the main branch.</p>
+        <button id="migrate-button">Migrate Submissions</button>
+        <p id="message" style="display: none;"></p>
+    </div>
+    <script>
+        if (window.netlifyIdentity) {
+            netlifyIdentity.on('init', user => {
+                if (!user) {
+                    netlifyIdentity.open('login');
+                }
+            });
+
+            netlifyIdentity.on('logout', () => {
+                window.location.href = '/';
+            });
+        }
+
+        document.getElementById('migrate-button').addEventListener('click', async () => {
+            const user = netlifyIdentity.currentUser();
+            if (!user) {
+                netlifyIdentity.open('login');
+                return;
+            }
+
+            const token = await user.jwt();
+            const messageEl = document.getElementById('message');
+            messageEl.style.display = 'block';
+            messageEl.textContent = 'Migrating submissions...';
+
+            try {
+                const response = await fetch('/.netlify/functions/migrate-submissions', {
+                    method: 'POST',
+                    headers: { 'X-Netlify-Identity-User': token },
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    messageEl.textContent = result.message;
+                } else {
+                    messageEl.textContent = `Error: ${result.message}`;
+                }
+            } catch (error) {
+                messageEl.textContent = `Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+
+</html>
