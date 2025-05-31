@@ -135,7 +135,7 @@ function renderCreations() {
                     if (urlRegex.test(line)) {
                         return `<a href="${line}" class="author-link" target="_blank" rel="noopener noreferrer">${line}</a>`;
                     }
-                    return line;
+                    return line.replace(/</g, '&lt;').replace(/>/g, '&gt;');
                 })
                 .join('<br>');
         }
@@ -144,7 +144,7 @@ function renderCreations() {
       <h3>${creation.title || 'Untitled'}</h3>
       <p class="creation-text">${creation.text}</p>
       ${creation.image ? `<img src="${creation.image}" alt="Creation image">` : ''}
-      ${creatorContent ? `<div class="creator-info">${creatorContent}</div>` : ''}
+      ${creatorContent ? `<div class="creator-info">Social Links: ${creatorContent}</div>` : ''}
       <div class="share-container">
         <button class="share-button">Share</button>
         <div class="share-submenu">
