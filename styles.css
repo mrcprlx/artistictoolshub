@@ -402,13 +402,24 @@ footer {
     margin: 0.5rem 0;
 }
 
-.creation-card a.author-link {
-    color: var(--primary-color);
-    text-decoration: none;
+.creator-label {
     font-weight: 600;
+    color: #2c2c2c;
+    margin-bottom: 0.25rem;
 }
 
-.creation-card a.author-link:hover {
+.creator-links {
+    margin-top: 0.25rem;
+}
+
+.creator-links a.author-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    display: block;
+    /* Ensure each link is on its own line */
+}
+
+.creator-links a.author-link:hover {
     color: var(--secondary-color);
 }
 
