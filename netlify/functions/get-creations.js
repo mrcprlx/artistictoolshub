@@ -42,9 +42,10 @@ exports.handler = async () => {
                             }
                         );
                         const fileContent = Buffer.from(fileResponse.data.content, 'base64').toString('utf-8');
+                        console.log('Raw file content:', fileContent); // Debug
                         const { data } = matter(fileContent);
                         if (data.status === 'published') {
-                            const creator = (data.creator || '').replace(/\\n/g, '\n').trim();
+                            const creator = (data.creator || '').replace(/\\n/g, '\n').replace(/\r\n/g, '\n').trim();
                             console.log('Processed creator field:', creator); // Debug
                             return {
                                 id: file.name.replace('.md', ''),

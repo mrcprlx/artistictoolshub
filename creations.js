@@ -129,16 +129,18 @@ function renderCreations() {
         console.log('Raw creator content:', creatorContent); // Debug
         if (creatorContent) {
             const urlRegex = /^https?:\/\/[^\s/$.?#].[^\s]*$/i;
-            creatorContent = creatorContent
-                .replace(/\\n/g, '\n') // Handle escaped newlines
-                .split('\n')
+            // Split by newlines or spaces as fallback
+            let lines = creatorContent.includes('\n') ? creatorContent.replace(/\\n/g, '\n').split('\n') : creatorContent.split(/\s+/);
+            creatorContent = lines
                 .map(line => line.trim())
                 .filter(line => line.length > 0)
                 .map(line => {
                     if (urlRegex.test(line)) {
                         return `<a href="${line}" class="author-link" target="_blank" rel="noopener noreferrer">${line}</a>`;
                     }
-                    return line.replace(/</g, '&lt;').replace(/>/g, '&gt;'); // Escape HTML
+                    // Create a text node to prevent HTML injection
+                    const textNode = document.createTextNode(line);
+                    return textNode.textContent;
                 })
                 .join('<br>');
             console.log('Processed creator content:', creatorContent); // Debug
