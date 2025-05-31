@@ -96,23 +96,23 @@ exports.handler = async (event) => {
                     const urlParts = data.image.split('/');
                     const fileName = urlParts[urlParts.length - 1];
                     const publicId = fileName.split('.')[0];
-                    const fullPublicId = `artistictoolshub/${publicId}`;
-                    console.log('Attempting to delete Cloudinary image', { publicId: fullPublicId, imageUrl: data.image });
+                    console.log('Attempting to delete Cloudinary image', { publicId, imageUrl: data.image });
 
                     if (!process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
                         throw new Error('Cannot delete image: Cloudinary credentials missing');
                     }
 
-                    const destroyResult = await cloudinary.uploader.destroy(fullPublicId, { invalidate: true });
+                    const destroyResult = await cloudinary.uploader.destroy(publicId, { invalidate: true });
                     console.log('Cloudinary destroy result', { result: destroyResult });
                     if (destroyResult.result !== 'ok') {
                         console.log('Failed to delete Cloudinary image', { result: destroyResult });
                     } else {
-                        console.log('Deleted image from Cloudinary', { publicId: fullPublicId });
+                        console.log('Deleted image from Cloudinary', { publicId });
                     }
                 } catch (cloudinaryError) {
                     console.log('Cloudinary deletion error', {
                         message: cloudinaryError.message,
+                        status: cloudinaryError.http_code,
                         details: cloudinaryError.response?.data || 'No additional details',
                     });
                     // Continue with deletion even if Cloudinary fails
