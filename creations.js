@@ -104,7 +104,6 @@ async function fetchCreations() {
         const response = await fetch('/.netlify/functions/get-creations');
         if (!response.ok) throw new Error('Failed to fetch creations');
         creations = await response.json();
-        console.log('Fetched creations:', creations); // Debug
         renderCreations();
     } catch (error) {
         console.error('Error fetching creations:', error);
@@ -126,24 +125,19 @@ function renderCreations() {
 
         // Parse creator field for multiple URLs
         let creatorContent = creation.creator || '';
-        console.log('Raw creator content:', creatorContent); // Debug
         if (creatorContent) {
-            const urlRegex = /^https?:\/\/[^\s/$.?#].[^\s]*$/i;
-            // Split by newlines or spaces as fallback
-            let lines = creatorContent.includes('\n') ? creatorContent.replace(/\\n/g, '\n').split('\n') : creatorContent.split(/\s+/);
-            creatorContent = lines
+            const urlRegex = /^(https?:\/\/[^\s/$.?#].[^\s]*)$/i;
+            creatorContent = creatorContent
+                .split('\n')
                 .map(line => line.trim())
                 .filter(line => line.length > 0)
                 .map(line => {
                     if (urlRegex.test(line)) {
                         return `<a href="${line}" class="author-link" target="_blank" rel="noopener noreferrer">${line}</a>`;
                     }
-                    // Create a text node to prevent HTML injection
-                    const textNode = document.createTextNode(line);
-                    return textNode.textContent;
+                    return line.replace(/</g, '<').replace(/>/g, '>');
                 })
                 .join('<br>');
-            console.log('Processed creator content:', creatorContent); // Debug
         }
 
         card.innerHTML = `
@@ -151,14 +145,6 @@ function renderCreations() {
       <p class="creation-text">${creation.text}</p>
       ${creation.image ? `<img src="${creation.image}" alt="Creation image">` : ''}
       ${creatorContent ? `<div class="creator-info">Social Links: ${creatorContent}</div>` : ''}
-      <div class="share-container">
-        <button class="share-button">Share</button>
-        <div class="share-submenu">
-          <a href="https://x.com/intent/tweet?text=Check%20out%20this%20creation%20on%20ArtisticToolsHub!&url=${encodeURIComponent(`https://artistictoolshub.com/creations?id=${creation.id}`)}" target="_blank">Share on X</a>
-          <a href="mailto:?subject=Check%20out%20this%20creation!&body=See%20this%20on%20ArtisticToolsHub:%20https://artistictoolshub.com/creations?id=${creation.id}" target="_blank">Email</a>
-          <button onclick="copyLink('${creation.id}')">Copy Link</button>
-        </div>
-      </div>
     `;
         creationsGrid.appendChild(card);
     });
@@ -166,12 +152,6 @@ function renderCreations() {
     prevPageBtn.disabled = currentPage === 1;
     nextPageBtn.disabled = end >= creations.length;
 }
-
-// Copy link
-window.copyLink = function (id) {
-    const url = `https://artistictoolshub.com/creations?id=${id}`;
-    navigator.clipboard.writeText(url).then(() => alert('Link copied!'));
-};
 
 // Pagination controls
 itemsPerPageSelect.addEventListener('change', (e) => {
