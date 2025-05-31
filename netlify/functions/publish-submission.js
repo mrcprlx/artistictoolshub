@@ -22,10 +22,11 @@ exports.handler = async (event) => {
         const githubToken = process.env.GITHUB_TOKEN;
         const repo = 'mrcprlx/artistictoolshub';
         const path = `content/creations/${submissionId}.md`;
+        const branch = 'submissions';
 
         // Fetch submission from submissions branch
         const fileResponse = await axios.get(
-            `https://api.github.com/repos/${repo}/contents/${path}?ref=submissions`,
+            `https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`,
             {
                 headers: {
                     Authorization: `token ${githubToken}`,
@@ -62,13 +63,14 @@ status: "published"
 ${markdownContent}`;
         const base64Content = Buffer.from(updatedContent).toString('base64');
 
-        // Move to main branch
+        // Update file in submissions branch
         await axios.put(
             `https://api.github.com/repos/${repo}/contents/${path}`,
             {
-                message: `Publish submission: ${data.title}`,
+                message: `Publish submission: ${data.title || submissionId}`,
                 content: base64Content,
-                branch: 'main'
+                branch: 'submissions',
+                sha: file.sha
             },
             {
                 headers: {
@@ -77,64 +79,6 @@ ${markdownContent}`;
                 },
             }
         );
-
-        // Delete from submissions branch
-        let remainingFiles = [];
-        try {
-            const response = await axios.get(
-                `https://api.github.com/repos/${repo}/contents/content/creations?ref=submissions`,
-                {
-                    headers: {
-                        Authorization: `token ${githubToken}`,
-                        Accept: 'application/vnd.github.v3+json',
-                    },
-                }
-            );
-            remainingFiles = response.data.filter(file => file.name !== submissionId + '.md');
-        } catch (error) {
-            if (error.response?.status !== 404) throw error;
-        }
-
-        await axios.delete(
-            `https://api.github.com/repos/${repo}/contents/${path}`,
-            {
-                headers: {
-                    Authorization: `token ${githubToken}`,
-                    Accept: 'application/vnd.github.v3+json',
-                },
-                data: {
-                    message: `Remove published submission: ${data.title}`,
-                    sha: file.sha,
-                    branch: 'submissions'
-                },
-            }
-        );
-
-        // If no files remain, add .gitkeep to prevent directory deletion
-        if (remainingFiles.length === 0) {
-            const gitkeepContent = Buffer.from('').toString('base64');
-            await axios.put(
-                `https://api.github.com/repos/${repo}/contents/content/creations/.gitkeep`,
-                {
-                    message: 'Add .gitkeep to content/creations after publish',
-                    content: gitkeepContent,
-                    branch: 'submissions'
-                },
-                {
-                    headers: {
-                        Authorization: `token ${githubToken}`,
-                        Accept: 'application/vnd.github.v3+json',
-                    },
-                }
-            );
-        }
-
-        // Trigger Netlify build
-        const buildHook = process.env.NETLIFY_BUILD_HOOK;
-        if (buildHook) {
-            await axios.post(buildHook);
-            console.log('Triggered Netlify build');
-        }
 
         return {
             statusCode: 200,

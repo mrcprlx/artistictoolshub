@@ -23,39 +23,15 @@ exports.handler = async (event) => {
         const githubToken = process.env.GITHUB_TOKEN;
         const repo = 'mrcprlx/artistictoolshub';
         const path = `content/creations/${submissionId}.md`;
-        const branch = 'main';
+        const branch = 'submissions';
 
         // Configure Cloudinary
-        console.log('Configuring Cloudinary', {
-            cloud_name: 'drxmkv1si',
-            api_key: process.env.CLOUDINARY_API_KEY ? '****' : 'undefined',
-            api_secret: process.env.CLOUDINARY_API_SECRET ? '****' : 'undefined',
-        });
         cloudinary.config({
             cloud_name: 'drxmkv1si',
             api_key: process.env.CLOUDINARY_API_KEY,
             api_secret: process.env.CLOUDINARY_API_SECRET,
             secure: true,
         });
-
-        // Validate Cloudinary credentials
-        if (!process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-            console.log('Cloudinary credentials missing - cannot delete image');
-            // Proceed with deletion even if credentials are missing
-        } else {
-            console.log('Cloudinary configured successfully');
-            // Test Cloudinary connectivity
-            try {
-                const pingResult = await cloudinary.api.ping();
-                console.log('Cloudinary API ping result', { result: pingResult });
-            } catch (pingError) {
-                console.log('Cloudinary API ping failed', {
-                    message: pingError.message,
-                    status: pingError.http_code,
-                    details: pingError.response?.data || 'No additional details',
-                });
-            }
-        }
 
         // Fetch submission to get image URL
         const fileResponse = await axios.get(
@@ -87,15 +63,15 @@ exports.handler = async (event) => {
                 console.log('Attempting to delete Cloudinary image', { publicId, imageUrl: data.image });
 
                 if (!process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-                    throw new Error('Cannot delete image: Cloudinary credentials missing');
-                }
-
-                const destroyResult = await cloudinary.uploader.destroy(publicId, { invalidate: true });
-                console.log('Cloudinary destroy result', { result: destroyResult });
-                if (destroyResult.result !== 'ok') {
-                    console.log('Failed to delete Cloudinary image', { result: destroyResult });
+                    console.log('Cloudinary credentials missing, skipping image deletion');
                 } else {
-                    console.log('Deleted image from Cloudinary', { publicId });
+                    const destroyResult = await cloudinary.uploader.destroy(publicId, { invalidate: true });
+                    console.log('Cloudinary destroy result', { result: destroyResult });
+                    if (destroyResult.result !== 'ok') {
+                        console.log('Failed to delete Cloudinary image', { result: destroyResult });
+                    } else {
+                        console.log('Deleted image from Cloudinary', { publicId });
+                    }
                 }
             } catch (cloudinaryError) {
                 console.log('Cloudinary deletion error', {
@@ -103,7 +79,6 @@ exports.handler = async (event) => {
                     status: cloudinaryError.http_code,
                     details: cloudinaryError.response?.data || 'No additional details',
                 });
-                // Continue with deletion even if Cloudinary fails
             }
         } else {
             console.log('No valid image to delete from Cloudinary', { image: data.image });
@@ -150,7 +125,7 @@ exports.handler = async (event) => {
                 {
                     message: 'Add .gitkeep to content/creations after remove',
                     content: gitkeepContent,
-                    branch: 'main'
+                    branch: 'submissions'
                 },
                 {
                     headers: {
@@ -159,13 +134,6 @@ exports.handler = async (event) => {
                     },
                 }
             );
-        }
-
-        // Trigger Netlify build
-        const buildHook = process.env.NETLIFY_BUILD_HOOK;
-        if (buildHook) {
-            await axios.post(buildHook);
-            console.log('Triggered Netlify build');
         }
 
         return {

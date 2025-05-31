@@ -14,11 +14,8 @@ exports.handler = async (event) => {
         const githubToken = process.env.GITHUB_TOKEN;
         const repo = 'mrcprlx/artistictoolshub';
 
-        // Fetch submissions from both branches
+        // Fetch submissions from submissions branch
         let submissionsFiles = [];
-        let mainFiles = [];
-
-        // Fetch from submissions branch (pending)
         try {
             const response = await axios.get(
                 `https://api.github.com/repos/${repo}/contents/content/creations?ref=submissions&t=${Date.now()}`,
@@ -36,32 +33,13 @@ exports.handler = async (event) => {
             console.log('No submissions found in submissions branch');
         }
 
-        // Fetch from main branch (published)
-        try {
-            const response = await axios.get(
-                `https://api.github.com/repos/${repo}/contents/content/creations?ref=main&t=${Date.now()}`,
-                {
-                    headers: {
-                        Authorization: `token ${githubToken}`,
-                        Accept: 'application/vnd.github.v3+json',
-                        'If-None-Match': '',
-                    },
-                }
-            );
-            mainFiles = response.data;
-        } catch (error) {
-            if (error.response?.status !== 404) throw error;
-            console.log('No submissions found in main branch');
-        }
-
-        // Process submissions from both branches
+        // Process submissions
         const submissions = await Promise.all(
-            [...submissionsFiles, ...mainFiles].map(async (file) => {
+            submissionsFiles.map(async (file) => {
                 if (file.type === 'file' && file.name.endsWith('.md') && file.name !== '.gitkeep') {
                     try {
-                        const branch = mainFiles.includes(file) ? 'main' : 'submissions';
                         const fileResponse = await axios.get(
-                            `https://api.github.com/repos/${repo}/contents/${file.path}?ref=${branch}&t=${Date.now()}`,
+                            `https://api.github.com/repos/${repo}/contents/${file.path}?ref=submissions&t=${Date.now()}`,
                             {
                                 headers: {
                                     Authorization: `token ${githubToken}`,
@@ -78,7 +56,7 @@ exports.handler = async (event) => {
                             text: data.text || '',
                             image: data.image || '',
                             creator: data.creator || '',
-                            status: data.status || (branch === 'main' ? 'published' : 'pending'),
+                            status: data.status || 'pending',
                         };
                     } catch (error) {
                         console.log('Error processing file', { path: file.path, error: error.message });
@@ -90,7 +68,7 @@ exports.handler = async (event) => {
         );
 
         const filteredSubmissions = submissions.filter(s => s !== null);
-        console.log('Fetched submissions', { count: filteredSubmissions.length, submissions: filteredSubmissions });
+        console.log('Fetched submissions', { count: filteredSubmissions.length });
         return {
             statusCode: 200,
             body: JSON.stringify(filteredSubmissions),

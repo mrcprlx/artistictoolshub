@@ -115,7 +115,7 @@ exports.handler = async (event) => {
 
         // Create markdown content with proper YAML formatting
         const submissionId = uuidv4();
-        const textLines = text.split('\n').map(line => `  ${line}`).join('\n'); // Preserve line breaks
+        const textLines = text.split('\n').map(line => `  ${line}`).join('\n');
         const authorLines = author ? author.split('\n').map(line => `  ${line}`).join('\n') : '';
         const content = `---
 title: "${title.replace(/"/g, '\\"')}"
@@ -129,46 +129,10 @@ status: "pending"
 `;
         const base64Content = Buffer.from(content).toString('base64');
 
-        // Ensure submissions branch exists
+        // Ensure content/creations directory exists
         const githubToken = process.env.GITHUB_TOKEN;
         const repo = 'mrcprlx/artistictoolshub';
         const branch = 'submissions';
-        try {
-            await axios.get(`https://api.github.com/repos/${repo}/branches/${branch}`, {
-                headers: {
-                    Authorization: `token ${githubToken}`,
-                    Accept: 'application/vnd.github.v3+json',
-                },
-            });
-        } catch (error) {
-            if (error.response?.status === 404) {
-                console.log('Submissions branch not found, creating it');
-                const mainBranch = await axios.get(`https://api.github.com/repos/${repo}/branches/main`, {
-                    headers: {
-                        Authorization: `token ${githubToken}`,
-                        Accept: 'application/vnd.github.v3+json',
-                    },
-                });
-                await axios.post(
-                    `https://api.github.com/repos/${repo}/git/refs`,
-                    {
-                        ref: `refs/heads/${branch}`,
-                        sha: mainBranch.data.commit.sha,
-                    },
-                    {
-                        headers: {
-                            Authorization: `token ${githubToken}`,
-                            Accept: 'application/vnd.github.v3+json',
-                        },
-                    }
-                );
-                console.log('Created submissions branch');
-            } else {
-                throw error;
-            }
-        }
-
-        // Ensure content/creations directory exists
         try {
             await axios.get(`https://api.github.com/repos/${repo}/contents/content/creations/.gitkeep?ref=${branch}`, {
                 headers: {

@@ -7,54 +7,67 @@ exports.handler = async () => {
         const githubToken = process.env.GITHUB_TOKEN;
         const repo = 'mrcprlx/artistictoolshub';
 
-        let files = [];
+        // Fetch submissions from submissions branch
+        let submissionsFiles = [];
         try {
             const response = await axios.get(
-                `https://api.github.com/repos/${repo}/contents/content/creations?ref=main`,
+                `https://api.github.com/repos/${repo}/contents/content/creations?ref=submissions&t=${Date.now()}`,
                 {
                     headers: {
                         Authorization: `token ${githubToken}`,
                         Accept: 'application/vnd.github.v3+json',
+                        'If-None-Match': '',
                     },
                 }
             );
-            files = response.data;
+            submissionsFiles = response.data;
         } catch (error) {
-            if (error.response?.status === 404) {
-                console.log('No creations found');
-                return {
-                    statusCode: 200,
-                    body: JSON.stringify([]),
-                };
-            }
-            throw error;
+            if (error.response?.status !== 404) throw error;
+            console.log('No submissions found in submissions branch');
         }
 
-        const creations = await Promise.all(
-            files.map(async (file) => {
-                if (file.type === 'file' && file.name.endsWith('.md')) {
-                    const fileResponse = await axios.get(file.download_url);
-                    const { data } = matter(fileResponse.data);
-                    if (data.status === 'published') {
-                        return {
-                            id: file.name.replace('.md', ''),
-                            title: data.title || 'Untitled',
-                            text: data.text || '',
-                            image: data.image || '',
-                            creator: data.creator || '',
-                        };
+        // Process submissions
+        const submissions = await Promise.all(
+            submissionsFiles.map(async (file) => {
+                if (file.type === 'file' && file.name.endsWith('.md') && file.name !== '.gitkeep') {
+                    try {
+                        const fileResponse = await axios.get(
+                            `https://api.github.com/repos/${repo}/contents/${file.path}?ref=submissions&t=${Date.now()}`,
+                            {
+                                headers: {
+                                    Authorization: `token ${githubToken}`,
+                                    Accept: 'application/vnd.github.v3+json',
+                                    'If-None-Match': '',
+                                },
+                            }
+                        );
+                        const fileContent = Buffer.from(fileResponse.data.content, 'base64').toString('utf-8');
+                        const { data } = matter(fileContent);
+                        if (data.status === 'published') {
+                            return {
+                                id: file.name.replace('.md', ''),
+                                title: data.title || 'Untitled',
+                                text: data.text || '',
+                                image: data.image || '',
+                                creator: data.creator || '',
+                                status: data.status
+                            };
+                        }
+                        return null;
+                    } catch (error) {
+                        console.log('Error processing file', { path: file.path, error: error.message });
+                        return null;
                     }
-                    return null;
                 }
                 return null;
             })
         );
 
-        const filteredCreations = creations.filter(c => c !== null);
-        console.log('Fetched creations', { count: filteredCreations.length });
+        const filteredSubmissions = submissions.filter(s => s !== null);
+        console.log('Fetched published creations', { count: filteredSubmissions.length });
         return {
             statusCode: 200,
-            body: JSON.stringify(filteredCreations),
+            body: JSON.stringify(filteredSubmissions),
         };
     } catch (error) {
         console.log('Server error', { message: error.message, stack: error.stack });
