@@ -260,17 +260,22 @@
             console.log('Review submissions:', reviewSubs);
             reviewEl.innerHTML = reviewSubs.map(sub => {
                 let creatorContent = sub.creator || 'Anonymous';
+                console.log('Raw creator content (review):', creatorContent); // Debug
                 if (creatorContent !== 'Anonymous') {
-                    const urlRegex = /(https?:\/\/[^\s]+)/g;
+                    const urlRegex = /^https?:\/\/[^\s/$.?#].[^\s]*$/i;
                     creatorContent = creatorContent
+                        .replace(/\\n/g, '\n')
                         .split('\n')
+                        .map(line => line.trim())
+                        .filter(line => line.length > 0)
                         .map(line => {
                             if (urlRegex.test(line)) {
-                                return `<a href="${line}" target="_blank">${line}</a>`;
+                                return `<a href="${line}" target="_blank" rel="noopener noreferrer">${line}</a>`;
                             }
-                            return line;
+                            return line.replace(/</g, '&lt;').replace(/>/g, '&gt;');
                         })
                         .join('<br>');
+                    console.log('Processed creator content (review):', creatorContent); // Debug
                 }
                 return `
                     <div class="submission" data-id="${sub.id}">
@@ -289,17 +294,22 @@
             console.log('Published submissions:', publishedSubs);
             publishedEl.innerHTML = publishedSubs.map(sub => {
                 let creatorContent = sub.creator || 'Anonymous';
+                console.log('Raw creator content (published):', creatorContent); // Debug
                 if (creatorContent !== 'Anonymous') {
-                    const urlRegex = /(https?:\/\/[^\s]+)/g;
+                    const urlRegex = /^https?:\/\/[^\s/$.?#].[^\s]*$/i;
                     creatorContent = creatorContent
+                        .replace(/\\n/g, '\n')
                         .split('\n')
+                        .map(line => line.trim())
+                        .filter(line => line.length > 0)
                         .map(line => {
                             if (urlRegex.test(line)) {
-                                return `<a href="${line}" target="_blank">${line}</a>`;
+                                return `<a href="${line}" target="_blank" rel="noopener noreferrer">${line}</a>`;
                             }
-                            return line;
+                            return line.replace(/</g, '&lt;').replace(/>/g, '&gt;');
                         })
                         .join('<br>');
+                    console.log('Processed creator content (published):', creatorContent); // Debug
                 }
                 return `
                     <div class="submission" data-id="${sub.id}">

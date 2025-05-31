@@ -125,9 +125,11 @@ function renderCreations() {
 
         // Parse creator field for multiple URLs
         let creatorContent = creation.creator || '';
+        console.log('Raw creator content:', creatorContent); // Debug raw input
         if (creatorContent) {
-            const urlRegex = /^(https?:\/\/[^\s/$.?#].[^\s]*)$/i;
+            const urlRegex = /^https?:\/\/[^\s/$.?#].[^\s]*$/i;
             creatorContent = creatorContent
+                .replace(/\\n/g, '\n') // Handle escaped newlines
                 .split('\n')
                 .map(line => line.trim())
                 .filter(line => line.length > 0)
@@ -138,6 +140,7 @@ function renderCreations() {
                     return line.replace(/</g, '&lt;').replace(/>/g, '&gt;');
                 })
                 .join('<br>');
+            console.log('Processed creator content:', creatorContent); // Debug output
         }
 
         card.innerHTML = `

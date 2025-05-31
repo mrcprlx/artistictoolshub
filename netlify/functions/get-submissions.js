@@ -55,7 +55,7 @@ exports.handler = async (event) => {
                             title: data.title || 'Untitled',
                             text: data.text || '',
                             image: data.image || '',
-                            creator: data.creator || '',
+                            creator: (data.creator || '').replace(/\\n/g, '\n').trim(),
                             status: data.status || 'pending',
                         };
                     } catch (error) {
