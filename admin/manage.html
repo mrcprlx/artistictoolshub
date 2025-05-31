@@ -104,14 +104,24 @@
             margin: 0.5rem 0;
         }
 
-        .creator-info a {
-            color: var(--primary-color);
-            text-decoration: none;
+        .creator-label {
+            font-weight: 600;
+            color: #2c2c2c;
+            margin-bottom: 0.25rem;
         }
 
-        .creator-info a:hover {
+        .creator-links {
+            margin-top: 0.25rem;
+        }
+
+        .creator-links a.author-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            display: block;
+        }
+
+        .creator-links a.author-link:hover {
             color: var(--secondary-color);
-            text-decoration: underline;
         }
 
         button {
@@ -226,6 +236,17 @@
 
         let submissions = [];
 
+        function escapeHtml(text) {
+            const map = {
+                '&': '&',
+                '<': '<',
+                '>': '>',
+                '"': '"',
+                "'": '''
+            };
+            return text.replace(/[&<>"']/g, char => map[char]);
+        }
+
         async function loadSubmissions() {
             const user = netlifyIdentity.currentUser();
             if (!user) return;
@@ -260,29 +281,31 @@
             console.log('Review submissions:', reviewSubs);
             reviewEl.innerHTML = reviewSubs.map(sub => {
                 let creatorContent = sub.creator || 'Anonymous';
-                console.log('Raw creator content (review):', creatorContent); // Debug
+                console.log('Raw creator content (review):', JSON.stringify(creatorContent));
                 if (creatorContent !== 'Anonymous') {
-                    const urlRegex = /^https?:\/\/[^\s/$.?#].[^\s]*$/i;
+                    const urlRegex = /^https?:\/\/[^\s]*$/i;
                     creatorContent = creatorContent
-                        .replace(/\\n/g, '\n')
                         .split('\n')
                         .map(line => line.trim())
                         .filter(line => line.length > 0)
                         .map(line => {
                             if (urlRegex.test(line)) {
-                                return `<a href="${line}" target="_blank" rel="noopener noreferrer">${line}</a>`;
+                                return `<a href="${line}" class="author-link" target="_blank" rel="noopener noreferrer">${line}</a>`;
                             }
-                            return line.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                            return escapeHtml(line);
                         })
                         .join('<br>');
-                    console.log('Processed creator content (review):', creatorContent); // Debug
+                    console.log('Processed creator content (review):', creatorContent);
                 }
                 return `
                     <div class="submission" data-id="${sub.id}">
                         <h3>${sub.title}</h3>
                         <p class="submission-text">${sub.text}</p>
                         ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy" onerror="this.style.display='none';">` : ''}
-                        <div class="creator-info">Creator: ${creatorContent}</div>
+                        <div class="creator-info">
+                            <div class="creator-label">Creator:</div>
+                            <div class="creator-links">${creatorContent}</div>
+                        </div>
                         <button onclick="publishSubmission('${sub.id}')">Publish</button>
                         <button class="delete" onclick="deleteSubmission('${sub.id}')">Delete</button>
                     </div>
@@ -294,29 +317,31 @@
             console.log('Published submissions:', publishedSubs);
             publishedEl.innerHTML = publishedSubs.map(sub => {
                 let creatorContent = sub.creator || 'Anonymous';
-                console.log('Raw creator content (published):', creatorContent); // Debug
+                console.log('Raw creator content (published):', JSON.stringify(creatorContent));
                 if (creatorContent !== 'Anonymous') {
-                    const urlRegex = /^https?:\/\/[^\s/$.?#].[^\s]*$/i;
+                    const urlRegex = /^https?:\/\/[^\s]*$/i;
                     creatorContent = creatorContent
-                        .replace(/\\n/g, '\n')
                         .split('\n')
                         .map(line => line.trim())
                         .filter(line => line.length > 0)
                         .map(line => {
                             if (urlRegex.test(line)) {
-                                return `<a href="${line}" target="_blank" rel="noopener noreferrer">${line}</a>`;
+                                return `<a href="${line}" class="author-link" target="_blank" rel="noopener noreferrer">${line}</a>`;
                             }
-                            return line.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                            return escapeHtml(line);
                         })
                         .join('<br>');
-                    console.log('Processed creator content (published):', creatorContent); // Debug
+                    console.log('Processed creator content (published):', creatorContent);
                 }
                 return `
                     <div class="submission" data-id="${sub.id}">
                         <h3>${sub.title}</h3>
                         <p class="submission-text">${sub.text}</p>
                         ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy" onerror="this.style.display='none';">` : ''}
-                        <div class="creator-info">Creator: ${creatorContent}</div>
+                        <div class="creator-info">
+                            <div class="creator-label">Creator:</div>
+                            <div class="creator-links">${creatorContent}</div>
+                        </div>
                         <button class="remove" onclick="removeSubmission('${sub.id}')">Remove</button>
                     </div>
                 `;
