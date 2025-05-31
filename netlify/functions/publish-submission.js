@@ -52,12 +52,14 @@ exports.handler = async (event) => {
         // Update status to published
         data.status = 'published';
         const textLines = (data.text || '').split('\n').map(line => `  ${line.trim()}`).join('\n');
+        const creatorLines = (data.creator || '').split('\n').map(line => `  ${line.trim()}`).join('\n');
         const updatedContent = `---
 title: "${(data.title || 'Untitled').replace(/"/g, '\\"')}"
 text: |
 ${textLines}
 image: "${data.image || ''}"
-creator: "${data.creator || ''}"
+creator: |
+${creatorLines}
 status: "published"
 ---
 ${markdownContent}`;
