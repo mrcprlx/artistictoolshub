@@ -51,6 +51,7 @@ exports.handler = async (event) => {
             } catch (pingError) {
                 console.log('Cloudinary API ping failed', {
                     message: pingError.message,
+                    status: pingError.http_code,
                     details: pingError.response?.data || 'No additional details',
                 });
             }
@@ -80,11 +81,9 @@ exports.handler = async (event) => {
         // Delete image from Cloudinary if exists
         if (data.image && typeof data.image === 'string' && data.image.trim() !== '') {
             try {
-                // Extract public_id from Cloudinary URL
-                // URL format: https://res.cloudinary.com/drxmkv1si/image/upload/v<timestamp>/<public_id>.<extension>
                 const urlParts = data.image.split('/');
-                const fileName = urlParts[urlParts.length - 1]; // e.g., <public_id>.<extension>
-                const publicId = fileName.split('.')[0]; // Remove extension, no folder prefix
+                const fileName = urlParts[urlParts.length - 1];
+                const publicId = fileName.split('.')[0];
                 console.log('Attempting to delete Cloudinary image', { publicId, imageUrl: data.image });
 
                 if (!process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {

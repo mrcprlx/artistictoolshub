@@ -51,6 +51,7 @@ exports.handler = async (event) => {
             } catch (pingError) {
                 console.log('Cloudinary API ping failed', {
                     message: pingError.message,
+                    status: pingError.http_code,
                     details: pingError.response?.data || 'No additional details',
                 });
             }

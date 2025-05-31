@@ -18,7 +18,7 @@ exports.handler = async (event) => {
         let submissionsFiles = [];
         let mainFiles = [];
 
-        // Fetch from submissions branch (pending and rejected)
+        // Fetch from submissions branch (pending)
         try {
             const response = await axios.get(
                 `https://api.github.com/repos/${repo}/contents/content/creations?ref=submissions&t=${Date.now()}`,
@@ -26,7 +26,7 @@ exports.handler = async (event) => {
                     headers: {
                         Authorization: `token ${githubToken}`,
                         Accept: 'application/vnd.github.v3+json',
-                        'If-None-Match': '', // Force fetch to bypass caching
+                        'If-None-Match': '',
                     },
                 }
             );
@@ -44,7 +44,7 @@ exports.handler = async (event) => {
                     headers: {
                         Authorization: `token ${githubToken}`,
                         Accept: 'application/vnd.github.v3+json',
-                        'If-None-Match': '', // Force fetch to bypass caching
+                        'If-None-Match': '',
                     },
                 }
             );
@@ -55,19 +55,18 @@ exports.handler = async (event) => {
         }
 
         // Process submissions from both branches
-        const allFiles = [...submissionsFiles, ...mainFiles];
         const submissions = await Promise.all(
-            allFiles.map(async (file) => {
+            [...submissionsFiles, ...mainFiles].map(async (file) => {
                 if (file.type === 'file' && file.name.endsWith('.md') && file.name !== '.gitkeep') {
                     try {
-                        // Fetch file content directly via GitHub API to avoid CDN caching
+                        const branch = mainFiles.includes(file) ? 'main' : 'submissions';
                         const fileResponse = await axios.get(
-                            `https://api.github.com/repos/${repo}/contents/${file.path}?ref=${file.path.includes('ref=main') ? 'main' : 'submissions'}&t=${Date.now()}`,
+                            `https://api.github.com/repos/${repo}/contents/${file.path}?ref=${branch}&t=${Date.now()}`,
                             {
                                 headers: {
                                     Authorization: `token ${githubToken}`,
                                     Accept: 'application/vnd.github.v3+json',
-                                    'If-None-Match': '', // Force fetch
+                                    'If-None-Match': '',
                                 },
                             }
                         );
@@ -79,7 +78,7 @@ exports.handler = async (event) => {
                             text: data.text || '',
                             image: data.image || '',
                             creator: data.creator || '',
-                            status: data.status || (file.path.includes('ref=main') ? 'published' : 'pending'),
+                            status: data.status || (branch === 'main' ? 'published' : 'pending'),
                         };
                     } catch (error) {
                         console.log('Error processing file', { path: file.path, error: error.message });

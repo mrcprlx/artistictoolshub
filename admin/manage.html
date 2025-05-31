@@ -71,12 +71,12 @@
             background: #0056b3;
         }
 
-        button.reject,
+        button.delete,
         button.remove {
             background: #dc3545;
         }
 
-        button.reject:hover,
+        button.delete:hover,
         button.remove:hover {
             background: #c82333;
         }
@@ -88,14 +88,6 @@
         img {
             max-width: 200px;
             height: auto;
-        }
-
-        .bulk-actions {
-            margin-bottom: 20px;
-        }
-
-        input[type="checkbox"] {
-            margin-right: 5px;
         }
 
         @media (max-width: 600px) {
@@ -128,17 +120,10 @@
         <h1>Manage Submissions</h1>
         <div class="tabs">
             <div class="tab active" data-tab="review">Review</div>
-            <div class="tab" data-tab="rejected">Rejected</div>
             <div class="tab" data-tab="published">Published</div>
         </div>
         <div id="review" class="tab-content active">
             <div id="review-submissions"></div>
-        </div>
-        <div id="rejected" class="tab-content">
-            <div class="bulk-actions">
-                <button id="bulk-delete" style="background: #dc3545;">Bulk Delete Selected</button>
-            </div>
-            <div id="rejected-submissions"></div>
         </div>
         <div id="published" class="tab-content">
             <div id="published-submissions"></div>
@@ -187,7 +172,6 @@
 
         function renderSubmissions() {
             const reviewEl = document.getElementById('review-submissions');
-            const rejectedEl = document.getElementById('rejected-submissions');
             const publishedEl = document.getElementById('published-submissions');
 
             console.log('Rendering submissions:', submissions);
@@ -202,21 +186,7 @@
                     ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy" onerror="this.style.display='none';">` : ''}
                     <p>Creator: ${sub.creator || 'Anonymous'}</p>
                     <button onclick="publishSubmission('${sub.id}')">Publish</button>
-                    <button class="reject" onclick="rejectSubmission('${sub.id}')">Reject</button>
-                </div>
-            `).join('');
-
-            // Rejected Tab (status: rejected)
-            const rejectedSubs = submissions.filter(sub => sub.status === 'rejected');
-            console.log('Rejected submissions:', rejectedSubs);
-            rejectedEl.innerHTML = rejectedSubs.map(sub => `
-                <div class="submission" data-id="${sub.id}">
-                    <input type="checkbox" class="delete-checkbox" data-id="${sub.id}">
-                    <h3>${sub.title}</h3>
-                    <p>${sub.text}</p>
-                    ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy" onerror="this.style.display='none';">` : ''}
-                    <p>Creator: ${sub.creator || 'Anonymous'}</p>
-                    <button class="reject" onclick="deleteSubmission('${sub.id}')">Delete</button>
+                    <button class="delete" onclick="deleteSubmission('${sub.id}')">Delete</button>
                 </div>
             `).join('');
 
@@ -254,39 +224,10 @@
                     throw new Error(result.message || 'Failed to publish submission');
                 }
                 messageEl.textContent = result.message;
-                // Add delay to ensure GitHub update propagates
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 await loadSubmissions();
             } catch (error) {
                 messageEl.textContent = `Error publishing submission: ${error.message}`;
-            }
-        }
-
-        async function rejectSubmission(submissionId) {
-            const user = netlifyIdentity.currentUser();
-            if (!user) return;
-
-            const token = await user.jwt();
-            const messageEl = document.getElementById('message');
-            messageEl.style.display = 'block';
-            messageEl.textContent = 'Rejecting submission...';
-
-            try {
-                const response = await fetch('/.netlify/functions/reject-submission', {
-                    method: 'POST',
-                    headers: { 'X-Netlify-Identity-User': token },
-                    body: JSON.stringify({ submissionId }),
-                });
-                const result = await response.json();
-                if (!response.ok) {
-                    throw new Error(result.message || 'Failed to reject submission');
-                }
-                messageEl.textContent = result.message;
-                // Add delay to ensure GitHub update propagates
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                await loadSubmissions();
-            } catch (error) {
-                messageEl.textContent = `Error rejecting submission: ${error.message}`;
             }
         }
 
@@ -348,41 +289,6 @@
             }
         }
 
-        async function bulkDeleteSubmissions() {
-            const checkboxes = document.querySelectorAll('.delete-checkbox:checked');
-            if (checkboxes.length === 0) {
-                alert('Please select at least one submission to delete.');
-                return;
-            }
-            if (!confirm(`Are you sure you want to permanently delete ${checkboxes.length} submission(s)?`)) return;
-
-            const user = netlifyIdentity.currentUser();
-            if (!user) return;
-
-            const token = await user.jwt();
-            const messageEl = document.getElementById('message');
-            messageEl.style.display = 'block';
-            messageEl.textContent = 'Deleting submissions...';
-
-            try {
-                const submissionIds = Array.from(checkboxes).map(cb => cb.dataset.id);
-                const response = await fetch('/.netlify/functions/delete-submission', {
-                    method: 'POST',
-                    headers: { 'X-Netlify-Identity-User': token },
-                    body: JSON.stringify({ submissionIds }),
-                });
-                const result = await response.json();
-                if (!response.ok) {
-                    throw new Error(result.message || 'Failed to delete submissions');
-                }
-                messageEl.textContent = result.message;
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                await loadSubmissions();
-            } catch (error) {
-                messageEl.textContent = `Error deleting submissions: ${error.message}`;
-            }
-        }
-
         // Tab navigation
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
@@ -392,9 +298,6 @@
                 document.getElementById(tab.dataset.tab).classList.add('active');
             });
         });
-
-        // Bulk delete button
-        document.getElementById('bulk-delete').addEventListener('click', bulkDeleteSubmissions);
     </script>
 </body>
 
