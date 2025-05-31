@@ -2,7 +2,7 @@
 let creations = [];
 let currentPage = 1;
 let itemsPerPage = 10;
-const creationsGrid = document.getElementById('creations-content');
+const creationsGrid = document.getElementById('creations-grid');
 const prevPageBtn = document.getElementById('prev-page');
 const nextPageBtn = document.getElementById('next-page');
 const itemsPerPageSelect = document.getElementById('items-per-page');
@@ -115,9 +115,14 @@ async function fetchCreations() {
 
 // Render creations
 function renderCreations() {
+    if (!creationsGrid) {
+        console.error('creationsGrid element not found'); // Debug
+        return;
+    }
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
     const creationsToShow = creations.slice(start, end);
+    console.log('Rendering creations:', creationsToShow); // Debug
 
     creationsGrid.innerHTML = '';
     creationsToShow.forEach((creation) => {
@@ -139,7 +144,7 @@ function renderCreations() {
                         return `<a href="${line}" class="author-link" target="_blank" rel="noopener noreferrer">${line}</a>`;
                     }
                     // Escape HTML characters in non-URL text
-                    return line.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+                    return line.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"').replace(/'/g, ''');
                 })
                 .join('<br>');
             console.log('Processed creator content:', creatorContent); // Debug
