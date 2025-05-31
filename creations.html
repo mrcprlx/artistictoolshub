@@ -43,20 +43,19 @@
         <section class="submission-form" id="submission-form" style="display: none;">
             <div class="form-container">
                 <h2>Submit Your Creation</h2>
-                <p>Guidelines: Max 100 characters for title, 500 words for text, 2MB PNG/JPG images, no explicit
-                    content. Social links may be reviewed for
-                    appropriateness. Latest 50 creations displayed; older ones archived but accessible via direct links
-                    for 2 years.</p>
+                <p>Guidelines: Max 100 characters for title, 5000 characters for text, 2MB PNG/JPG images, no explicit
+                    content. Social links may be reviewed for appropriateness. Latest 50 creations displayed; older ones
+                    archived but accessible via direct links for 2 years.</p>
                 <form id="creation-form" method="POST" enctype="multipart/form-data">
                     <label for="creation-title">Title (max 100 characters)</label>
                     <input type="text" id="creation-title" name="title" maxlength="100" required>
-                    <label for="creation-text">Your Creation (max 500 words)</label>
+                    <label for="creation-text">Your Creation (max 5000 characters)</label>
                     <textarea id="creation-text" name="text" maxlength="5000" required></textarea>
                     <label for="creation-image">Add Image (optional, 2MB max, PNG/JPG)</label>
                     <input type="file" id="creation-image" name="image" accept="image/png,image/jpeg">
-                    <label for="creation-author">Name or Social Link (optional)</label>
-                    <input type="text" id="creation-author" name="author"
-                        placeholder="Enter name or social links, optional">
+                    <label for="creation-author">Name or Social Links (optional, one per line)</label>
+                    <textarea id="creation-author" name="author"
+                        placeholder="Enter name or social links, one per line"></textarea>
                     <button type="submit" class="cta-button g-recaptcha"
                         data-sitekey="6LcutUArAAAAACGLWQEY0JpxX758DhjP6dx3Shld" data-callback="onSubmit">Submit for
                         Review</button>

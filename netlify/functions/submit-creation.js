@@ -23,12 +23,11 @@ exports.handler = async (event) => {
                 body: JSON.stringify({ message: 'Title exceeds 100 characters' }),
             };
         }
-        const wordCount = text.trim().split(/\s+/).length;
-        if (wordCount > 500) {
-            console.log('Text exceeds 500 words', { wordCount });
+        if (text.length > 5000) {
+            console.log('Text exceeds 5000 characters', { charCount: text.length });
             return {
                 statusCode: 400,
-                body: JSON.stringify({ message: 'Text exceeds 500 words' }),
+                body: JSON.stringify({ message: 'Text exceeds 5000 characters' }),
             };
         }
 
@@ -71,7 +70,6 @@ exports.handler = async (event) => {
                     body: JSON.stringify({ message: 'Invalid image data: must be a non-empty base64 string' }),
                 };
             }
-            // Validate base64 format and image type
             const base64Regex = /^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
             if (!base64Regex.test(image)) {
                 console.log('Invalid base64 string', { image });
@@ -83,7 +81,7 @@ exports.handler = async (event) => {
             try {
                 console.log('Uploading image to Cloudinary');
                 const formData = new FormData();
-                const mimeType = image.startsWith('/9j/') ? 'image/jpeg' : 'image/png'; // Detect JPEG or PNG
+                const mimeType = image.startsWith('/9j/') ? 'image/jpeg' : 'image/png';
                 formData.append('file', `data:${mimeType};base64,${image}`);
                 formData.append('upload_preset', 'artistictoolshub');
                 const controllerCloudinary = new AbortController();
@@ -117,13 +115,15 @@ exports.handler = async (event) => {
 
         // Create markdown content with proper YAML formatting
         const submissionId = uuidv4();
-        const textLines = text.split('\n').map(line => `  ${line.trim()}`).join('\n');
+        const textLines = text.split('\n').map(line => `  ${line}`).join('\n'); // Preserve line breaks
+        const authorLines = author ? author.split('\n').map(line => `  ${line}`).join('\n') : '';
         const content = `---
 title: "${title.replace(/"/g, '\\"')}"
 text: |
 ${textLines}
 image: "${imageUrl}"
-creator: "${author || ''}"
+creator: |
+${authorLines}
 status: "pending"
 ---
 `;
@@ -168,7 +168,7 @@ status: "pending"
             }
         }
 
-        // Ensure content/creations directory exists by creating a .gitkeep file if needed
+        // Ensure content/creations directory exists
         try {
             await axios.get(`https://api.github.com/repos/${repo}/contents/content/creations/.gitkeep?ref=${branch}`, {
                 headers: {
@@ -199,7 +199,7 @@ status: "pending"
             }
         }
 
-        // Create file in GitHub repo (submissions branch)
+        // Create file in GitHub repo
         const path = `content/creations/submission-${submissionId}.md`;
         try {
             const controllerGitHub = new AbortController();

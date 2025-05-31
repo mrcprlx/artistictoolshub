@@ -287,10 +287,12 @@ footer {
 }
 
 .form-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 1.5rem;
     background-color: var(--bg-color);
     border: 1px solid var(--nav-bg);
     border-radius: 8px;
-    padding: 1.5rem;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
@@ -331,6 +333,7 @@ footer {
 .submission-form textarea {
     resize: vertical;
     min-height: 150px;
+    font-family: 'Lora', serif;
 }
 
 .submission-form button {
@@ -371,6 +374,8 @@ footer {
     border-radius: 8px;
     padding: 1.5rem;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .creation-card h3 {
@@ -380,21 +385,21 @@ footer {
     margin: 0 0 0.5rem;
 }
 
-.creation-card p {
+.creation-text {
+    white-space: pre-wrap;
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    margin: 0.5rem 0;
     color: #2c2c2c;
-    margin: 0 0 1rem;
-    display: -webkit-box;
-    line-clamp: 3;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
 }
 
-.creation-card img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 5px;
-    margin-bottom: 1rem;
+.creator-info {
+    white-space: pre-wrap;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.9rem;
+    color: #555;
+    margin: 0.5rem 0;
 }
 
 .creation-card a.author-link {
@@ -405,6 +410,13 @@ footer {
 
 .creation-card a.author-link:hover {
     color: var(--secondary-color);
+}
+
+.creation-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 1rem;
 }
 
 .share-container {
@@ -505,6 +517,10 @@ footer {
         padding: 0 1rem;
     }
 
+    .form-container {
+        padding: 1rem;
+    }
+
     .creations-grid {
         grid-template-columns: 1fr;
     }
@@ -529,5 +545,22 @@ footer {
         max-width: 300px;
         font-size: 0.9rem;
         padding: 0.5rem 1rem;
+    }
+
+    .creation-text,
+    .creator-info {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .creation-card {
+        padding: 1rem;
+        margin: 0.5rem;
+    }
+
+    .creation-text,
+    .creator-info {
+        font-size: 0.95rem;
     }
 }

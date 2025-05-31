@@ -33,10 +33,9 @@ async function submitForm(recaptchaResponse) {
         return;
     }
 
-    // Validate text (500 words)
-    const wordCount = text.trim().split(/\s+/).length;
-    if (wordCount > 500) {
-        alert('Text exceeds 500 words.');
+    // Validate text (5000 characters)
+    if (text.length > 5000) {
+        alert('Text exceeds 5000 characters.');
         grecaptcha.reset();
         return;
     }
@@ -58,7 +57,6 @@ async function submitForm(recaptchaResponse) {
         imageBase64 = await new Promise((resolve) => {
             const reader = new FileReader();
             reader.onload = () => {
-                // Remove Data URL prefix (e.g., "data:image/png;base64,")
                 const base64String = reader.result.split(',')[1];
                 resolve(base64String);
             };
@@ -124,11 +122,27 @@ function renderCreations() {
     creationsToShow.forEach((creation) => {
         const card = document.createElement('div');
         card.className = 'creation-card';
+
+        // Parse creator field for multiple URLs
+        let creatorContent = creation.creator || '';
+        if (creatorContent) {
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            creatorContent = creatorContent
+                .split('\n')
+                .map(line => {
+                    if (urlRegex.test(line)) {
+                        return `<a href="${line}" class="author-link" target="_blank">${line}</a>`;
+                    }
+                    return line;
+                })
+                .join('<br>');
+        }
+
         card.innerHTML = `
       <h3>${creation.title || 'Untitled'}</h3>
-      <p>${creation.text}</p>
+      <p class="creation-text">${creation.text}</p>
       ${creation.image ? `<img src="${creation.image}" alt="Creation image">` : ''}
-      ${creation.creator ? `<a href="${creation.creator.startsWith('http') ? creation.creator : '#'}" class="author-link">${creation.creator}</a>` : ''}
+      ${creatorContent ? `<div class="creator-info">${creatorContent}</div>` : ''}
       <div class="share-container">
         <button class="share-button">Share</button>
         <div class="share-submenu">
