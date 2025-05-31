@@ -7,6 +7,18 @@ const prevPageBtn = document.getElementById('prev-page');
 const nextPageBtn = document.getElementById('next-page');
 const itemsPerPageSelect = document.getElementById('items-per-page');
 
+// HTML escape function for non-URL text
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, char => map[char]);
+}
+
 // Show/hide submission form
 document.getElementById('submit-creation').addEventListener('click', (e) => {
     e.preventDefault();
@@ -143,24 +155,23 @@ function renderCreations() {
                     if (urlRegex.test(line)) {
                         return `<a href="${line}" class="author-link" target="_blank" rel="noopener noreferrer">${line}</a>`;
                     }
-                    // Escape HTML characters in non-URL text
-                    return line.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"').replace(/'/g, ''');
+                    return escapeHtml(line);
                 })
                 .join('<br>');
             console.log('Processed creator content:', creatorContent); // Debug
         }
 
         card.innerHTML = `
-      <h3>${creation.title || 'Untitled'}</h3>
-      <p class="creation-text">${creation.text}</p>
-      ${creation.image ? `<img src="${creation.image}" alt="Creation image">` : ''}
-      ${creatorContent ? `
-        <div class="creator-info">
-          <div class="creator-label">Social Links:</div>
-          <div class="creator-links">${creatorContent}</div>
-        </div>
-      ` : ''}
-    `;
+            <h3>${creation.title || 'Untitled'}</h3>
+            <p class="creation-text">${creation.text}</p>
+            ${creation.image ? `<img src="${creation.image}" alt="Creation image" />` : ''}
+            ${creatorContent ? `
+                <div class="creator-info">
+                    <div class="creator-label">Social Links:</div>
+                    <div class="creator-links">${creatorContent}</div>
+                </div>
+            ` : ''}
+        `;
         creationsGrid.appendChild(card);
     });
 
