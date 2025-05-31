@@ -126,9 +126,11 @@ function renderCreations() {
         // Parse creator field for multiple URLs
         let creatorContent = creation.creator || '';
         if (creatorContent) {
-            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            const urlRegex = /^(https?:\/\/[^\s]+)$/;
             creatorContent = creatorContent
                 .split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0)
                 .map(line => {
                     if (urlRegex.test(line)) {
                         return `<a href="${line}" class="author-link" target="_blank">${line}</a>`;
