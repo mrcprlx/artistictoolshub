@@ -8,9 +8,10 @@ text: |
   From words to tunes, we’ve got the groove,
   
   Visit now—your muse will approve!
+  
 image: ""
-creator: |
-  https://artistictoolshub.com/
-  https://x.com/Arttoolshub
-status: "pending"
+creator: "https://artistictoolshub.com/
+https://x.com/Arttoolshub
+"
+status: "published"
 ---
