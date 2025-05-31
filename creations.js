@@ -104,6 +104,7 @@ async function fetchCreations() {
         const response = await fetch('/.netlify/functions/get-creations');
         if (!response.ok) throw new Error('Failed to fetch creations');
         creations = await response.json();
+        console.log('Fetched creations:', creations); // Debug
         renderCreations();
     } catch (error) {
         console.error('Error fetching creations:', error);
@@ -125,7 +126,7 @@ function renderCreations() {
 
         // Parse creator field for multiple URLs
         let creatorContent = creation.creator || '';
-        console.log('Raw creator content:', creatorContent); // Debug raw input
+        console.log('Raw creator content:', creatorContent); // Debug
         if (creatorContent) {
             const urlRegex = /^https?:\/\/[^\s/$.?#].[^\s]*$/i;
             creatorContent = creatorContent
@@ -137,10 +138,10 @@ function renderCreations() {
                     if (urlRegex.test(line)) {
                         return `<a href="${line}" class="author-link" target="_blank" rel="noopener noreferrer">${line}</a>`;
                     }
-                    return line.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    return line.replace(/</g, '&lt;').replace(/>/g, '&gt;'); // Escape HTML
                 })
                 .join('<br>');
-            console.log('Processed creator content:', creatorContent); // Debug output
+            console.log('Processed creator content:', creatorContent); // Debug
         }
 
         card.innerHTML = `
