@@ -9,10 +9,20 @@
         rel="stylesheet">
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <style>
+        :root {
+            --bg-color: #fffaf5;
+            --text-color: #1a1a1a;
+            --primary-color: #2a9d8f;
+            --secondary-color: #d9786a;
+            --nav-bg: #a8b5a2;
+        }
+
         body {
             font-family: 'Open Sans', sans-serif;
             margin: 0;
             padding: 20px;
+            color: var(--text-color);
+            background-color: var(--bg-color);
         }
 
         .container {
@@ -22,6 +32,9 @@
 
         h1 {
             font-family: 'Lora', serif;
+            font-size: 2rem;
+            color: #2c2c2c;
+            text-align: center;
         }
 
         .tabs {
@@ -33,19 +46,25 @@
             padding: 10px 20px;
             background: #f0f0f0;
             cursor: pointer;
-            border: 1px solid #ccc;
+            border: 1px solid var(--nav-bg);
             border-bottom: none;
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
         }
 
         .tab.active {
-            background: #fff;
+            background: var(--bg-color);
             font-weight: bold;
+            border-bottom: 1px solid var(--bg-color);
         }
 
         .tab-content {
             display: none;
-            border: 1px solid #ccc;
+            border: 1px solid var(--nav-bg);
             padding: 20px;
+            background: var(--bg-color);
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .tab-content.active {
@@ -53,22 +72,62 @@
         }
 
         .submission {
-            border: 1px solid #ccc;
-            padding: 10px;
+            border: 1px solid var(--nav-bg);
+            padding: 15px;
             margin: 10px 0;
+            border-radius: 8px;
+            background: var(--bg-color);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .submission h3 {
+            font-family: 'Lora', serif;
+            font-size: 1.5rem;
+            color: #2c2c2c;
+            margin: 0 0 0.5rem;
+        }
+
+        .submission-text {
+            white-space: pre-wrap;
+            font-family: 'Lora', serif;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin: 0.5rem 0;
+            color: #2c2c2c;
+        }
+
+        .creator-info {
+            white-space: pre-wrap;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 0.9rem;
+            color: #555;
+            margin: 0.5rem 0;
+        }
+
+        .creator-info a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .creator-info a:hover {
+            color: var(--secondary-color);
+            text-decoration: underline;
         }
 
         button {
             padding: 5px 10px;
-            background: #007bff;
+            background: var(--primary-color);
             color: white;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
             margin-right: 5px;
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
         }
 
         button:hover {
-            background: #0056b3;
+            background: var(--secondary-color);
         }
 
         button.delete,
@@ -83,14 +142,22 @@
 
         #message {
             margin-top: 20px;
+            color: #2c2c2c;
+            font-family: 'Open Sans', sans-serif;
         }
 
         img {
             max-width: 200px;
             height: auto;
+            border-radius: 5px;
+            margin-bottom: 1rem;
         }
 
         @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
             .container {
                 padding: 10px;
             }
@@ -100,12 +167,24 @@
             }
 
             .tab {
-                border-bottom: 1px solid #ccc;
+                border-bottom: 1px solid var(--nav-bg);
+                text-align: center;
+            }
+
+            .submission {
+                padding: 10px;
+                margin: 5px 0;
+            }
+
+            .submission-text,
+            .creator-info {
+                font-size: 0.95rem;
             }
 
             button {
                 width: 100%;
                 margin: 5px 0;
+                padding: 8px;
             }
 
             img {
@@ -179,29 +258,59 @@
             // Review Tab (status: pending)
             const reviewSubs = submissions.filter(sub => sub.status === 'pending');
             console.log('Review submissions:', reviewSubs);
-            reviewEl.innerHTML = reviewSubs.map(sub => `
-                <div class="submission" data-id="${sub.id}">
-                    <h3>${sub.title}</h3>
-                    <p>${sub.text}</p>
-                    ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy" onerror="this.style.display='none';">` : ''}
-                    <p>Creator: ${sub.creator || 'Anonymous'}</p>
-                    <button onclick="publishSubmission('${sub.id}')">Publish</button>
-                    <button class="delete" onclick="deleteSubmission('${sub.id}')">Delete</button>
-                </div>
-            `).join('');
+            reviewEl.innerHTML = reviewSubs.map(sub => {
+                let creatorContent = sub.creator || 'Anonymous';
+                if (creatorContent !== 'Anonymous') {
+                    const urlRegex = /(https?:\/\/[^\s]+)/g;
+                    creatorContent = creatorContent
+                        .split('\n')
+                        .map(line => {
+                            if (urlRegex.test(line)) {
+                                return `<a href="${line}" target="_blank">${line}</a>`;
+                            }
+                            return line;
+                        })
+                        .join('<br>');
+                }
+                return `
+                    <div class="submission" data-id="${sub.id}">
+                        <h3>${sub.title}</h3>
+                        <p class="submission-text">${sub.text}</p>
+                        ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy" onerror="this.style.display='none';">` : ''}
+                        <div class="creator-info">Creator: ${creatorContent}</div>
+                        <button onclick="publishSubmission('${sub.id}')">Publish</button>
+                        <button class="delete" onclick="deleteSubmission('${sub.id}')">Delete</button>
+                    </div>
+                `;
+            }).join('');
 
             // Published Tab (status: published)
             const publishedSubs = submissions.filter(sub => sub.status === 'published');
             console.log('Published submissions:', publishedSubs);
-            publishedEl.innerHTML = publishedSubs.map(sub => `
-                <div class="submission" data-id="${sub.id}">
-                    <h3>${sub.title}</h3>
-                    <p>${sub.text}</p>
-                    ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy" onerror="this.style.display='none';">` : ''}
-                    <p>Creator: ${sub.creator || 'Anonymous'}</p>
-                    <button class="remove" onclick="removeSubmission('${sub.id}')">Remove</button>
-                </div>
-            `).join('');
+            publishedEl.innerHTML = publishedSubs.map(sub => {
+                let creatorContent = sub.creator || 'Anonymous';
+                if (creatorContent !== 'Anonymous') {
+                    const urlRegex = /(https?:\/\/[^\s]+)/g;
+                    creatorContent = creatorContent
+                        .split('\n')
+                        .map(line => {
+                            if (urlRegex.test(line)) {
+                                return `<a href="${line}" target="_blank">${line}</a>`;
+                            }
+                            return line;
+                        })
+                        .join('<br>');
+                }
+                return `
+                    <div class="submission" data-id="${sub.id}">
+                        <h3>${sub.title}</h3>
+                        <p class="submission-text">${sub.text}</p>
+                        ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy" onerror="this.style.display='none';">` : ''}
+                        <div class="creator-info">Creator: ${creatorContent}</div>
+                        <button class="remove" onclick="removeSubmission('${sub.id}')">Remove</button>
+                    </div>
+                `;
+            }).join('');
         }
 
         async function publishSubmission(submissionId) {
