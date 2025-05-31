@@ -24,7 +24,15 @@ document.getElementById('submit-creation').addEventListener('click', (e) => {
     e.preventDefault();
     const formSection = document.getElementById('submission-form');
     formSection.style.display = formSection.style.display === 'block' ? 'none' : 'block';
-    formSection.scrollIntoView({ behavior: 'smooth' });
+    if (formSection.style.display === 'block') {
+        const header = document.querySelector('header');
+        const headerHeight = header ? header.offsetHeight : 0;
+        const formTop = formSection.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({
+            top: formTop - headerHeight,
+            behavior: 'smooth'
+        });
+    }
 });
 
 // Form submission with reCAPTCHA
