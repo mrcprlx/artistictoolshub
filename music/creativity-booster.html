@@ -1,11 +1,11 @@
 <script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
+    var gk_isXlsx = false;
+    var gk_xlsxFileLookup = {};
+    var gk_fileData = {};
+    function filledCell(cell) {
+        return cell !== '' && cell != null;
+    }
+    function loadFileData(filename) {
         if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
             try {
                 var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
@@ -19,11 +19,11 @@
 
                 // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
                 var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                    row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
                 );
                 // Fallback
                 if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
+                    headerRowIndex = 0;
                 }
 
                 // Convert filtered JSON back to CSV
@@ -36,19 +36,25 @@
             }
         }
         return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+    }
+</script>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Creativity Booster - Overcome creative blocks with music prompts at Artistic Tools Hub.">
+    <meta name="description"
+        content="Creativity Booster - Overcome creative blocks with music prompts at Artistic Tools Hub.">
     <meta name="keywords" content="creativity booster, music inspiration tool, songwriting">
     <title>Creativity Booster - Artistic Tools Hub</title>
     <link rel="stylesheet" href="../styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7078691985192067" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600&display=swap"
+        rel="stylesheet">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7078691985192067"
+        crossorigin="anonymous"></script>
 </head>
+
 <body>
     <header>
         <nav>
@@ -57,8 +63,9 @@
             <label for="nav-toggle" class="nav-toggle-label">☰</label>
             <ul>
                 <li><a href="../index.html">Home</a></li>
-                <li><a href="../poetry/index.html">Poetry Tools</a></li>
-                <li><a href="index.html">Music Tools</a></li>
+                <li><a href="../creations.html">Creations</a></li>
+                <li><a href="../poetry/index.html">Poetry</a></li>
+                <li><a href="index.html">Music</a></li>
                 <li><a href="../visual-arts/index.html">Visual Arts</a></li>
                 <li><a href="../literature/index.html">Literature</a></li>
                 <li><a href="../about.html">About</a></li>
@@ -80,12 +87,8 @@
     </main>
     <footer>
         <p>© 2025 Artistic Tools Hub. All rights reserved.</p>
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-7078691985192067"
-             data-ad-slot="1234567890"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7078691985192067"
+            data-ad-slot="1234567890" data-ad-format="auto" data-full-width-responsive="true"></ins>
         <script>
             (adsbygoogle = window.adsbygoogle || []).push({});
         </script>
@@ -93,4 +96,5 @@
     <script src="../scripts.js"></script>
     <script src="creativity-booster.js"></script>
 </body>
+
 </html>
