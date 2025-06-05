@@ -15,8 +15,9 @@ text: |
   The solstice calls, the summer comes.
   In radiant days, we’ll bask and play,
   The sun’s embrace will light our way.
+  
 image: "https://res.cloudinary.com/drxmkv1si/image/upload/v1749125053/wbp72upbvgtxnarvojmq.jpg"
 creator: |
-
-status: "pending"
+  
+status: "published"
 ---
