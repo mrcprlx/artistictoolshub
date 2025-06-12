@@ -10,77 +10,110 @@ exports.handler = async (event) => {
     }
 
     try {
+        console.log('Starting publish-submission function');
         const { submissionId } = JSON.parse(event.body);
         if (!submissionId) {
+            console.log('Missing submissionId');
             return {
                 statusCode: 400,
                 body: JSON.stringify({ message: 'Missing submissionId' }),
             };
         }
 
-        console.log('Publishing submission', { submissionId });
         const githubToken = process.env.GITHUB_TOKEN;
         const repo = 'mrcprlx/artistictoolshub';
-        const path = `content/creations/${submissionId}.md`;
         const branch = 'submissions';
+        const path = `content/creations/${submissionId}.md`;
 
-        // Fetch submission from submissions branch
-        const fileResponse = await axios.get(
-            `https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`,
-            {
-                headers: {
-                    Authorization: `token ${githubToken}`,
-                    Accept: 'application/vnd.github.v3+json',
-                },
-            }
-        );
-        const file = fileResponse.data;
-        const fileContent = Buffer.from(file.content, 'base64').toString('utf-8');
-        let data, markdownContent;
+        // Fetch existing file
+        let fileResponse;
         try {
-            const parsed = matter(fileContent);
-            data = parsed.data;
-            markdownContent = parsed.content;
-        } catch (parseError) {
-            console.log('Failed to parse frontmatter', { error: parseError.message });
+            fileResponse = await axios.get(
+                `https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}&t=${Date.now()}`,
+                {
+                    headers: {
+                        Authorization: `token ${githubToken}`,
+                        Accept: 'application/vnd.github.v3+json',
+                        'If-None-Match': '',
+                    },
+                }
+            );
+        } catch (error) {
+            console.log('Error fetching file', { path, error: error.message });
             return {
-                statusCode: 400,
-                body: JSON.stringify({ message: 'Invalid submission format: failed to parse frontmatter', details: parseError.message }),
+                statusCode: error.response?.status || 500,
+                body: JSON.stringify({ message: 'Failed to fetch submission', details: error.message }),
             };
         }
 
-        // Update status to published
-        data.status = 'published';
-        const textLines = (data.text || '').split('\n').map(line => `  ${line.trim()}`).join('\n');
-        const creatorLines = (data.creator || '').split('\n').map(line => `  ${line.trim()}`).join('\n');
-        const updatedContent = `---
-title: "${(data.title || 'Untitled').replace(/"/g, '\\"')}"
+        const fileContent = Buffer.from(fileResponse.data.content, 'base64').toString('utf-8');
+        const { data, content } = matter(fileContent);
+        console.log('Existing frontmatter:', data);
+
+        if (data.status === 'published') {
+            console.log('Submission already published', { submissionId });
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: 'Submission already published' }),
+            };
+        }
+
+        // Update frontmatter with status: published, preserve createdAt
+        const updatedData = {
+            ...data,
+            status: 'published',
+            createdAt: data.createdAt || new Date().toISOString().replace(/\.\d{3}Z$/, 'Z') // Fallback if missing
+        };
+
+        // Reconstruct markdown
+        const textLines = updatedData.text ? updatedData.text.split('\n').map(line => `  ${line}`).join('\n') : '';
+        const creatorLines = updatedData.creator ? updatedData.creator.split('\n').map(line => `  ${line}`).join('\n') : '';
+        const newContent = `---
+title: "${updatedData.title ? updatedData.title.replace(/"/g, '\\"') : 'Untitled'}"
 text: |
 ${textLines}
-image: "${data.image || ''}"
+image: "${updatedData.image || ''}"
 creator: |
 ${creatorLines}
-status: "published"
+status: "${updatedData.status}"
+createdAt: "${updatedData.createdAt}"
 ---
-${markdownContent}`;
-        const base64Content = Buffer.from(updatedContent).toString('base64');
+`;
+        const base64Content = Buffer.from(newContent).toString('base64');
 
-        // Update file in submissions branch
-        await axios.put(
-            `https://api.github.com/repos/${repo}/contents/${path}`,
-            {
-                message: `Publish submission: ${data.title || submissionId}`,
-                content: base64Content,
-                branch: 'submissions',
-                sha: file.sha
-            },
-            {
-                headers: {
-                    Authorization: `token ${githubToken}`,
-                    Accept: 'application/vnd.github.v3+json',
+        // Update file in GitHub
+        try {
+            const controllerGitHub = new AbortController();
+            const timeoutGitHub = setTimeout(() => controllerGitHub.abort(), 8000);
+            await axios.put(
+                `https://api.github.com/repos/${repo}/contents/${path}`,
+                {
+                    message: `Publish submission: ${updatedData.title || 'Untitled'}`,
+                    content: base64Content,
+                    sha: fileResponse.data.sha,
+                    branch: 'submissions'
                 },
-            }
-        );
+                {
+                    headers: {
+                        Authorization: `token ${githubToken}`,
+                        Accept: 'application/vnd.github.v3+json',
+                    },
+                    signal: controllerGitHub.signal,
+                }
+            );
+            clearTimeout(timeoutGitHub);
+            console.log('Submission published', { path });
+        } catch (error) {
+            console.log('GitHub API error', { message: error.message, response: error.response?.data });
+            return {
+                statusCode: 500,
+                body: JSON.stringify({
+                    message: 'Failed to publish submission',
+                    details: error.message,
+                    response: error.response?.data
+                }),
+            };
+        }
 
         return {
             statusCode: 200,
