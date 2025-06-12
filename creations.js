@@ -139,6 +139,12 @@ function renderCreations() {
         console.error('creationsGrid element not found'); // Debug
         return;
     }
+    // Sort creations by createdAt in descending order (newest first)
+    creations.sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+        const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+        return dateB - dateA;
+    });
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
     const creationsToShow = creations.slice(start, end);

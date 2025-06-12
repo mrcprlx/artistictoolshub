@@ -117,6 +117,7 @@ exports.handler = async (event) => {
         const submissionId = uuidv4();
         const textLines = text.split('\n').map(line => `  ${line}`).join('\n');
         const authorLines = author ? author.split('\n').map(line => `  ${line}`).join('\n') : '';
+        const createdAt = new Date().toISOString();
         const content = `---
 title: "${title.replace(/"/g, '\\"')}"
 text: |
@@ -125,6 +126,7 @@ image: "${imageUrl}"
 creator: |
 ${authorLines}
 status: "pending"
+createdAt: "${createdAt}"
 ---
 `;
         const base64Content = Buffer.from(content).toString('base64');
