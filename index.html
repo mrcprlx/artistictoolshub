@@ -13,7 +13,7 @@
         rel="stylesheet">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7078691985192067"
         crossorigin="anonymous">
-        </script>
+    </script>
     <script>
         // Log and redirect invite token with delay for debugging
         const fullUrl = window.location.href;
@@ -38,7 +38,6 @@
 
         .cta-button {
             background-color: #D77A61;
-            /* Terracotta */
             color: white;
             padding: 10px 20px;
             text-decoration: none;
@@ -50,7 +49,6 @@
 
         .cta-button:hover {
             background-color: #A9BA9D;
-            /* Sage green */
         }
 
         @media (max-width: 600px) {
@@ -69,7 +67,6 @@
 </head>
 
 <body>
-
     <header>
         <nav>
             <div class="logo">Artistic Tools Hub</div>
@@ -107,6 +104,10 @@
                 you're crafting poems, composing music, painting masterpieces, or writing stories, our platform supports
                 your creative journey.</p>
         </section>
+        <section class="latest-creations">
+            <h2>Latest Creations</h2>
+            <div class="creations-grid" id="latest-creations-grid"></div>
+        </section>
     </main>
     <footer>
         <p>© 2025 Artistic Tools Hub. All rights reserved.</p>
@@ -117,6 +118,83 @@
         </script>
     </footer>
     <script src="scripts.js"></script>
+    <script>
+        // HTML escape function for non-URL text
+        function escapeHtml(text) {
+            const map = {
+                '&': '&',
+                '<': '<',
+                '>': '>',
+                '"': '"',
+                "'": '&'
+            };
+            return text.replace(/[&<>"']/g, char => map[char]);
+        }
+
+        // Fetch and render latest two creations
+        async function fetchLatestCreations() {
+            try {
+                const response = await fetch('/.netlify/functions/get-creations');
+                if (!response.ok) throw new Error('Failed to fetch creations');
+                let creations = await response.json();
+                console.log('Fetched creations for homepage:', creations);
+
+                // Sort by createdAt (newest first)
+                creations.sort((a, b) => {
+                    const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+                    const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+                    return dateB - dateA;
+                });
+
+                // Take top 2 creations
+                const latestCreations = creations.slice(0, 2);
+                console.log('Rendering latest creations:', latestCreations);
+
+                const grid = document.getElementById('latest-creations-grid');
+                grid.innerHTML = '';
+                latestCreations.forEach((creation) => {
+                    const card = document.createElement('div');
+                    card.className = 'creation-card';
+
+                    // Parse creator field for URLs
+                    let creatorContent = creation.creator || '';
+                    if (creatorContent) {
+                        const urlRegex = /^https?:\/\/[^\s]*$/i;
+                        creatorContent = creatorContent
+                            .split('\n')
+                            .map(line => line.trim())
+                            .filter(line => line.length > 0)
+                            .map(line => {
+                                if (urlRegex.test(line)) {
+                                    return `<a href="${line}" class="author-link" target="_blank" rel="noopener noreferrer">${line}</a>`;
+                                }
+                                return escapeHtml(line);
+                            })
+                            .join('<br>');
+                    }
+
+                    card.innerHTML = `
+                        <h3>${creation.title || 'Untitled'}</h3>
+                        <p class="creation-text">${creation.text}</p>
+                        ${creation.image ? `<img src="${creation.image}" alt="Image for ${creation.title}" loading="lazy" onerror="this.style.display='none';">` : ''}
+                        ${creatorContent ? `
+                            <div class="creator-info">
+                                <div class="creator-label">Social Links:</div>
+                                <div class="creator-links">${creatorContent}</div>
+                            </div>
+                        ` : ''}
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error fetching latest creations:', error);
+                document.getElementById('latest-creations-grid').innerHTML = '<p>Failed to load latest creations.</p>';
+            }
+        }
+
+        // Run on page load
+        document.addEventListener('DOMContentLoaded', fetchLatestCreations);
+    </script>
 </body>
 
 </html>
