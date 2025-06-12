@@ -20,4 +20,5 @@ image: "https://res.cloudinary.com/drxmkv1si/image/upload/v1749125053/wbp72upbvg
 creator: |
   
 status: "published"
+createdAt: "2025-06-03T12:00:00Z"
 ---
