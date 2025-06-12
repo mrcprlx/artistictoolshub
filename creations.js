@@ -125,15 +125,12 @@ async function fetchCreations() {
         if (!response.ok) throw new Error('Failed to fetch creations');
         creations = await response.json();
         console.log('Fetched creations:', creations);
-        // Log createdAt values
-        console.log('createdAt values:', creations.map(c => ({ id: c.id, createdAt: c.createdAt })));
         // Sort creations by createdAt in descending order (newest first)
         creations.sort((a, b) => {
             const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
             const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
             return dateB - dateA;
         });
-        console.log('Sorted creations:', creations.map(c => ({ id: c.id, createdAt: c.createdAt })));
         renderCreations();
     } catch (error) {
         console.error('Error fetching creations:', error);

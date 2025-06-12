@@ -105,7 +105,7 @@
         }
 
         .creator-label {
-            font-weight: 600;
+            font-weight: 'Open Sans', sans-serif;
             color: #2c2c2c;
             margin-bottom: 0.25rem;
         }
@@ -125,7 +125,7 @@
         }
 
         button {
-            padding: 5px 10px;
+            padding: 5px;
             background: var(--primary-color);
             color: white;
             border: none;
@@ -263,15 +263,12 @@
                 }
                 submissions = await response.json();
                 console.log('Fetched submissions:', submissions);
-                // Log createdAt values
-                console.log('createdAt values:', submissions.map(s => ({ id: s.id, createdAt: s.createdAt })));
                 // Sort submissions by createdAt in descending order (newest first)
                 submissions.sort((a, b) => {
                     const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
                     const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
                     return dateB - dateA;
                 });
-                console.log('Sorted submissions:', submissions.map(s => ({ id: s.id, createdAt: s.createdAt })));
                 renderSubmissions();
             } catch (error) {
                 messageEl.style.display = 'block';
@@ -310,7 +307,7 @@
                     <div class="submission" data-id="${sub.id}">
                         <h3>${sub.title}</h3>
                         <p class="submission-text">${sub.text}</p>
-                        ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy" onerror="this.style.display='none';">` : ''}
+                        ${sub.image ? `<img src="${sub.image}" alt="Image for ${sub.title}" loading="lazy" onerror="this.style.display='none';">` : ''}
                         <div class="creator-info">
                             <div class="creator-label">Creator:</div>
                             <div class="creator-links">${creatorContent}</div>
@@ -346,7 +343,7 @@
                     <div class="submission" data-id="${sub.id}">
                         <h3>${sub.title}</h3>
                         <p class="submission-text">${sub.text}</p>
-                        ${sub.image ? `<img src="${sub.image}" alt="${sub.title}" loading="lazy" onerror="this.style.display='none';">` : ''}
+                        ${sub.image ? `<img src="${sub.image}" alt="Image for ${sub.title}" loading="lazy" onerror="this.style.display='none';">` : ''}
                         <div class="creator-info">
                             <div class="creator-label">Creator:</div>
                             <div class="creator-links">${creatorContent}</div>

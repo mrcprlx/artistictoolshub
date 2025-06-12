@@ -57,6 +57,7 @@ exports.handler = async (event) => {
                             image: data.image || '',
                             creator: (data.creator || '').replace(/\\n/g, '\n').trim(),
                             status: data.status || 'pending',
+                            createdAt: data.createdAt || ''
                         };
                     } catch (error) {
                         console.log('Error processing file', { path: file.path, error: error.message });
