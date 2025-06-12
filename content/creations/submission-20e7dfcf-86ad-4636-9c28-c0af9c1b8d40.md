@@ -8,4 +8,5 @@ creator: |
   https://mariefranceproulx.com
   
 status: "published"
+createdAt: "2025-06-02T12:00:00Z"
 ---
