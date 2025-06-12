@@ -105,7 +105,7 @@
         }
 
         .creator-label {
-            font-weight: 'Open Sans', sans-serif;
+            font-weight: 600;
             color: #2c2c2c;
             margin-bottom: 0.25rem;
         }
@@ -125,7 +125,7 @@
         }
 
         button {
-            padding: 5px;
+            padding: 5px 10px;
             background: var(--primary-color);
             color: white;
             border: none;
@@ -263,6 +263,7 @@
                 }
                 submissions = await response.json();
                 console.log('Fetched submissions:', submissions);
+                console.log('createdAt values:', submissions.map(s => ({ id: s.id, createdAt: s.createdAt })));
                 // Sort submissions by createdAt in descending order (newest first)
                 submissions.sort((a, b) => {
                     const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);

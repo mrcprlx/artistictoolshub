@@ -117,7 +117,7 @@ exports.handler = async (event) => {
         const submissionId = uuidv4();
         const textLines = text.split('\n').map(line => `  ${line}`).join('\n');
         const authorLines = author ? author.split('\n').map(line => `  ${line}`).join('\n') : '';
-        const createdAt = new Date().toISOString();
+        const createdAt = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'); // Remove milliseconds
         const content = `---
 title: "${title.replace(/"/g, '\\"')}"
 text: |
