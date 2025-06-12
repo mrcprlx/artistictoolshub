@@ -263,6 +263,15 @@
                 }
                 submissions = await response.json();
                 console.log('Fetched submissions:', submissions);
+                // Log createdAt values
+                console.log('createdAt values:', submissions.map(s => ({ id: s.id, createdAt: s.createdAt })));
+                // Sort submissions by createdAt in descending order (newest first)
+                submissions.sort((a, b) => {
+                    const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+                    const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+                    return dateB - dateA;
+                });
+                console.log('Sorted submissions:', submissions.map(s => ({ id: s.id, createdAt: s.createdAt })));
                 renderSubmissions();
             } catch (error) {
                 messageEl.style.display = 'block';
@@ -275,13 +284,6 @@
             const publishedEl = document.getElementById('published-submissions');
 
             console.log('Rendering submissions:', submissions);
-
-            // Sort submissions by createdAt in descending order (newest first)
-            submissions.sort((a, b) => {
-                const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
-                const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
-                return dateB - dateA;
-            });
 
             // Review Tab (status: pending)
             const reviewSubs = submissions.filter(sub => sub.status === 'pending');
@@ -323,7 +325,7 @@
             const publishedSubs = submissions.filter(sub => sub.status === 'published');
             console.log('Published submissions:', publishedSubs);
             publishedEl.innerHTML = publishedSubs.map(sub => {
-                let creatorContent = sub.creator || '';
+                let creatorContent = sub.creator || 'Anonymous';
                 console.log('Raw creator content (published):', JSON.stringify(creatorContent));
                 if (creatorContent !== 'Anonymous') {
                     const urlRegex = /^https?:\/\/[^\s]*$/i;
@@ -333,7 +335,7 @@
                         .filter(line => line.length > 0)
                         .map(line => {
                             if (urlRegex.test(line)) {
-                                return `<a href="${line}" class="author-link" target="_blank" rel="noopener">${line}</a>`;
+                                return `<a href="${line}" class="author-link" target="_blank" rel="noopener noreferrer">${line}</a>`;
                             }
                             return escapeHtml(line);
                         })

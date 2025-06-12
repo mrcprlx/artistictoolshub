@@ -124,7 +124,16 @@ async function fetchCreations() {
         const response = await fetch('/.netlify/functions/get-creations');
         if (!response.ok) throw new Error('Failed to fetch creations');
         creations = await response.json();
-        console.log('Fetched creations:', creations); // Debug
+        console.log('Fetched creations:', creations);
+        // Log createdAt values
+        console.log('createdAt values:', creations.map(c => ({ id: c.id, createdAt: c.createdAt })));
+        // Sort creations by createdAt in descending order (newest first)
+        creations.sort((a, b) => {
+            const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+            const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+            return dateB - dateA;
+        });
+        console.log('Sorted creations:', creations.map(c => ({ id: c.id, createdAt: c.createdAt })));
         renderCreations();
     } catch (error) {
         console.error('Error fetching creations:', error);
@@ -136,19 +145,13 @@ async function fetchCreations() {
 // Render creations
 function renderCreations() {
     if (!creationsGrid) {
-        console.error('creationsGrid element not found'); // Debug
+        console.error('creationsGrid element not found');
         return;
     }
-    // Sort creations by createdAt in descending order (newest first)
-    creations.sort((a, b) => {
-        const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
-        const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
-        return dateB - dateA;
-    });
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
     const creationsToShow = creations.slice(start, end);
-    console.log('Rendering creations:', creationsToShow); // Debug
+    console.log('Rendering creations:', creationsToShow);
 
     creationsGrid.innerHTML = '';
     creationsToShow.forEach((creation) => {
@@ -157,7 +160,7 @@ function renderCreations() {
 
         // Parse creator field for multiple URLs
         let creatorContent = creation.creator || '';
-        console.log('Raw creator content:', JSON.stringify(creatorContent)); // Debug
+        console.log('Raw creator content:', JSON.stringify(creatorContent));
         if (creatorContent) {
             const urlRegex = /^https?:\/\/[^\s]*$/i;
             creatorContent = creatorContent
@@ -171,7 +174,7 @@ function renderCreations() {
                     return escapeHtml(line);
                 })
                 .join('<br>');
-            console.log('Processed creator content:', creatorContent); // Debug
+            console.log('Processed creator content:', creatorContent);
         }
 
         card.innerHTML = `
